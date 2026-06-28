@@ -3,36 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="EduReach is a South African inclusive education consultancy helping schools, teachers, families and communities support every learner." />
+  <meta name="description" content="EduReach is an inclusive education consultancy helping schools build practical, research-informed support systems so every learner can participate, belong and succeed." />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#052f76" />
+  <meta name="theme-color" content="#063b82" />
   <meta property="og:title" content="EduReach | Inclusive Education Consultancy" />
-  <meta property="og:description" content="Inclusive education support, teacher training, learner support services and school improvement programmes in South Africa." />
+  <meta property="og:description" content="Teacher training, school inclusion audits, learner support, research and community-centred education programmes." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/images/hero-inclusive-classroom.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <!-- TODO: Add the live website URL as a canonical link before publishing. -->
-  <title>EduReach | Inclusive Education Consultancy in South Africa</title>
+  <title>EduReach | Inclusive Education Consultancy</title>
   <link rel="icon" href="assets/logo-mark.png" type="image/png" />
   <link rel="preload" as="image" href="assets/images/hero-inclusive-classroom.png" />
   <link rel="stylesheet" href="styles.css" />
   <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "EducationalOrganization",
-      "name": "EduReach",
-      "description": "Inclusive education consultancy supporting schools, teachers, families and communities in South Africa.",
-      "areaServed": "South Africa"
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "EduReach Inclusive Education Consultancy",
+  "description": "Inclusive education consultancy supporting schools, educators, learners, families and communities.",
+  "email": "edureach70@gmail.com",
+  "telephone": "+27812181963",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "12A Chat Crescent",
+    "addressLocality": "Birdswood, Richards Bay",
+    "postalCode": "3900",
+    "addressCountry": "ZA"
+  },
+  "areaServed": "South Africa"
     }
   </script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  <!-- Reusable inline icons keep the website fast and framework-free. -->
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
     <symbol id="icon-arrow" viewBox="0 0 24 24">
       <path d="M5 12h14M13 6l6 6-6 6" />
+    </symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24">
+      <path d="M4 6h16v12H4V6Z" />
+      <path d="m4 8 8 6 8-6" />
     </symbol>
     <symbol id="icon-message" viewBox="0 0 24 24">
       <path d="M4 5h16v11H8l-4 4V5Z" />
@@ -54,31 +66,26 @@
       <path d="m5 12 4 4L19 6" />
       <path d="M21 12a9 9 0 1 1-5.3-8.2" />
     </symbol>
-    <symbol id="icon-briefcase" viewBox="0 0 24 24">
-      <path d="M9 6V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1" />
-      <path d="M4 7h16v13H4V7Z" />
-      <path d="M4 12h16" />
+    <symbol id="icon-file" viewBox="0 0 24 24">
+      <path d="M6 3h8l4 4v18H6V3Z" />
+      <path d="M14 3v5h4" />
+      <path d="M9 13h6M9 17h6" />
+    </symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24">
+      <path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H20v18H7.5A3.5 3.5 0 0 0 4 23V5.5Z" />
+      <path d="M4 6a3 3 0 0 0 3 3h13" />
     </symbol>
     <symbol id="icon-compass" viewBox="0 0 24 24">
       <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
       <path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" />
     </symbol>
-    <symbol id="icon-file" viewBox="0 0 24 24">
-      <path d="M6 3h8l4 4v14H6V3Z" />
-      <path d="M14 3v5h4" />
-      <path d="M9 13h6M9 17h6" />
-    </symbol>
   </svg>
 
-  <!-- ===========================
-  HEADER
-  TODO:
-  Update the WhatsApp number in site-config.js.
-  ============================ -->
   <header class="site-header" data-header>
     <div class="container header-inner">
       <a class="brand" href="#home" aria-label="EduReach home">
-        <img src="assets/logo.png" alt="EduReach" width="320" height="92" />
+        <!-- TODO: Replace with final organisation logo if the logo changes. -->
+        <img src="assets/logo.png" alt="EduReach Inclusive Education Consultancy" width="320" height="92" />
       </a>
 
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation menu">
@@ -89,475 +96,471 @@
 
       <nav class="primary-nav" id="primary-navigation" aria-label="Primary navigation">
         <a href="#home" aria-current="page">Home</a>
-        <a href="#about">About</a>
+        <a href="#story">Story</a>
+        <a href="#founder">Founder</a>
         <a href="#services">Services</a>
+        <a href="#vision">Vision</a>
+        <a href="#mission">Mission</a>
         <a href="#pilot">Pilot</a>
-        <a href="#how">How</a>
         <a href="#resources">Resources</a>
         <a href="#contact">Contact</a>
-        <a class="button button-whatsapp nav-whatsapp js-whatsapp" href="#contact">
-          <span class="button-icon" aria-hidden="true">WA</span>
-          WhatsApp
-        </a>
+        <a class="button button-small button-primary" href="#consultation">Book Consultation</a>
       </nav>
     </div>
   </header>
 
   <main id="main-content">
-    <!-- ===========================
-    HERO
-    TODO:
-    Replace this image with assets/images/hero.jpg when the final brand image is ready.
-    ============================ -->
     <section class="hero" id="home" aria-labelledby="hero-title">
-      <img class="hero-image" src="assets/images/hero-inclusive-classroom.png" alt="Inclusive classroom placeholder image for EduReach" width="1600" height="1000" />
+      <img class="hero-image" src="assets/images/hero-inclusive-classroom.png" alt="Teacher supporting diverse learners in a bright classroom" width="1600" height="1000" />
       <div class="hero-scrim" aria-hidden="true"></div>
       <div class="container hero-inner reveal">
-        <p class="eyebrow">Inclusive education consultancy | South Africa</p>
-        <h1 id="hero-title">Inclusive education support for schools that want every learner to belong.</h1>
-        <!-- TODO:
-        Replace this paragraph with EduReach's final introduction.
-        -->
-        <p class="hero-intro">EduReach partners with schools, teachers, families and communities to build practical support systems for diverse learning needs.</p>
+        <p class="eyebrow">Inclusive education consultancy</p>
+        <h1 id="hero-title">Every learner deserves the opportunity to succeed.</h1>
+        <p class="hero-intro">EduReach helps schools turn inclusive education from an aspiration into daily practice through training, support systems, research-informed guidance and community-centred care.</p>
         <div class="hero-actions" aria-label="Primary calls to action">
-          <a class="button button-primary js-whatsapp" href="#contact">
-            <span class="button-icon" aria-hidden="true">WA</span>
-            Chat on WhatsApp
-          </a>
-          <a class="button button-secondary" href="#services">
-            Explore services
+          <a class="button button-gold" href="#consultation">Book Consultation</a>
+          <a class="button button-glass" href="#services">
+            Explore Services
             <svg class="button-svg" aria-hidden="true"><use href="#icon-arrow"></use></svg>
           </a>
         </div>
-        <ul class="hero-points" aria-label="EduReach focus areas">
-          <li>Teacher training</li>
-          <li>Learner support</li>
-          <li>School inclusion systems</li>
-        </ul>
+      </div>
+      <a class="scroll-indicator" href="#story" aria-label="Scroll to Our Story">
+        <span></span>
+      </a>
+    </section>
+
+    <section class="story section" id="story" aria-labelledby="story-title">
+      <div class="container story-grid">
+        <div class="story-copy reveal">
+          <p class="eyebrow">Our Story</p>
+          <h2 id="story-title">EduReach exists for the learner who is present, but not yet fully included.</h2>
+          <div class="story-text">
+            <p>In every school there are children whose potential is visible, but whose path is blocked by barriers that are easy to miss: a classroom pace that leaves them behind, a learning need that has not been identified, a family unsure where to turn, or a school team carrying more needs than it has support for.</p>
+            <p>EduReach begins there, with the child, the teacher and the school community. The work is not about labelling learners. It is about understanding what stands in the way of participation and building practical support around dignity, belonging and progress.</p>
+            <p>Inclusive education becomes possible when schools are not left to carry the work alone. EduReach offers a partner who listens first, brings specialist knowledge, and helps turn hope into systems that can be used in real classrooms.</p>
+          </div>
+        </div>
+
+        <div class="story-media reveal">
+          <img src="assets/images/about-learning-support.png" alt="Learner receiving individual support during a school activity" width="1024" height="1536" loading="lazy" decoding="async" />
+          <div class="media-note glass-card">
+            <strong>Inclusion is built one learner, one classroom and one school relationship at a time.</strong>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- ===========================
-    IMPACT STATISTICS
-    TODO:
-    Replace these statistics with real values.
-    ============================ -->
-    <section class="stats section-compact" id="impact" aria-labelledby="impact-title">
-      <div class="container">
-        <div class="section-kicker">
-          <p class="eyebrow">Impact snapshot</p>
-          <h2 id="impact-title">Placeholder statistics ready for real outcomes.</h2>
-        </div>
-        <ul class="stats-grid">
-          <li class="stat-card reveal">
-            <strong>00+</strong>
-            <span>Schools Supported</span>
-          </li>
-          <li class="stat-card reveal">
-            <strong>000+</strong>
-            <span>Teachers Trained</span>
-          </li>
-          <li class="stat-card reveal">
-            <strong>000+</strong>
-            <span>Learners Supported</span>
-          </li>
-          <li class="stat-card reveal">
-            <strong>00+</strong>
-            <span>Workshops Conducted</span>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- ===========================
-    ABOUT EDUREACH
-    Leave this section as editable placeholders.
-    ============================ -->
-    <section class="about section" id="about" aria-labelledby="about-title">
-      <div class="container about-layout">
-        <div class="section-heading section-heading-left reveal">
-          <p class="eyebrow">About EduReach</p>
-          <h2 id="about-title">A warm, professional profile that can be edited in minutes.</h2>
-          <!-- TODO:
-          Replace this paragraph with EduReach's official about description.
-          -->
-          <p>EduReach is an Inclusive Education Consultancy based in South Africa. This placeholder paragraph can be replaced with the organisation's official mission, approach and story.</p>
+    <section class="founder section section-blue" id="founder" aria-labelledby="founder-title">
+      <div class="container founder-grid">
+        <div class="founder-photo reveal">
+          <img
+            class="founder-image"
+            src="assets/images/founder.jpg"
+            alt="Hlakaniphani Buthelezi, founder and Managing Director of EduReach"
+            width="900"
+            height="1100"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
-        <article class="founder-panel reveal" aria-labelledby="founder-title">
-          <!-- ===========================
-          FOUNDER INFORMATION
-          Replace everything below with your own information.
-          ============================ -->
-          <div class="founder-photo-placeholder" role="img" aria-label="Founder photo placeholder">
-            <!-- TODO:
-            Replace this placeholder with an image such as assets/images/founder.jpg.
-            -->
-            <span>[Founder Photo Here]</span>
-            <small>assets/images/founder.jpg</small>
-          </div>
+        <article class="founder-content reveal">
+          <p class="eyebrow">Meet the Founder</p>
+          <h2 id="founder-title">Experienced leadership grounded in inclusive education and research.</h2>
 
-          <div class="founder-details">
-            <h3 id="founder-title">Founder Information</h3>
-            <dl class="editable-fields">
-              <div>
-                <dt>Full Name:</dt>
-                <dd>________________________</dd>
-              </div>
-              <div>
-                <dt>Professional Title:</dt>
-                <dd>________________________</dd>
-              </div>
-              <div>
-                <dt>Qualifications:</dt>
-                <dd>________________________</dd>
-              </div>
-              <div>
-                <dt>Biography:</dt>
-                <dd>________________________</dd>
-              </div>
-              <div>
-                <dt>Years of Experience:</dt>
-                <dd>________________________</dd>
-              </div>
-              <div>
-                <dt>Research Interests:</dt>
-                <dd>________________________</dd>
-              </div>
-            </dl>
-          </div>
+          <dl class="founder-fields">
+            <div>
+              <dt>Founder Name</dt>
+              <dd>Hlakaniphani Buthelezi</dd>
+            </div>
+            <div>
+              <dt>Professional Title</dt>
+              <dd>Managing Director</dd>
+            </div>
+            <div>
+              <dt>Biography</dt>
+              <dd>With expertise in educational psychology, autism research, cerebral palsy and inclusive education, Hlakaniphani provides practical, evidence-informed support that strengthens teaching practices, removes barriers to learning and improves learner participation.</dd>
+            </div>
+            <div>
+              <dt>Qualifications</dt>
+              <dd>Master's degree in Educational Psychology with research focused on autism</dd>
+            </div>
+            <div>
+              <dt>Research Interests</dt>
+              <dd>Autism, cerebral palsy, inclusive education, barriers to learning and learner support systems</dd>
+            </div>
+            <div>
+              <dt>Years of Experience</dt>
+              <dd>23 years of experience in education, including service as a Senior Education Specialist at King Cetshwayo Education District</dd>
+            </div>
+            <div>
+              <dt>Professional Memberships</dt>
+              <dd>South African Council for Educators (SACE)</dd>
+            </div>
+            <div>
+              <dt>Current Research</dt>
+              <dd>Currently undertaking Doctor of Education research focused on cerebral palsy</dd>
+            </div>
+          </dl>
         </article>
       </div>
     </section>
 
-    <!-- ===========================
-    WHY CHOOSE EDUREACH
-    TODO:
-    Edit these six feature cards to match EduReach's strongest proof points.
-    ============================ -->
-    <section class="why section" aria-labelledby="why-title">
+    <section class="philosophy section" id="philosophy" aria-labelledby="philosophy-title">
       <div class="container">
         <div class="section-heading reveal">
-          <p class="eyebrow">Why choose EduReach</p>
-          <h2 id="why-title">Support that feels human, structured and sustainable.</h2>
+          <p class="eyebrow">Our Philosophy</p>
+          <h2 id="philosophy-title">Inclusive schools are built through values that can be practised.</h2>
         </div>
 
-        <div class="feature-grid">
-          <article class="feature-card reveal">
-            <svg class="card-icon" aria-hidden="true"><use href="#icon-school"></use></svg>
-            <h3>School-focused support</h3>
-            <p>Programmes are designed around the realities of South African school communities.</p>
-          </article>
-          <article class="feature-card reveal">
-            <svg class="card-icon" aria-hidden="true"><use href="#icon-users"></use></svg>
-            <h3>Collaborative practice</h3>
-            <p>We work with school leaders, teachers, parents and support professionals.</p>
-          </article>
-          <article class="feature-card reveal">
-            <svg class="card-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
-            <h3>Practical implementation</h3>
-            <p>Recommendations are clear, usable and built for everyday school environments.</p>
-          </article>
-          <article class="feature-card reveal">
+        <div class="philosophy-grid">
+          <article class="value-card reveal">
             <svg class="card-icon" aria-hidden="true"><use href="#icon-heart"></use></svg>
-            <h3>Learner-centred care</h3>
-            <p>Every service keeps learner dignity, participation and wellbeing at the centre.</p>
+            <h3>Every Learner Matters</h3>
+            <p>Support begins with the belief that each learner has dignity, potential and a right to meaningful participation.</p>
           </article>
-          <article class="feature-card reveal">
+          <article class="value-card reveal">
+            <svg class="card-icon" aria-hidden="true"><use href="#icon-users"></use></svg>
+            <h3>Collaboration</h3>
+            <p>Schools, families and professionals work best when knowledge is shared and decisions are made together.</p>
+          </article>
+          <article class="value-card reveal">
             <svg class="card-icon" aria-hidden="true"><use href="#icon-file"></use></svg>
-            <h3>Policy-aware guidance</h3>
-            <p>Support can align with inclusive education processes, documentation and referrals.</p>
+            <h3>Evidence-Based Practice</h3>
+            <p>Recommendations should be informed by research, careful observation and the lived realities of schools.</p>
           </article>
-          <article class="feature-card reveal">
+          <article class="value-card reveal">
+            <svg class="card-icon" aria-hidden="true"><use href="#icon-school"></use></svg>
+            <h3>Community Partnerships</h3>
+            <p>Learner support becomes stronger when schools are connected to families, health services and community care.</p>
+          </article>
+          <article class="value-card reveal">
+            <svg class="card-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+            <h3>Respect</h3>
+            <p>Inclusive practice honours learner voice, family context, teacher effort and professional boundaries.</p>
+          </article>
+          <article class="value-card reveal">
             <svg class="card-icon" aria-hidden="true"><use href="#icon-compass"></use></svg>
-            <h3>Long-term impact</h3>
-            <p>Capacity building helps schools continue the work after a session or programme ends.</p>
+            <h3>Empowerment</h3>
+            <p>The goal is to strengthen school capacity so support continues beyond one consultation or workshop.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ===========================
-    FEATURED SERVICES
-    TODO:
-    Replace service text with final service descriptions and pricing if needed.
-    ============================ -->
-    <section class="featured-services section" id="services" aria-labelledby="featured-services-title">
+    <section class="services section" id="services" aria-labelledby="services-title">
       <div class="container">
         <div class="section-heading section-heading-left reveal">
-          <p class="eyebrow">Featured services</p>
-          <h2 id="featured-services-title">High-impact services for inclusive schools.</h2>
-        </div>
-
-        <div class="featured-grid">
-          <article class="large-service-card reveal">
-            <svg class="card-icon" aria-hidden="true"><use href="#icon-school"></use></svg>
-            <h3>Inclusive Education Training</h3>
-            <p>Workshops that help educators understand barriers to learning, inclusive classroom strategies and learner support pathways.</p>
-            <a class="card-link" href="#contact">Request training <span aria-hidden="true">-&gt;</span></a>
-          </article>
-          <article class="large-service-card reveal">
-            <svg class="card-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
-            <h3>SIAS and SBST Support</h3>
-            <p>Guidance for learner identification, support documentation, school-based support team processes and referral planning.</p>
-            <a class="card-link" href="#contact">Plan support <span aria-hidden="true">-&gt;</span></a>
-          </article>
-          <article class="large-service-card reveal">
-            <svg class="card-icon" aria-hidden="true"><use href="#icon-users"></use></svg>
-            <h3>Learner Support Agents</h3>
-            <p>On-site support capacity for schools that need practical help connecting learners, teachers and professional services.</p>
-            <a class="card-link" href="#pilot">View pilot <span aria-hidden="true">-&gt;</span></a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===========================
-    ALL SERVICES
-    TODO:
-    Add, remove or reorder services as EduReach's offer develops.
-    ============================ -->
-    <section class="all-services section" id="all-services" aria-labelledby="all-services-title">
-      <div class="container">
-        <div class="section-heading reveal">
-          <p class="eyebrow">All services</p>
-          <h2 id="all-services-title">A complete support ecosystem.</h2>
+          <p class="eyebrow">What We Do</p>
+          <h2 id="services-title">Practical services for schools building inclusive systems.</h2>
         </div>
 
         <div class="services-grid">
           <article class="service-card reveal">
             <span>01</span>
-            <h3>Inclusive education training</h3>
-            <p>Training for teachers, support staff and school leaders.</p>
+            <h3>Teacher Training</h3>
+            <p>Workshops that equip teachers with inclusive classroom strategies, learner support awareness and practical next steps.</p>
           </article>
           <article class="service-card reveal">
             <span>02</span>
-            <h3>SIAS and SBST support</h3>
-            <p>Support with learner identification and school-based support processes.</p>
+            <h3>School Inclusion Audits</h3>
+            <p>Reviews of school practices, barriers and support pathways with clear recommendations for improvement.</p>
           </article>
           <article class="service-card reveal">
             <span>03</span>
-            <h3>School inclusion audits</h3>
-            <p>Reviews and improvement plans for inclusive school practice.</p>
+            <h3>Research</h3>
+            <p>Research-informed insight for schools, programmes and education partners working in inclusion.</p>
           </article>
           <article class="service-card reveal">
             <span>04</span>
-            <h3>Parent consultations</h3>
-            <p>Guidance for families navigating learner support needs.</p>
+            <h3>Education Programme Development</h3>
+            <p>Design of school and community programmes that are realistic, inclusive and aligned to learner needs.</p>
           </article>
           <article class="service-card reveal">
             <span>05</span>
-            <h3>Learner Support Agents</h3>
-            <p>On-site learner support capacity placed in participating schools.</p>
+            <h3>Learner Support</h3>
+            <p>Guidance that helps schools identify barriers, plan support and connect learners to appropriate services.</p>
           </article>
           <article class="service-card reveal">
             <span>06</span>
-            <h3>Social work supervision</h3>
-            <p>Supervision and counselling support for school-based needs.</p>
+            <h3>Parent Guidance</h3>
+            <p>Support for families who need clarity, referral direction and partnership with the school.</p>
           </article>
           <article class="service-card reveal">
             <span>07</span>
-            <h3>Health and wellness awareness</h3>
-            <p>Programmes linking wellbeing, attendance and learning participation.</p>
+            <h3>Health Awareness</h3>
+            <p>School awareness programmes linking wellbeing, participation, attendance and learner safety.</p>
           </article>
           <article class="service-card reveal">
             <span>08</span>
-            <h3>Early identification and referral</h3>
-            <p>Referral support for learners who need additional services.</p>
-          </article>
-          <article class="service-card reveal">
-            <span>09</span>
-            <h3>Mental health and child protection</h3>
-            <p>Anti-bullying, safety and child-protection awareness programmes.</p>
-          </article>
-          <article class="service-card reveal">
-            <span>10</span>
-            <h3>Accessible learning materials</h3>
-            <p>Communication support and inclusive learning material guidance.</p>
+            <h3>Policy Development</h3>
+            <p>Inclusive education policies, referral processes and implementation guidance for school environments.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ===========================
-    FIVE-SCHOOL LEARNER SUPPORT PILOT
-    TODO:
-    Replace this summary with the final pilot description, dates and partner requirements.
-    ============================ -->
-    <section class="pilot section" id="pilot" aria-labelledby="pilot-title">
-      <div class="container pilot-layout">
-        <div class="pilot-copy reveal">
-          <p class="eyebrow">Five-School Learner Support Pilot</p>
-          <h2 id="pilot-title">A connected support pathway for five partner schools.</h2>
-          <p>This placeholder pilot section shows how a school can connect learners to practical support through an agent, social worker, professional nurse and EduReach coordination.</p>
-          <a class="button button-primary js-whatsapp" href="#contact">
-            <span class="button-icon" aria-hidden="true">WA</span>
-            Discuss the pilot
-          </a>
+    <section
+      class="vision section section-blue"
+      id="vision"
+      aria-labelledby="vision-title"
+    >
+      <div class="container vision-layout">
+
+        <div class="vision-copy reveal">
+          <p class="eyebrow">Our Vision</p>
+
+          <h2 id="vision-title">
+            Inclusive education in every school.
+          </h2>
+
+          <p class="vision-statement">
+            To see inclusive education fully implemented in every school,
+            ensuring that all learners are welcomed, supported and able to
+            participate meaningfully in education.
+          </p>
         </div>
 
-        <ol class="process-flow reveal" aria-label="Five-School Learner Support Pilot process">
+        <div
+          class="vision-pillars reveal"
+          aria-label="EduReach vision priorities"
+        >
+          <article class="vision-pillar">
+            <span class="vision-number" aria-hidden="true">01</span>
+
+            <div>
+              <h3>Implementation in Every School</h3>
+              <p>
+                Inclusive education should move beyond policy and become part
+                of everyday teaching, planning and learner support.
+              </p>
+            </div>
+          </article>
+
+          <article class="vision-pillar">
+            <span class="vision-number" aria-hidden="true">02</span>
+
+            <div>
+              <h3>Meaningful Participation</h3>
+              <p>
+                Every learner should be welcomed, supported and enabled to
+                participate meaningfully in learning and school life.
+              </p>
+            </div>
+          </article>
+
+          <article class="vision-pillar">
+            <span class="vision-number" aria-hidden="true">03</span>
+
+            <div>
+              <h3>Sustainable Inclusive Practice</h3>
+              <p>
+                Schools should have the knowledge, systems and partnerships
+                required to maintain inclusive education in practice.
+              </p>
+            </div>
+          </article>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="mission section" id="mission" aria-labelledby="mission-title">
+      <div class="container mission-layout">
+        <div class="reveal">
+          <p class="eyebrow">Our Mission</p>
+          <h2 id="mission-title">Turning inclusive education into practical, everyday support.</h2>
+          <p class="mission-statement">
+            Our mission is to support schools, educators, learners, families and communities through professional consultancy, training, research and inclusive education programmes.
+          </p>
+        </div>
+
+        <div class="mission-priorities reveal" aria-label="EduReach mission priorities">
+          <article class="mission-priority">
+            <h3>Build School Capacity</h3>
+            <p>Equip educators and school teams with practical knowledge, tools and inclusive teaching strategies.</p>
+          </article>
+          <article class="mission-priority">
+            <h3>Strengthen Learner Support</h3>
+            <p>Help schools identify barriers early and create clear support, referral and follow-up pathways.</p>
+          </article>
+          <article class="mission-priority">
+            <h3>Connect Schools and Communities</h3>
+            <p>Promote collaboration between learners, families, educators, health professionals and community services.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="vision pilot section" id="pilot" aria-labelledby="pilot-title">
+      <div class="container vision-layout">
+        <div class="vision-copy reveal">
+          <p class="eyebrow">Five-School Learner Support Pilot</p>
+          <h2 id="pilot-title">A connected support model for five participating schools.</h2>
+          <p>
+            EduReach plans to partner with a group of five schools and place a Learner Support Agent in each school. These agents will provide an accessible first point of support for learners, teachers and families.
+          </p>
+          <p>
+            A qualified Social Worker will supervise the five Learner Support Agents and respond when a learner needs professional counselling, family support, protection services or further assessment. A professional Nurse will support health-awareness activities and guide appropriate health referrals.
+          </p>
+          <ul class="vision-list">
+            <li>One Learner Support Agent in each participating school</li>
+            <li>One Social Worker supervising and supporting all five agents</li>
+            <li>Professional counselling and family-support referrals</li>
+            <li>Nurse-led health awareness and referral guidance</li>
+            <li>Ongoing collaboration with teachers, families and school leadership</li>
+          </ul>
+        </div>
+
+        <ol class="pilot-timeline reveal" aria-label="Five-school learner support pilot pathway">
           <li>
-            <span class="flow-dot">1</span>
-            <h3>School</h3>
+            <span>1</span>
+            <h3>School-Based Access</h3>
+            <p>Each school has a named Learner Support Agent who is available to learners, teachers and families.</p>
           </li>
           <li>
-            <span class="flow-dot">2</span>
-            <h3>Learner Support Agent</h3>
+            <span>2</span>
+            <h3>Early Identification</h3>
+            <p>The agent notices barriers, records concerns and helps coordinate practical school-level support.</p>
           </li>
           <li>
-            <span class="flow-dot">3</span>
-            <h3>Social Worker</h3>
+            <span>3</span>
+            <h3>Social Worker Support</h3>
+            <p>The supervising Social Worker provides counselling, family engagement and professional intervention when needed.</p>
           </li>
           <li>
-            <span class="flow-dot">4</span>
-            <h3>Professional Nurse</h3>
+            <span>4</span>
+            <h3>Health Support</h3>
+            <p>The Nurse conducts health-awareness programmes and guides learners toward suitable health services.</p>
           </li>
           <li>
-            <span class="flow-dot">5</span>
-            <h3>EduReach</h3>
+            <span>5</span>
+            <h3>Referral and Follow-Up</h3>
+            <p>Clear referral pathways and ongoing follow-up help ensure that learners do not fall through the gaps.</p>
           </li>
         </ol>
       </div>
     </section>
 
-    <!-- ===========================
-    HOW WE WORK
-    TODO:
-    Adjust this five-step process to match EduReach's real delivery method.
-    ============================ -->
-    <section class="how section" id="how" aria-labelledby="how-title">
+    <section class="choose section" id="choose" aria-labelledby="choose-title">
+      <div class="container choose-layout">
+        <div class="section-heading section-heading-left reveal">
+          <p class="eyebrow">Why Schools Choose EduReach</p>
+          <h2 id="choose-title">Trust is earned through clarity, expertise and implementation.</h2>
+        </div>
+
+        <div class="choose-grid">
+          <article class="proof-card reveal">
+            <h3>Research-led approach</h3>
+            <p>Support is shaped by evidence, reflective practice and careful understanding of school context.</p>
+          </article>
+          <article class="proof-card reveal">
+            <h3>Founder expertise</h3>
+            <p>The founder profile will show the professional background and research focus behind the work.</p>
+          </article>
+          <article class="proof-card reveal">
+            <h3>Practical implementation</h3>
+            <p>EduReach focuses on tools, conversations and systems schools can actually use.</p>
+          </article>
+          <article class="proof-card reveal">
+            <h3>Long-term partnerships</h3>
+            <p>The aim is sustained capacity, not one-off advice that fades after a meeting.</p>
+          </article>
+          <article class="proof-card reveal">
+            <h3>Inclusive education specialists</h3>
+            <p>Services stay focused on barriers to learning, participation, dignity and support planning.</p>
+          </article>
+          <article class="proof-card reveal">
+            <h3>Community-centred solutions</h3>
+            <p>Schools are supported within the wider network of families, health, care and community resources.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="resources section" id="resources" aria-labelledby="resources-title">
       <div class="container">
         <div class="section-heading reveal">
-          <p class="eyebrow">How we work</p>
-          <h2 id="how-title">A clear process from first conversation to sustained impact.</h2>
-        </div>
-
-        <ol class="work-timeline">
-          <li class="timeline-step reveal">
-            <span>01</span>
-            <h3>Listen</h3>
-            <p>We begin with your school's needs, context, priorities and existing support structures.</p>
-          </li>
-          <li class="timeline-step reveal">
-            <span>02</span>
-            <h3>Assess</h3>
-            <p>We identify barriers, opportunities and practical next steps for inclusive support.</p>
-          </li>
-          <li class="timeline-step reveal">
-            <span>03</span>
-            <h3>Design</h3>
-            <p>We build a focused plan, workshop, consultation or programme around your goals.</p>
-          </li>
-          <li class="timeline-step reveal">
-            <span>04</span>
-            <h3>Deliver</h3>
-            <p>We facilitate training, support sessions, consultations or school-based services.</p>
-          </li>
-          <li class="timeline-step reveal">
-            <span>05</span>
-            <h3>Review</h3>
-            <p>We reflect on progress and recommend sustainable actions for continued improvement.</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- ===========================
-    TESTIMONIALS
-    TODO:
-    Add testimonials here.
-    ============================ -->
-    <section class="testimonials section" id="testimonials" aria-labelledby="testimonials-title">
-      <div class="container">
-        <div class="section-heading section-heading-left reveal">
-          <p class="eyebrow">Testimonials</p>
-          <h2 id="testimonials-title">Placeholder stories from schools and partners.</h2>
-        </div>
-
-        <div class="testimonial-grid">
-          <blockquote class="testimonial-card reveal">
-            <p>Testimonial goes here.</p>
-            <footer>
-              <strong>Principal Name</strong>
-              <span>School Name</span>
-            </footer>
-          </blockquote>
-          <blockquote class="testimonial-card reveal">
-            <p>Testimonial goes here.</p>
-            <footer>
-              <strong>Principal Name</strong>
-              <span>School Name</span>
-            </footer>
-          </blockquote>
-          <blockquote class="testimonial-card reveal">
-            <p>Testimonial goes here.</p>
-            <footer>
-              <strong>Principal Name</strong>
-              <span>School Name</span>
-            </footer>
-          </blockquote>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===========================
-    RESOURCES
-    TODO:
-    Replace these placeholders with downloadable resources, articles or guides.
-    ============================ -->
-    <section class="resources section" id="resources" aria-labelledby="resources-title">
-      <div class="container resources-layout">
-        <div class="section-heading section-heading-left reveal">
           <p class="eyebrow">Resources</p>
-          <h2 id="resources-title">Helpful resources for inclusive school communities.</h2>
-          <p>Use this section for guides, printable tools, workshop flyers, research notes or parent support material.</p>
+          <h2 id="resources-title">Helpful tools for inclusive school communities.</h2>
+          <p>EduReach resources will support teachers, parents and school leaders with accessible guidance they can return to after training or consultation.</p>
         </div>
 
-        <div class="resource-list">
+        <div class="resource-grid">
           <article class="resource-card reveal">
-            <span>Guide</span>
-            <h3>Resource Title</h3>
-            <p>Short resource description goes here.</p>
-            <a href="#contact">Request resource <span aria-hidden="true">-&gt;</span></a>
+            <span class="badge">Coming Soon</span>
+            <h3>Articles</h3>
+            <p>Short research-informed reflections on inclusive classrooms, learner support and school collaboration.</p>
           </article>
           <article class="resource-card reveal">
-            <span>Checklist</span>
-            <h3>Resource Title</h3>
-            <p>Short resource description goes here.</p>
-            <a href="#contact">Request resource <span aria-hidden="true">-&gt;</span></a>
+            <span class="badge">Coming Soon</span>
+            <h3>Guides</h3>
+            <p>Practical guides for teachers and families navigating learner support conversations.</p>
           </article>
           <article class="resource-card reveal">
-            <span>Article</span>
-            <h3>Resource Title</h3>
-            <p>Short resource description goes here.</p>
-            <a href="#contact">Request resource <span aria-hidden="true">-&gt;</span></a>
+            <span class="badge">Coming Soon</span>
+            <h3>Downloadable Resources</h3>
+            <p>Checklists, planning templates and awareness materials for school-based use.</p>
+          </article>
+          <article class="resource-card resource-image reveal">
+            <!-- TODO: Add real workshop photography when available. -->
+            <span class="badge">Placeholder</span>
+            <h3>Workshop Photos</h3>
+            <p>Future images from EduReach training and school engagement sessions.</p>
+          </article>
+          <article class="resource-card resource-image reveal">
+            <!-- TODO: Add future gallery images when EduReach has approved photographs. -->
+            <span class="badge">Placeholder</span>
+            <h3>Future Gallery</h3>
+            <p>A place for approved school, community and programme images.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ===========================
-    CONTACT
-    TODO:
-    Add the real contact email and WhatsApp number in site-config.js.
-    Replace the Google Maps placeholder with an embedded map when ready.
-    ============================ -->
+    <section class="consultation cta-section" id="consultation" aria-labelledby="consultation-title">
+      <img class="cta-image" src="assets/images/about-learning-support.png" alt="" width="1024" height="1536" loading="lazy" decoding="async" />
+      <div class="cta-scrim" aria-hidden="true"></div>
+      <div class="container cta-content reveal">
+        <p class="eyebrow">Let's Work Together</p>
+        <h2 id="consultation-title">Build a school environment where support is visible, practical and shared.</h2>
+        <p>Start with a conversation about your school, your learners and the support structures you want to strengthen.</p>
+        <div class="cta-actions">
+          <a class="button button-gold" href="#contact">Book Consultation</a>
+          <a class="button button-glass js-whatsapp" href="#contact">
+            WhatsApp
+            <svg class="button-svg" aria-hidden="true"><use href="#icon-message"></use></svg>
+          </a>
+          <a class="button button-glass js-email" href="mailto:edureach70@gmail.com">
+            Email
+            <svg class="button-svg" aria-hidden="true"><use href="#icon-mail"></use></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <section class="contact section" id="contact" aria-labelledby="contact-title">
       <div class="container contact-layout">
         <div class="contact-copy reveal">
-          <p class="eyebrow">Contact EduReach</p>
-          <h2 id="contact-title">Ready to strengthen learner support at your school?</h2>
-          <p>Send a message and EduReach will follow up with the next practical step.</p>
-          <div class="contact-actions">
-            <a class="button button-whatsapp js-whatsapp" href="#contact">
-              <span class="button-icon" aria-hidden="true">WA</span>
-              Chat on WhatsApp
-            </a>
-            <a class="button button-secondary button-secondary-light" href="mailto:">
-              Email EduReach
-              <svg class="button-svg" aria-hidden="true"><use href="#icon-message"></use></svg>
-            </a>
+          <p class="eyebrow">Contact</p>
+          <h2 id="contact-title">Tell EduReach what your school community needs next.</h2>
+          <p>Use the form to prepare an enquiry, or contact EduReach directly using the details below.</p>
+          <address class="contact-details">
+            <div class="contact-detail">
+              <strong>Email</strong>
+              <a href="mailto:edureach70@gmail.com">edureach70@gmail.com</a>
+            </div>
+            <div class="contact-detail">
+              <strong>WhatsApp</strong>
+              <!-- TODO: Add the WhatsApp number in site-config.js to activate this link. -->
+              <a class="js-whatsapp" href="#contact" aria-label="Contact EduReach on WhatsApp">WhatsApp</a>
+            </div>
+          </address>
+          <div class="map-placeholder" role="img" aria-label="Google Maps placeholder">
+            <!-- TODO: Replace with a Google Maps embed when the location is ready to publish. -->
+            <span>Google Maps Placeholder</span>
+            <small>Service area: South Africa</small>
           </div>
         </div>
 
@@ -583,15 +586,18 @@
             </div>
           </div>
           <div class="field">
-            <label for="service">What support do you need?</label>
+            <label for="service">What support are you interested in?</label>
             <select id="service" name="service">
               <option value="">Please select</option>
-              <option>Inclusive education training</option>
-              <option>SIAS and SBST support</option>
-              <option>Learner Support Agents</option>
+              <option>Teacher Training</option>
+              <option>School Inclusion Audits</option>
+              <option>Research</option>
+              <option>Education Programme Development</option>
+              <option>Learner Support</option>
+              <option>Parent Guidance</option>
+              <option>Health Awareness</option>
+              <option>Policy Development</option>
               <option>Five-School Learner Support Pilot</option>
-              <option>Parent consultation</option>
-              <option>Other support</option>
             </select>
           </div>
           <div class="field">
@@ -602,50 +608,47 @@
             <label for="website">Website</label>
             <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
           </div>
-          <button class="button button-gold" type="submit">
+          <button class="button button-primary" type="submit">
             Send message
             <svg class="button-svg" aria-hidden="true"><use href="#icon-arrow"></use></svg>
           </button>
-          <p class="form-status" id="form-status" role="status" aria-live="polite">Complete the form and it will prepare your enquiry using the contact details configured for EduReach.</p>
+          <p class="form-status" id="form-status" role="status" aria-live="polite">The form will prepare your enquiry using EduReach's email address.</p>
         </form>
-
-        <div class="map-placeholder reveal" role="img" aria-label="Google Maps placeholder">
-          <!-- TODO:
-          Replace this placeholder with a Google Maps embed.
-          -->
-          <span>Google Maps Placeholder</span>
-          <small>South Africa</small>
-        </div>
       </div>
     </section>
   </main>
 
-  <!-- ===========================
-  FOOTER
-  TODO:
-  Replace social links with EduReach's live profiles.
-  ============================ -->
   <footer class="site-footer">
     <div class="container footer-layout">
       <div class="footer-brand">
+        <!-- TODO: Replace with final organisation logo if needed. -->
         <img src="assets/logo.png" alt="EduReach" width="260" height="75" />
-        <p>Inclusive education consultancy supporting schools, learners and communities in South Africa.</p>
+        <p>Inclusive education consultancy supporting schools, learners, families and communities.</p>
       </div>
 
       <nav class="footer-links" aria-label="Quick links">
-        <h2>Quick links</h2>
-        <a href="#about">About</a>
+        <h2>Quick Links</h2>
+        <a href="#story">Our Story</a>
+        <a href="#founder">Founder</a>
         <a href="#services">Services</a>
-        <a href="#pilot">Pilot</a>
-        <a href="#resources">Resources</a>
+        <a href="#vision">Our Vision</a>
+        <a href="#mission">Our Mission</a>
+        <a href="#pilot">School Pilot</a>
         <a href="#contact">Contact</a>
       </nav>
 
-      <nav class="footer-links" aria-label="Social links">
-        <h2>Social links</h2>
-        <a href="#" aria-label="EduReach on Facebook">Facebook</a>
-        <a href="#" aria-label="EduReach on LinkedIn">LinkedIn</a>
-        <a href="#" aria-label="EduReach on Instagram">Instagram</a>
+      <div class="footer-links">
+        <h2>Contact</h2>
+        <a href="mailto:edureach70@gmail.com">edureach70@gmail.com</a>
+        <a class="js-whatsapp" href="#contact">WhatsApp placeholder</a>
+      </div>
+
+      <nav class="footer-links" aria-label="Social media">
+        <h2>Social Media</h2>
+        <!-- TODO: Replace with EduReach's live social media links. -->
+        <a href="#" aria-label="EduReach Facebook placeholder">Facebook</a>
+        <a href="#" aria-label="EduReach LinkedIn placeholder">LinkedIn</a>
+        <a href="#" aria-label="EduReach Instagram placeholder">Instagram</a>
       </nav>
     </div>
     <div class="container footer-bottom">

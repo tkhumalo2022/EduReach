@@ -5,14 +5,13 @@ A modern, responsive one-page website for EduReach, an Inclusive Education Consu
 ## What is included
 
 - Sticky navigation with smooth scrolling
-- Full-bleed hero section with placeholder imagery
-- Impact statistics placeholders
+- Full-screen storytelling hero with local education imagery
+- Our Story section focused on learners, schools, barriers, hope and inclusion
 - Editable founder information section
-- Why Choose EduReach feature cards
-- Featured services and all-services grid
-- Five-School Learner Support Pilot process timeline
-- Five-step How We Work timeline
-- Placeholder testimonials and resources
+- Philosophy, services and trust-building cards without fake statistics
+- Five-School Learner Support Pilot presented as Our Vision
+- Resources section with coming-soon cards and future gallery placeholders
+- Large consultation call-to-action with background imagery
 - Contact form with mailto or endpoint support
 - WhatsApp buttons configured through `site-config.js`
 - Google Maps placeholder
@@ -38,7 +37,9 @@ window.EDUREACH_CONFIG = {
 
 ## Customise content
 
-Search for `TODO:` comments in `index.html`, `site-config.js` and `styles.css`. They mark the places a beginner developer can safely update copy, statistics, founder details, testimonials, resources, social links and contact settings.
+Search for `TODO:` comments in `index.html`, `site-config.js` and `styles.css`. They mark the places a beginner developer can safely update founder details, verified qualifications, research interests, approved imagery, resources, social links and contact settings.
+
+Do not add fake statistics, fake testimonials, fake partner logos, fake awards or claims that make EduReach appear older than it is. Build trust through verified founder expertise, mission clarity, practical services and authentic storytelling.
 
 ## Images
 

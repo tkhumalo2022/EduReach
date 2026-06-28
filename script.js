@@ -5,7 +5,7 @@
   const navigation = document.querySelector(".primary-nav");
   const navLinks = navigation ? [...navigation.querySelectorAll("a")] : [];
   const whatsappButtons = [...document.querySelectorAll(".js-whatsapp")];
-  const emailButtons = [...document.querySelectorAll('a[href="mailto:"]')];
+  const emailButtons = [...document.querySelectorAll(".js-email, a[href='mailto:']")];
   const form = document.getElementById("contact-form");
   const formStatus = document.getElementById("form-status");
   const currentYear = document.getElementById("current-year");
@@ -15,7 +15,7 @@
   const whatsappNumber = trim(config.whatsappNumber).replace(/[^\d]/g, "");
   const contactEmail = trim(config.contactEmail);
   const formEndpoint = trim(config.formEndpoint);
-  const defaultWhatsAppMessage = "Hello EduReach, I would like to learn more about your inclusive education services.";
+  const defaultWhatsAppMessage = "Hello EduReach, I would like to book a consultation about inclusive education support.";
 
   if (currentYear) {
     currentYear.textContent = new Date().getFullYear();
