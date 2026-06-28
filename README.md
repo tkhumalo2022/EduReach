@@ -1,41 +1,55 @@
 # EduReach Website
 
-A responsive one-page website for EduReach Inclusive Education Consultancy.
+A modern, responsive one-page website for EduReach, an Inclusive Education Consultancy based in South Africa.
 
-## Sections
+## What is included
 
-- Hero section
-- About section
-- Services section
-- WhatsApp call-to-action
-- Contact form
-- Responsive mobile navigation
-- Foundational SEO metadata
-- Local website images in `assets/images`
-- Current EduReach logo crop at `assets/logo.png`
-- Current EduReach logo mark at `assets/logo-mark.png`
-- Services flyer at `assets/images/edureach-services-flyer.png`
+- Sticky navigation with smooth scrolling
+- Full-bleed hero section with placeholder imagery
+- Impact statistics placeholders
+- Editable founder information section
+- Why Choose EduReach feature cards
+- Featured services and all-services grid
+- Five-School Learner Support Pilot process timeline
+- Five-step How We Work timeline
+- Placeholder testimonials and resources
+- Contact form with mailto or endpoint support
+- WhatsApp buttons configured through `site-config.js`
+- Google Maps placeholder
+- SEO metadata and accessible semantic HTML
 
 ## Before publishing
 
-Open `site-config.js` and add:
+Open `site-config.js` and update:
 
 - `whatsappNumber` in international format without spaces or `+`
-- `contactEmail` for contact enquiries
+- `contactEmail` for form enquiries
+- `formEndpoint` only if using a form service or custom API
 
 Example:
 
 ```js
 window.EDUREACH_CONFIG = {
   whatsappNumber: "27821234567",
-  contactEmail: "hello@example.com"
+  contactEmail: "hello@example.com",
+  formEndpoint: ""
 };
 ```
 
+## Customise content
+
+Search for `TODO:` comments in `index.html`, `site-config.js` and `styles.css`. They mark the places a beginner developer can safely update copy, statistics, founder details, testimonials, resources, social links and contact settings.
+
+## Images
+
+Current images are placeholder assets in `assets/images`. Replace them with final approved images when ready. Do not add personal founder images until the founder has approved the final file.
+
+Suggested final names:
+
+- `assets/images/hero.jpg`
+- `assets/images/founder.jpg`
+- `assets/images/classroom.jpg`
+
 ## Run locally
 
-Open `index.html` in a browser, or use the VS Code Live Server extension.
-
-## Deploy on Vercel
-
-Import the GitHub repository in Vercel. This is a static website, so no build command is required.
+Open `index.html` in a browser, or use the VS Code Live Server extension. No build step is required.
