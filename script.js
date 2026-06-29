@@ -118,45 +118,18 @@
     formStatus.classList.toggle("is-success", type === "success");
   };
 
-  const formatMessage = (data) => {
-    const entries = [
-      ["Name", data.get("name")],
-      ["Email", data.get("email")],
-      ["Phone", data.get("phone")],
-      ["School or organisation", data.get("organisation")],
-      ["Support needed", data.get("service")],
-      ["Message", data.get("message")]
-    ];
-
-    return entries
-      .map(([label, value]) => [label, trim(value)])
-      .filter(([, value]) => value)
-      .map(([label, value]) => `${label}: ${value}`)
-      .join("\n");
-  };
-
-  const openEmailFallback = (name, messageBody) => {
-    if (!contactEmail) return false;
-    const subject = encodeURIComponent(`EduReach website enquiry from ${name || "Website visitor"}`);
-    const bodyText = encodeURIComponent(messageBody);
-    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${bodyText}`;
-    return true;
-  };
-
-  const openWhatsAppFallback = (messageBody) => {
-    const url = buildWhatsAppUrl(messageBody);
-    if (!url) return false;
-    window.open(url, "_blank", "noopener,noreferrer");
-    return true;
-  };
-
   if (form) {
-    if (!formEndpoint && !contactEmail && !whatsappNumber) {
-      setFormStatus("The form is ready. Add an email, WhatsApp number, or form endpoint in site-config.js to activate sending.");
+    if (!formEndpoint) {
+      setFormStatus("The contact form is not configured yet. Please try again later.", "error");
     }
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+
+      if (!formEndpoint) {
+        setFormStatus("The contact form is not configured yet. Please try again later.", "error");
+        return;
+      }
 
       if (!form.checkValidity()) {
         form.reportValidity();
@@ -167,43 +140,28 @@
       const data = new FormData(form);
       if (data.get("website")) return;
 
-      const name = trim(data.get("name")) || "Website visitor";
-      const messageBody = formatMessage(data);
       const payload = Object.fromEntries(data.entries());
       delete payload.website;
 
-      if (formEndpoint) {
-        setFormStatus("Sending your message...");
+      setFormStatus("Sending your message...");
 
-        try {
-          const response = await fetch(formEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
+      try {
+        const response = await fetch(formEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json().catch(() => null);
 
-          if (!response.ok) throw new Error("Form endpoint failed");
-          form.reset();
-          setFormStatus("Thank you. Your message has been sent.", "success");
-          return;
-        } catch (error) {
-          setFormStatus("The online form could not send. Preparing another contact option instead.", "error");
+        if (!response.ok || result?.ok === false) {
+          throw new Error("Form endpoint failed");
         }
-      }
 
-      if (openEmailFallback(name, messageBody)) {
         form.reset();
-        setFormStatus("Your email application is opening with the enquiry prepared.", "success");
-        return;
+        setFormStatus("Thank you. Your message has been sent.", "success");
+      } catch (error) {
+        setFormStatus("We could not send your message right now. Please try again later.", "error");
       }
-
-      if (openWhatsAppFallback(messageBody)) {
-        form.reset();
-        setFormStatus("WhatsApp is opening with the enquiry prepared.", "success");
-        return;
-      }
-
-      setFormStatus("Add a contact email, WhatsApp number, or form endpoint in site-config.js to activate sending.", "error");
     });
   }
 
