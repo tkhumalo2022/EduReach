@@ -5,9 +5,8 @@ const SITE_CONFIG = {
   email: "edureach70@gmail.com",
 
   // Optional:
-  // Add a form service endpoint such as Formspree, Basin or your own API.
-  // Leave blank to use the mailto fallback.
-  formEndpoint: ""
+  // Vercel Function that securely forwards enquiries to Google Apps Script.
+  formEndpoint: "/api/contact"
 };
 
 window.SITE_CONFIG = SITE_CONFIG;
