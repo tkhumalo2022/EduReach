@@ -1,19 +1,25 @@
 (() => {
-  const config = window.EDUREACH_CONFIG || {};
+  const config = window.SITE_CONFIG || window.EDUREACH_CONFIG || {};
   const body = document.body;
   const menuButton = document.querySelector(".menu-toggle");
   const navigation = document.querySelector(".primary-nav");
   const navLinks = navigation ? [...navigation.querySelectorAll("a")] : [];
   const whatsappButtons = [...document.querySelectorAll(".js-whatsapp")];
-  const emailButtons = [...document.querySelectorAll(".js-email, a[href='mailto:']")];
+  const emailButtons = [...document.querySelectorAll(".js-email, a[href^='mailto:']")];
   const form = document.getElementById("contact-form");
   const formStatus = document.getElementById("form-status");
   const currentYear = document.getElementById("current-year");
   const revealItems = [...document.querySelectorAll(".reveal")];
+  const faqToggle = document.getElementById("faq-toggle");
+  const faqWidget = document.getElementById("faq-widget");
+  const faqClose = document.getElementById("faq-close");
+  const faqQuestions = document.querySelectorAll(".faq-question");
 
   const trim = (value) => String(value || "").trim();
-  const whatsappNumber = trim(config.whatsappNumber).replace(/[^\d]/g, "");
-  const contactEmail = trim(config.contactEmail);
+  const phoneTel = trim(config.phoneTel).replace(/[^\d+]/g, "");
+  const whatsappUrl = trim(config.whatsappUrl);
+  const whatsappNumber = trim(config.whatsappNumber || phoneTel).replace(/[^\d]/g, "");
+  const contactEmail = trim(config.email || config.contactEmail);
   const formEndpoint = trim(config.formEndpoint);
   const defaultWhatsAppMessage = "Hello EduReach, I would like to book a consultation about inclusive education support.";
 
@@ -47,12 +53,12 @@
   }
 
   const buildWhatsAppUrl = (message) => {
-    if (!whatsappNumber) return "";
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const baseUrl = whatsappUrl || (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "");
+    if (!baseUrl) return "";
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    return `${baseUrl}${separator}text=${encodeURIComponent(message)}`;
   };
 
-  // TODO:
-  // Update the WhatsApp number in site-config.js.
   whatsappButtons.forEach((button) => {
     const url = buildWhatsAppUrl(defaultWhatsAppMessage);
 
@@ -64,6 +70,36 @@
       button.href = "#contact";
       button.title = "Add your WhatsApp number in site-config.js to activate this button.";
     }
+  });
+
+  const closeFaq = () => {
+    if (!faqWidget || !faqToggle) return;
+    faqWidget.classList.remove("is-open");
+    faqWidget.setAttribute("aria-hidden", "true");
+    faqToggle.setAttribute("aria-expanded", "false");
+  };
+
+  if (faqToggle && faqWidget && faqClose) {
+    faqToggle.addEventListener("click", () => {
+      faqWidget.classList.add("is-open");
+      faqWidget.setAttribute("aria-hidden", "false");
+      faqToggle.setAttribute("aria-expanded", "true");
+    });
+
+    faqClose.addEventListener("click", closeFaq);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeFaq();
+    });
+  }
+
+  faqQuestions.forEach((question) => {
+    question.setAttribute("aria-expanded", "false");
+
+    question.addEventListener("click", () => {
+      const isActive = question.classList.toggle("is-active");
+      question.setAttribute("aria-expanded", String(isActive));
+    });
   });
 
   emailButtons.forEach((button) => {

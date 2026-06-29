@@ -1,14 +1,22 @@
-window.EDUREACH_CONFIG = {
-  // TODO:
-  // Update the WhatsApp number.
-  // Use international format without + or spaces, for example: 27821234567
-  whatsappNumber: "",
-
-  // Business email for website enquiries.
-  contactEmail: "edureach70@gmail.com",
+const SITE_CONFIG = {
+  phoneDisplay: "+27 81 214 8384",
+  phoneTel: "+27812148384",
+  whatsappUrl: "https://wa.me/27812148384",
+  email: "edureach70@gmail.com",
 
   // Optional:
   // Add a form service endpoint such as Formspree, Basin or your own API.
-  // Leave blank to use the mailto fallback above.
+  // Leave blank to use the mailto fallback.
   formEndpoint: ""
+};
+
+window.SITE_CONFIG = SITE_CONFIG;
+
+window.EDUREACH_CONFIG = {
+  phoneDisplay: SITE_CONFIG.phoneDisplay,
+  phoneTel: SITE_CONFIG.phoneTel,
+  whatsappUrl: SITE_CONFIG.whatsappUrl,
+  whatsappNumber: SITE_CONFIG.phoneTel.replace(/[^\d]/g, ""),
+  contactEmail: SITE_CONFIG.email,
+  formEndpoint: SITE_CONFIG.formEndpoint
 };
