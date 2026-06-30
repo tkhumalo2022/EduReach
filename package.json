@@ -9,7 +9,6 @@
     "build": "node scripts/validate-js.mjs"
   },
   "dependencies": {
-    "@wix/blog": "^1.0.620",
     "@wix/data": "^1.0.482",
     "@wix/sdk": "^1.21.12"
   },

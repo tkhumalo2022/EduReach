@@ -4,9 +4,9 @@
   const TYPE_LABELS = {
     articles: "Articles",
     ebooks: "Ebooks",
-    downloads: "Downloadable Resources",
-    workshops: "Workshop Photos",
-    gallery: "Gallery",
+    downloads: "DownloadableResources",
+    workshops: "WorkshopAlbums",
+    gallery: "GalleryAlbums",
     blog: "Blogs"
   };
 
@@ -22,9 +22,9 @@
   const LISTING_COPY = {
     articles: "Search EduReach articles by title, topic or category.",
     ebooks: "Search ebooks and filter by category when Wix content is available.",
-    downloads: "Find practical downloads for schools, teachers and families.",
-    workshops: "Browse approved workshop photo albums with confirmed consent.",
-    gallery: "Browse approved EduReach gallery albums with confirmed consent.",
+    downloads: "Search DownloadableResources by title, topic or category.",
+    workshops: "Browse approved WorkshopAlbums with confirmed consent.",
+    gallery: "Browse approved GalleryAlbums with confirmed consent.",
     blog: "Search EduReach blogs by title, topic or category."
   };
 

@@ -1,12 +1,12 @@
 import { createClient, media, OAuthStrategy } from "@wix/sdk";
 import { items } from "@wix/data";
-import { posts } from "@wix/blog";
 
 export const WIX_ENV_KEYS = Object.freeze([
   "NEXT_PUBLIC_WIX_CLIENT_ID",
   "WIX_ACCOUNT_ID",
   "WIX_SITE_ID",
   "WIX_ARTICLES_COLLECTION_ID",
+  "WIX_BLOGS_COLLECTION_ID",
   "WIX_EBOOKS_COLLECTION_ID",
   "WIX_DOWNLOADS_COLLECTION_ID",
   "WIX_WORKSHOP_ALBUMS_COLLECTION_ID",
@@ -21,6 +21,7 @@ export function readWixConfig(env = process.env) {
     siteId: env.WIX_SITE_ID || "",
     collections: {
       articles: env.WIX_ARTICLES_COLLECTION_ID || "",
+      blog: env.WIX_BLOGS_COLLECTION_ID || "",
       ebooks: env.WIX_EBOOKS_COLLECTION_ID || "",
       downloads: env.WIX_DOWNLOADS_COLLECTION_ID || "",
       workshops: env.WIX_WORKSHOP_ALBUMS_COLLECTION_ID || "",
@@ -44,8 +45,7 @@ export function createWixClient(config = readWixConfig()) {
 
   return createClient({
     modules: {
-      items,
-      posts
+      items
     },
     auth: OAuthStrategy({
       clientId: config.clientId

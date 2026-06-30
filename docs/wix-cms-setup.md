@@ -1,6 +1,6 @@
 # Wix CMS setup for EduReach
 
-EduReach remains a GitHub/Vercel website. Wix is used only as the headless content dashboard for articles, ebooks, downloads, albums, blog posts and paid digital products.
+EduReach remains a GitHub/Vercel website. Wix is used only as the headless content dashboard for articles, blogs, ebooks, downloads, albums and paid digital products.
 
 ## 1. Create or open the Wix Headless project
 
@@ -14,7 +14,6 @@ EduReach remains a GitHub/Vercel website. Wix is used only as the headless conte
 Install these Wix apps:
 
 - Wix CMS / Content Manager
-- Wix Blog, if `/blog` should show Wix Blog posts
 - Wix Stores, only if paid downloadable resources need Wix-managed checkout or secure store delivery
 
 ## 3. Create the OAuth application
@@ -33,7 +32,6 @@ Enable these permissions for the Wix Headless project:
 
 - Read Data Items
 - Read Data Collections
-- Read Blog Posts, if Wix Blog is used
 - Read Products / Checkout, only if Wix Stores is used for paid downloadable resources
 
 The website only reads published content. It does not create, update or delete Wix content.
@@ -46,6 +44,7 @@ Add these in Vercel Project Settings -> Environment Variables for Production, Pr
 NEXT_PUBLIC_WIX_CLIENT_ID=
 WIX_SITE_ID=
 WIX_ARTICLES_COLLECTION_ID=Articles
+WIX_BLOGS_COLLECTION_ID=Blogs
 WIX_EBOOKS_COLLECTION_ID=Ebooks
 WIX_DOWNLOADS_COLLECTION_ID=DownloadableResources
 WIX_WORKSHOP_ALBUMS_COLLECTION_ID=WorkshopAlbums
@@ -89,7 +88,27 @@ Collection ID: `Articles`
 | `seoTitle` | Text | Optional SEO title |
 | `seoDescription` | Text | Optional meta description |
 
-## 8. Ebooks collection
+## 8. Blogs collection
+
+Collection ID: `Blogs`
+
+| Field ID | Wix field type | Notes |
+|---|---|---|
+| `title` | Text | Required |
+| `slug` | Text | Optional but recommended; code can generate one from title |
+| `excerpt` | Text | Short card summary |
+| `content` | Rich Content or Text | Main post body |
+| `featuredImage` | Image | Optional card/detail image |
+| `imageAlt` | Text | Alternative text |
+| `author` | Text | Optional |
+| `publishDate` | Date and Time | Used for sorting |
+| `category` | Reference to Import6 or Text | Category label |
+| `tags` | Tags or Text | Optional |
+| `featured` | Boolean | Featured posts sort first |
+| `seoTitle` | Text | Optional SEO title |
+| `seoDescription` | Text | Optional meta description |
+
+## 9. Ebooks collection
 
 Collection ID: `Ebooks`
 
@@ -114,7 +133,7 @@ Website behavior:
 - If `isFree` is false and `paymentLink` is empty, the website shows Coming Soon.
 - The code can generate a URL slug from the title, so the owner does not need to manage a slug for basic ebook setup.
 
-## 9. Downloadable Resources collection
+## 10. DownloadableResources collection
 
 Collection ID: `DownloadableResources`
 
@@ -143,7 +162,7 @@ Collection ID: `DownloadableResources`
 
 For paid resources, do not place the protected final file in `resourceFile`. Use Wix Stores for secure delivery.
 
-## 10. Workshop Albums collection
+## 11. WorkshopAlbums collection
 
 Collection ID: `WorkshopAlbums`
 
@@ -164,7 +183,7 @@ Collection ID: `WorkshopAlbums`
 
 Only publish albums after written media consent has been confirmed.
 
-## 11. Gallery Albums collection
+## 12. GalleryAlbums collection
 
 Collection ID: `GalleryAlbums`
 
@@ -185,7 +204,7 @@ Collection ID: `GalleryAlbums`
 
 Only publish albums after written media consent has been confirmed.
 
-## 12. Categories collection
+## 13. Category helper collection
 
 Collection ID: `Import6`
 
@@ -197,16 +216,15 @@ Collection ID: `Import6`
 | `resourceType` | Dropdown | Article, Ebook, Download, Workshop, Gallery, Blog |
 | `active` | Boolean | Only active categories are used |
 
-## 13. Wix Blog setup
+## 14. Blogs setup
 
-1. Install Wix Blog.
-2. Add Read Blog Posts permission to the Headless project.
-3. Add real blog posts in Wix Blog.
-4. Publish the posts in Wix.
+1. Open CMS -> Blogs.
+2. Add real blog posts in the `Blogs` CMS collection.
+3. Publish the posts in Wix.
 
-If Wix Blog is not installed or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts.
+If the `Blogs` collection is missing or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts.
 
-## 14. Paid digital products
+## 15. Paid digital products
 
 For basic paid ebooks, Wix Stores is not required. Add the payment page URL to the ebook `paymentLink` field. This can be a Wix payment link, Stripe link, PayFast link, invoice link or any approved checkout URL.
 
@@ -221,7 +239,7 @@ For paid downloadable resources that need protected file delivery through Wix St
 
 The website displays the price and Buy button for paid resources, but it never prints protected paid file URLs.
 
-## 15. Create test content
+## 16. Create test content
 
 1. Create one draft article and confirm it does not appear publicly.
 2. Publish one article and confirm it appears under Resources and `/resources/articles`.
@@ -230,7 +248,7 @@ The website displays the price and Buy button for paid resources, but it never p
 5. Create one workshop album with `consentConfirmed` false and confirm it stays hidden.
 6. Set `consentConfirmed` true and publish the album to confirm it appears.
 
-## 16. Test the connection locally
+## 17. Test the connection locally
 
 1. Copy `.env.example` to `.env.local`.
 2. Fill in real Wix values locally.
@@ -240,7 +258,7 @@ The website displays the price and Buy button for paid resources, but it never p
 6. Run `npm run build`.
 7. Start a local server or Vercel dev environment and open the Resources pages.
 
-## 17. Test the connection on Vercel
+## 18. Test the connection on Vercel
 
 1. Add the same environment variables in Vercel.
 2. Redeploy after adding variables.
@@ -248,6 +266,6 @@ The website displays the price and Buy button for paid resources, but it never p
 4. Check `/`, `/resources/articles`, `/resources/ebooks`, `/resources/downloads`, `/resources/workshops`, `/resources/gallery`, and `/blog`.
 5. Confirm pages work when a collection is empty.
 
-## 18. Cache and revalidation
+## 19. Cache and revalidation
 
 The Vercel API response uses `s-maxage=300, stale-while-revalidate=600`. Newly published Wix content can take a few minutes to appear without a new deployment.

@@ -23,6 +23,24 @@ Use the `.sample.csv` files as copy-paste references while creating test records
 | `seoTitle` | Text | Sample Article: Inclusive Classroom Support |
 | `seoDescription` | Text | Sample SEO description for testing article pages. |
 
+## Blogs fields
+
+| Field ID | Wix field type | Sample value |
+|---|---|---|
+| `title` | Text | Sample Blog: Inclusive Classroom Note |
+| `slug` | Text | sample-inclusive-classroom-note |
+| `excerpt` | Text | Sample only. Replace this with a real EduReach blog summary. |
+| `content` | Rich Content | Use a few paragraphs in Wix Rich Content. |
+| `featuredImage` | Image | Upload a sample blog image in Wix. |
+| `imageAlt` | Text | Sample inclusive classroom image |
+| `author` | Text | EduReach |
+| `publishDate` | Date and Time | 2026-07-01 |
+| `category` | Reference to Categories or Text | Inclusion |
+| `tags` | Tags | inclusion, classroom support |
+| `featured` | Boolean | true |
+| `seoTitle` | Text | Sample Blog: Inclusive Classroom Note |
+| `seoDescription` | Text | Sample blog post for testing EduReach Blogs. |
+
 ## Ebooks fields
 
 | Field ID | Wix field type | Sample value |
@@ -111,6 +129,7 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 ## Sample file list
 
 - `Articles.sample.csv`
+- `Blogs.sample.csv`
 - `Ebooks.sample.csv`
 - `DownloadableResources.sample.csv`
 - `WorkshopAlbums.sample.csv`

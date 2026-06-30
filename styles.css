@@ -966,8 +966,10 @@ h3 {
 }
 
 .cms-resource-header h3 {
+  min-width: 0;
   margin-bottom: 0;
   font-size: 1.45rem;
+  overflow-wrap: anywhere;
 }
 
 .cms-section-description {

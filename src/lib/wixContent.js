@@ -32,8 +32,8 @@ export const CONTENT_TYPES = Object.freeze({
     emptyMessage: EMPTY_MESSAGE
   },
   downloads: {
-    label: "Downloadable Resources",
-    singular: "Downloadable Resource",
+    label: "DownloadableResources",
+    singular: "DownloadableResources",
     collectionKey: "downloads",
     dateField: "publicationDate",
     detailPath: "/resources/downloads",
@@ -41,8 +41,8 @@ export const CONTENT_TYPES = Object.freeze({
     emptyMessage: EMPTY_MESSAGE
   },
   workshops: {
-    label: "Workshop Photos",
-    singular: "Workshop Album",
+    label: "WorkshopAlbums",
+    singular: "WorkshopAlbums",
     collectionKey: "workshops",
     dateField: "workshopDate",
     detailPath: "/resources/workshops",
@@ -51,8 +51,8 @@ export const CONTENT_TYPES = Object.freeze({
     requiresConsent: true
   },
   gallery: {
-    label: "Gallery",
-    singular: "Gallery Album",
+    label: "GalleryAlbums",
+    singular: "GalleryAlbums",
     collectionKey: "gallery",
     dateField: "albumDate",
     detailPath: "/resources/gallery",
@@ -63,16 +63,17 @@ export const CONTENT_TYPES = Object.freeze({
   blog: {
     label: "Blogs",
     singular: "Blog Post",
+    collectionKey: "blog",
     dateField: "publishDate",
     detailPath: "/blog",
     ctaLabel: "Read More",
-    emptyMessage: EMPTY_MESSAGE,
-    usesBlogApi: true
+    emptyMessage: EMPTY_MESSAGE
   }
 });
 
 const COLLECTION_ENV_KEYS = Object.freeze({
   articles: "WIX_ARTICLES_COLLECTION_ID",
+  blog: "WIX_BLOGS_COLLECTION_ID",
   ebooks: "WIX_EBOOKS_COLLECTION_ID",
   downloads: "WIX_DOWNLOADS_COLLECTION_ID",
   workshops: "WIX_WORKSHOP_ALBUMS_COLLECTION_ID",
@@ -93,7 +94,7 @@ export function getWixConnectionStatus(type = "") {
     missing.push(COLLECTION_ENV_KEYS.categories);
   }
 
-  if (normalizedType && !CONTENT_TYPES[normalizedType].usesBlogApi) {
+  if (normalizedType) {
     const collectionKey = CONTENT_TYPES[normalizedType].collectionKey;
     if (!config.collections[collectionKey]) {
       missing.push(COLLECTION_ENV_KEYS[normalizedType]);
@@ -193,34 +194,7 @@ export async function getCategories(options = {}) {
 }
 
 export async function getPublishedBlogPosts(options = {}) {
-  const status = getWixConnectionStatus("blog");
-  if (!status.configured) return unconfiguredResult(status);
-
-  const paging = normalizePaging(options);
-  const needsLocalFiltering = Boolean(paging.search || paging.category);
-  const wixLimit = needsLocalFiltering ? MAX_FILTER_FETCH : paging.limit;
-  const offset = needsLocalFiltering ? 0 : paging.skip;
-
-  try {
-    const client = createWixClient();
-    const response = await client.posts.listPosts({
-      featured: Boolean(options.featuredOnly) || undefined,
-      paging: { limit: wixLimit, offset }
-    });
-
-    let items = (response.posts || []).map(normalizeBlogPost).filter(Boolean);
-    items = applyNormalizedFilters(items, paging).sort(sortFeaturedNewest);
-
-    const total = needsLocalFiltering
-      ? items.length
-      : Number(response.metaData?.total ?? response.metaData?.count ?? items.length);
-
-    if (needsLocalFiltering) items = slicePage(items, paging);
-
-    return listResult(items, paging, total, response.metaData?.total > offset + wixLimit);
-  } catch (error) {
-    return errorResult(error, "Wix Blog could not be loaded.");
-  }
+  return getPublishedCollection("blog", options);
 }
 
 export async function getFeaturedBlogPosts(options = {}) {
@@ -228,21 +202,7 @@ export async function getFeaturedBlogPosts(options = {}) {
 }
 
 export async function getBlogPostBySlug(slug) {
-  const cleanSlug = normalizeSlug(slug);
-  if (!cleanSlug) return { configured: true, item: null };
-
-  const status = getWixConnectionStatus("blog");
-  if (!status.configured) return unconfiguredResult(status, true);
-
-  try {
-    const client = createWixClient();
-    const response = await client.posts.getPostBySlug(cleanSlug);
-    const item = normalizeBlogPost(response.post);
-
-    return { configured: true, item };
-  } catch (error) {
-    return errorResult(error, "Wix Blog post could not be loaded.", true);
-  }
+  return getCollectionItemBySlug("blog", slug);
 }
 
 export async function getContentList(type, options = {}) {
@@ -354,8 +314,8 @@ async function getCollectionItemBySlug(type, slug) {
     });
     const item = result.items?.[0]
       ? normalizeCmsItem(type, result.items[0])
-      : type === "ebooks"
-        ? await findEbookByGeneratedSlug(collectionId, cleanSlug)
+      : type === "ebooks" || type === "blog"
+        ? await findItemByGeneratedSlug(type, collectionId, cleanSlug)
         : null;
 
     return { configured: true, item };
@@ -364,19 +324,25 @@ async function getCollectionItemBySlug(type, slug) {
   }
 }
 
-async function findEbookByGeneratedSlug(collectionId, slug) {
+async function findItemByGeneratedSlug(type, collectionId, slug) {
+  const definition = CONTENT_TYPES[type];
   const client = createWixClient();
-  const result = await client.items
+  let query = client.items
     .query(collectionId)
-    .descending("featured", "publishedDate", "_createdDate")
-    .limit(MAX_FILTER_FETCH)
-    .find({
-      showDrafts: false,
-      includeReferences: [{ field: "category", limit: 1 }]
-    });
+    .descending("featured", definition.dateField, "_createdDate")
+    .limit(MAX_FILTER_FETCH);
+
+  if (definition.requiresConsent) {
+    query = query.eq("consentConfirmed", true);
+  }
+
+  const result = await query.find({
+    showDrafts: false,
+    includeReferences: [{ field: "category", limit: 1 }]
+  });
 
   return (result.items || [])
-    .map((item) => normalizeCmsItem("ebooks", item))
+    .map((item) => normalizeCmsItem(type, item))
     .find((item) => item.slug === slug) || null;
 }
 
@@ -387,7 +353,7 @@ function normalizeCmsItem(type, rawItem) {
     ? normalizeEbookAccessType(data)
     : normalizeAccessType(data.accessType);
   const image =
-    withFallbackAlt(resolveWixImage(data.featuredImage || data.coverImage || data.thumbnail), [
+    withFallbackAlt(resolveWixImage(data.featuredImage || data.coverImage || data.thumbnail || data.image), [
       data.imageAlt,
       data.coverAlt,
       data.thumbnailAlt,
@@ -448,46 +414,6 @@ function normalizeCmsItem(type, rawItem) {
     seoDescription: text(data.seoDescription || data.excerpt || data.description || data.shortDescription),
     detailUrl: `${definition.detailPath}/${encodeURIComponent(slug)}`,
     ctaLabel: ctaLabel(type, accessType, paymentLink)
-  };
-}
-
-function normalizeBlogPost(post) {
-  if (!post) return null;
-
-  const image =
-    resolveWixImage(post.media?.displayed) ||
-    resolveWixImage(post.media?.custom) ||
-    resolveWixImage(post.media?.embedMedia?.thumbnail);
-  const contentBlocks = richContentToBlocks(post.richContent || post.preview || post.excerpt);
-  const slug = normalizeSlug(post.slug);
-
-  return {
-    id: post._id || "",
-    type: "blog",
-    label: "Blogs",
-    title: text(post.title),
-    slug,
-    excerpt: text(post.excerpt || post.preview),
-    content: blocksToPlainText(contentBlocks),
-    contentBlocks,
-    image,
-    author: text(post.author || post.owner || post.memberId),
-    category: text(post.categoryLabel || post.categoryIds?.[0]),
-    tags: normalizeTags(post.hashtags || post.tags || post.tagIds),
-    date: dateValue(post.firstPublishedDate || post.lastPublishedDate || post.publishedDate),
-    featured: Boolean(post.featured || post.pinned),
-    accessType: "free",
-    price: "",
-    currency: "ZAR",
-    purchaseLink: "",
-    storeProductId: "",
-    fileUrl: "",
-    previewUrl: "",
-    seoTitle: text(post.seoData?.title || post.title),
-    seoDescription: text(post.seoData?.description || post.excerpt || post.preview),
-    detailUrl: `/blog/${encodeURIComponent(slug)}`,
-    ctaLabel: "Read More",
-    mediaGallery: []
   };
 }
 
