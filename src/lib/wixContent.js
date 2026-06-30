@@ -270,10 +270,10 @@ async function getPublishedCollection(type, options = {}) {
       query = query.eq("featured", true);
     }
 
-    const result = await query.find({
+    const result = await findItems(query, {
       showDrafts: false,
       returnTotalCount: true,
-      includeReferences: [{ field: "category", limit: 1 }]
+      includeCategoryReference: true
     });
 
     let items = (result.items || [])
@@ -308,9 +308,9 @@ async function getCollectionItemBySlug(type, slug) {
       query = query.eq("consentConfirmed", true);
     }
 
-    const result = await query.find({
+    const result = await findItems(query, {
       showDrafts: false,
-      includeReferences: [{ field: "category", limit: 1 }]
+      includeCategoryReference: true
     });
     const item = result.items?.[0]
       ? normalizeCmsItem(type, result.items[0])
@@ -336,14 +336,31 @@ async function findItemByGeneratedSlug(type, collectionId, slug) {
     query = query.eq("consentConfirmed", true);
   }
 
-  const result = await query.find({
+  const result = await findItems(query, {
     showDrafts: false,
-    includeReferences: [{ field: "category", limit: 1 }]
+    includeCategoryReference: true
   });
 
   return (result.items || [])
     .map((item) => normalizeCmsItem(type, item))
     .find((item) => item.slug === slug) || null;
+}
+
+async function findItems(query, options = {}) {
+  const { includeCategoryReference = false, ...findOptions } = options;
+
+  if (!includeCategoryReference) {
+    return query.find(findOptions);
+  }
+
+  try {
+    return await query.find({
+      ...findOptions,
+      includeReferences: [{ field: "category", limit: 1 }]
+    });
+  } catch {
+    return query.find(findOptions);
+  }
 }
 
 function normalizeCmsItem(type, rawItem) {
