@@ -9,45 +9,47 @@ const LIMITS = Object.freeze({
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function clean(value, maxLength) {
+function clean(value, maxLength = 4000) {
   return String(value ?? "").trim().slice(0, maxLength);
 }
 
-function json(data, status = 200) {
-  return Response.json(data, {
-    status,
-    headers: {
-      "Cache-Control": "no-store"
-    }
-  });
+function sendJson(response, statusCode, data) {
+  response.setHeader("Cache-Control", "no-store");
+  return response.status(statusCode).json(data);
 }
 
-export function GET() {
-  return json({ ok: true, service: "EduReach contact endpoint" });
-}
+export default async function handler(request, response) {
+  if (request.method === "GET") {
+    return sendJson(response, 200, {
+      ok: true,
+      service: "EduReach contact endpoint"
+    });
+  }
 
-export async function POST(request) {
+  if (request.method !== "POST") {
+    response.setHeader("Allow", "GET, POST");
+    return sendJson(response, 405, {
+      ok: false,
+      message: "Method not allowed."
+    });
+  }
+
   const appsScriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
   const backendSecret = process.env.EDUREACH_BACKEND_SECRET;
 
   if (!appsScriptUrl || !backendSecret) {
     console.error("EduReach backend environment variables are missing.");
-    return json(
-      { ok: false, message: "The contact service is not configured yet." },
-      500
-    );
+    return sendJson(response, 500, {
+      ok: false,
+      message: "The contact service is not configured yet."
+    });
   }
 
-  let body;
+  const body = request.body || {};
 
-  try {
-    body = await request.json();
-  } catch {
-    return json({ ok: false, message: "Invalid request body." }, 400);
-  }
-
+  // Honeypot field. Humans will not fill this field, but spam bots often do.
   if (clean(body.website, 200)) {
-    return json({ ok: true });
+    return sendJson(response, 200, { ok: true });
   }
 
   const enquiry = {
@@ -60,14 +62,17 @@ export async function POST(request) {
   };
 
   if (!enquiry.name || !enquiry.email || !enquiry.message) {
-    return json(
-      { ok: false, message: "Name, email and message are required." },
-      400
-    );
+    return sendJson(response, 400, {
+      ok: false,
+      message: "Name, email and message are required."
+    });
   }
 
   if (!EMAIL_PATTERN.test(enquiry.email)) {
-    return json({ ok: false, message: "Enter a valid email address." }, 400);
+    return sendJson(response, 400, {
+      ok: false,
+      message: "Enter a valid email address."
+    });
   }
 
   try {
@@ -79,7 +84,8 @@ export async function POST(request) {
       body: JSON.stringify({
         ...enquiry,
         secret: backendSecret,
-        source: "EduReach website"
+        source: "EduReach website",
+        submittedAt: new Date().toISOString()
       }),
       redirect: "follow"
     });
@@ -90,7 +96,7 @@ export async function POST(request) {
     try {
       upstreamData = JSON.parse(responseText);
     } catch {
-      // A non-JSON reply is treated as an upstream failure below.
+      // Google Apps Script should return JSON. Non-JSON means something is wrong upstream.
     }
 
     if (!upstreamResponse.ok || upstreamData?.ok !== true) {
@@ -98,21 +104,23 @@ export async function POST(request) {
         status: upstreamResponse.status,
         responseText
       });
-      return json(
-        { ok: false, message: "The enquiry could not be saved right now." },
-        502
-      );
+
+      return sendJson(response, 502, {
+        ok: false,
+        message: "The enquiry could not be saved right now."
+      });
     }
 
-    return json({
+    return sendJson(response, 200, {
       ok: true,
       message: "Thank you. Your message has been sent."
     });
   } catch (error) {
     console.error("EduReach contact endpoint failed.", error);
-    return json(
-      { ok: false, message: "The enquiry service is temporarily unavailable." },
-      502
-    );
+
+    return sendJson(response, 502, {
+      ok: false,
+      message: "The enquiry service is temporarily unavailable."
+    });
   }
 }
