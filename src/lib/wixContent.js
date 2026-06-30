@@ -61,7 +61,7 @@ export const CONTENT_TYPES = Object.freeze({
     requiresConsent: true
   },
   blog: {
-    label: "Blog",
+    label: "Blogs",
     singular: "Blog Post",
     dateField: "publishDate",
     detailPath: "/blog",
@@ -464,7 +464,7 @@ function normalizeBlogPost(post) {
   return {
     id: post._id || "",
     type: "blog",
-    label: "Blog",
+    label: "Blogs",
     title: text(post.title),
     slug,
     excerpt: text(post.excerpt || post.preview),

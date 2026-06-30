@@ -39,7 +39,7 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 | Downloadable Resources | `DownloadableResources` | `docs/wix-cms-templates/DownloadableResources.sample.csv` |
 | Workshop Albums | `WorkshopAlbums` | `docs/wix-cms-templates/WorkshopAlbums.sample.csv` |
 | Gallery Albums | `GalleryAlbums` | `docs/wix-cms-templates/GalleryAlbums.sample.csv` |
-| Categories | `Categories` | `docs/wix-cms-templates/Categories.sample.csv` |
+| Category helper collection | `Import6` | `docs/wix-cms-templates/Categories.sample.csv` |
 
 ## Fast sample data workflow
 
@@ -63,7 +63,7 @@ WIX_EBOOKS_COLLECTION_ID=Ebooks
 WIX_DOWNLOADS_COLLECTION_ID=DownloadableResources
 WIX_WORKSHOP_ALBUMS_COLLECTION_ID=WorkshopAlbums
 WIX_GALLERY_ALBUMS_COLLECTION_ID=GalleryAlbums
-WIX_CATEGORIES_COLLECTION_ID=Categories
+WIX_CATEGORIES_COLLECTION_ID=Import6
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```

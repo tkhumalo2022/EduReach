@@ -7,7 +7,7 @@
     downloads: "Downloadable Resources",
     workshops: "Workshop Photos",
     gallery: "Gallery",
-    blog: "Blog"
+    blog: "Blogs"
   };
 
   const TYPE_PATHS = {
@@ -25,7 +25,7 @@
     downloads: "Find practical downloads for schools, teachers and families.",
     workshops: "Browse approved workshop photo albums with confirmed consent.",
     gallery: "Browse approved EduReach gallery albums with confirmed consent.",
-    blog: "Search EduReach blog posts and updates."
+    blog: "Search EduReach blogs by title, topic or category."
   };
 
   const listStates = new WeakMap();

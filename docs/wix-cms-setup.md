@@ -50,7 +50,7 @@ WIX_EBOOKS_COLLECTION_ID=Ebooks
 WIX_DOWNLOADS_COLLECTION_ID=DownloadableResources
 WIX_WORKSHOP_ALBUMS_COLLECTION_ID=WorkshopAlbums
 WIX_GALLERY_ALBUMS_COLLECTION_ID=GalleryAlbums
-WIX_CATEGORIES_COLLECTION_ID=Categories
+WIX_CATEGORIES_COLLECTION_ID=Import6
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
@@ -187,7 +187,7 @@ Only publish albums after written media consent has been confirmed.
 
 ## 12. Categories collection
 
-Collection ID: `Categories`
+Collection ID: `Import6`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
