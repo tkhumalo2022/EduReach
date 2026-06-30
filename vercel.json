@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    {
+      "source": "/resources/articles/:slug",
+      "destination": "/resources/articles/detail.html"
+    },
+    {
+      "source": "/resources/ebooks/:slug",
+      "destination": "/resources/ebooks/detail.html"
+    },
+    {
+      "source": "/resources/downloads/:slug",
+      "destination": "/resources/downloads/detail.html"
+    },
+    {
+      "source": "/resources/workshops/:slug",
+      "destination": "/resources/workshops/detail.html"
+    },
+    {
+      "source": "/resources/gallery/:slug",
+      "destination": "/resources/gallery/detail.html"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/blog/detail.html"
+    }
+  ]
+}

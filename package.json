@@ -1,0 +1,19 @@
+{
+  "name": "edureach-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "node scripts/validate-js.mjs",
+    "typecheck": "tsc --noEmit",
+    "build": "node scripts/validate-js.mjs"
+  },
+  "dependencies": {
+    "@wix/blog": "^1.0.620",
+    "@wix/data": "^1.0.482",
+    "@wix/sdk": "^1.21.12"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

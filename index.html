@@ -821,52 +821,108 @@
           </p>
         </div>
 
-        <div class="resource-grid">
-          <article class="resource-card reveal">
-            <span class="badge">Coming Soon</span>
-            <h3>Articles</h3>
-            <p>
-              Short research-informed reflections on inclusive classrooms,
-              learner support and school collaboration.
+        <div class="cms-resource-sections">
+          <section class="cms-resource-section reveal" aria-labelledby="resources-articles-title">
+            <div class="cms-resource-header">
+              <h3 id="resources-articles-title">Articles</h3>
+              <a class="button button-small button-primary" href="/resources/articles">View All</a>
+            </div>
+            <p class="cms-section-description">
+              Research-informed reflections on inclusive classrooms, learner support and school collaboration.
             </p>
-          </article>
+            <div
+              class="resource-grid cms-grid"
+              data-cms-list
+              data-cms-type="articles"
+              data-limit="3"
+              data-empty-message="New EduReach resources will be available soon."
+            ></div>
+          </section>
 
-          <article class="resource-card reveal">
-            <span class="badge">Coming Soon</span>
-            <h3>Guides</h3>
-            <p>
-              Practical guides for teachers and families navigating learner
-              support conversations.
+          <section class="cms-resource-section reveal" aria-labelledby="resources-ebooks-title">
+            <div class="cms-resource-header">
+              <h3 id="resources-ebooks-title">Ebooks</h3>
+              <a class="button button-small button-primary" href="/resources/ebooks">View All</a>
+            </div>
+            <p class="cms-section-description">
+              Digital guides and EduReach publications for teachers, families and school leaders.
             </p>
-          </article>
+            <div
+              class="resource-grid cms-grid"
+              data-cms-list
+              data-cms-type="ebooks"
+              data-limit="3"
+              data-empty-message="New EduReach resources will be available soon."
+            ></div>
+          </section>
 
-          <article class="resource-card reveal">
-            <span class="badge">Coming Soon</span>
-            <h3>Downloadable Resources</h3>
-            <p>
-              Checklists, planning templates and awareness materials for
-              school-based use.
+          <section class="cms-resource-section reveal" aria-labelledby="resources-blog-title">
+            <div class="cms-resource-header">
+              <h3 id="resources-blog-title">Blog</h3>
+              <a class="button button-small button-primary" href="/blog">View All</a>
+            </div>
+            <p class="cms-section-description">
+              EduReach updates, practical notes and inclusive education commentary.
             </p>
-          </article>
+            <div
+              class="resource-grid cms-grid"
+              data-cms-list
+              data-cms-type="blog"
+              data-limit="3"
+              data-empty-message="New EduReach resources will be available soon."
+            ></div>
+          </section>
 
-          <article class="resource-card resource-image reveal">
-            <!-- TODO: Add real workshop photography when available. -->
-            <span class="badge">Placeholder</span>
-            <h3>Workshop Photos</h3>
-            <p>
-              Future images from EduReach training and school engagement
-              sessions.
+          <section class="cms-resource-section reveal" aria-labelledby="resources-downloads-title">
+            <div class="cms-resource-header">
+              <h3 id="resources-downloads-title">Downloadable Resources</h3>
+              <a class="button button-small button-primary" href="/resources/downloads">View All</a>
+            </div>
+            <p class="cms-section-description">
+              Checklists, templates and school-based tools for practical learner support.
             </p>
-          </article>
+            <div
+              class="resource-grid cms-grid"
+              data-cms-list
+              data-cms-type="downloads"
+              data-limit="3"
+              data-empty-message="New EduReach resources will be available soon."
+            ></div>
+          </section>
 
-          <article class="resource-card resource-image reveal">
-            <!-- TODO: Add future gallery images when EduReach has approved photographs. -->
-            <span class="badge">Placeholder</span>
-            <h3>Future Gallery</h3>
-            <p>
-              A place for approved school, community and programme images.
+          <section class="cms-resource-section reveal" aria-labelledby="resources-workshops-title">
+            <div class="cms-resource-header">
+              <h3 id="resources-workshops-title">Workshop Photos</h3>
+              <a class="button button-small button-primary" href="/resources/workshops">View All</a>
+            </div>
+            <p class="cms-section-description">
+              Approved workshop albums that are only shown after photograph consent is confirmed.
             </p>
-          </article>
+            <div
+              class="resource-grid cms-grid"
+              data-cms-list
+              data-cms-type="workshops"
+              data-limit="3"
+              data-empty-message="New EduReach resources will be available soon."
+            ></div>
+          </section>
+
+          <section class="cms-resource-section reveal" aria-labelledby="resources-gallery-title">
+            <div class="cms-resource-header">
+              <h3 id="resources-gallery-title">Gallery</h3>
+              <a class="button button-small button-primary" href="/resources/gallery">View All</a>
+            </div>
+            <p class="cms-section-description">
+              Approved EduReach programme, community and school engagement albums.
+            </p>
+            <div
+              class="resource-grid cms-grid"
+              data-cms-list
+              data-cms-type="gallery"
+              data-limit="3"
+              data-empty-message="New EduReach resources will be available soon."
+            ></div>
+          </section>
         </div>
       </div>
     </section>
@@ -1274,5 +1330,6 @@
 
   <script src="site-config.js"></script>
   <script src="script.js"></script>
+  <script src="cms.js"></script>
 </body>
 </html>
