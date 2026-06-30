@@ -33,13 +33,14 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 
 | Collection name in Wix | Collection ID expected by code | Template file |
 |---|---|---|
-| Articles | `Articles` | `docs/wix-cms-templates/Articles.sample.csv` |
-| Blogs | `Blogs` | `docs/wix-cms-templates/Blogs.sample.csv` |
-| Ebooks | `Ebooks` | `docs/wix-cms-templates/Ebooks.sample.csv` |
-| DownloadableResources | `DownloadableResources` | `docs/wix-cms-templates/DownloadableResources.sample.csv` |
-| WorkshopAlbums | `WorkshopAlbums` | `docs/wix-cms-templates/WorkshopAlbums.sample.csv` |
-| GalleryAlbums | `GalleryAlbums` | `docs/wix-cms-templates/GalleryAlbums.sample.csv` |
+| Articles | `Import1` | `docs/wix-cms-templates/Articles.sample.csv` |
+| DownloadableResources | `Import2` | `docs/wix-cms-templates/DownloadableResources.sample.csv` |
+| WorkshopAlbums | `Import3` | `docs/wix-cms-templates/WorkshopAlbums.sample.csv` |
+| GalleryAlbums | `Import4` | `docs/wix-cms-templates/GalleryAlbums.sample.csv` |
+| Ebooks | `Import5` | `docs/wix-cms-templates/Ebooks.sample.csv` |
 | Category helper collection | `Import6` | `docs/wix-cms-templates/Categories.sample.csv` |
+
+Only add `WIX_BLOGS_COLLECTION_ID` if Wix has a separate Blogs CMS collection with its own real collection ID. Do not use the display name `Blogs` as a collection ID.
 
 ## Fast sample data workflow
 
@@ -58,13 +59,13 @@ Add these in Vercel Project Settings -> Environment Variables for Production, Pr
 ```text
 NEXT_PUBLIC_WIX_CLIENT_ID=
 WIX_SITE_ID=
-WIX_ARTICLES_COLLECTION_ID=Articles
-WIX_BLOGS_COLLECTION_ID=Blogs
-WIX_EBOOKS_COLLECTION_ID=Ebooks
-WIX_DOWNLOADS_COLLECTION_ID=DownloadableResources
-WIX_WORKSHOP_ALBUMS_COLLECTION_ID=WorkshopAlbums
-WIX_GALLERY_ALBUMS_COLLECTION_ID=GalleryAlbums
+WIX_ARTICLES_COLLECTION_ID=Import1
+WIX_EBOOKS_COLLECTION_ID=Import5
+WIX_DOWNLOADS_COLLECTION_ID=Import2
+WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
+WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
+WIX_BLOGS_COLLECTION_ID=
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```

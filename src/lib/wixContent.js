@@ -170,12 +170,13 @@ export async function getGalleryAlbumBySlug(slug) {
 export async function getCategories(options = {}) {
   const status = getWixConnectionStatus("categories");
   if (!status.configured) return unconfiguredResult(status);
+  const config = readWixConfig();
+  const collectionId = config.collections.categories;
 
   try {
-    const config = readWixConfig();
     const client = createWixClient();
     let query = client.items
-      .query(config.collections.categories)
+      .query(collectionId)
       .eq("active", true)
       .ascending("name")
       .limit(safeLimit(options.limit || 100, 100));
@@ -189,7 +190,11 @@ export async function getCategories(options = {}) {
       pagination: paginationMeta(1, items.length || DEFAULT_LIMIT, result.totalCount, result.hasNext?.())
     };
   } catch (error) {
-    return errorResult(error, "Wix categories could not be loaded.");
+    return errorResult(error, "Wix categories could not be loaded.", false, {
+      collectionId,
+      debug: options.debug,
+      operation: "categories"
+    });
   }
 }
 
@@ -224,20 +229,20 @@ export async function getContentList(type, options = {}) {
   }
 }
 
-export async function getContentBySlug(type, slug) {
+export async function getContentBySlug(type, slug, options = {}) {
   switch (type) {
     case "articles":
-      return getArticleBySlug(slug);
+      return getCollectionItemBySlug("articles", slug, options);
     case "ebooks":
-      return getEbookBySlug(slug);
+      return getCollectionItemBySlug("ebooks", slug, options);
     case "downloads":
-      return getDownloadBySlug(slug);
+      return getCollectionItemBySlug("downloads", slug, options);
     case "workshops":
-      return getWorkshopAlbumBySlug(slug);
+      return getCollectionItemBySlug("workshops", slug, options);
     case "gallery":
-      return getGalleryAlbumBySlug(slug);
+      return getCollectionItemBySlug("gallery", slug, options);
     case "blog":
-      return getBlogPostBySlug(slug);
+      return getCollectionItemBySlug("blog", slug, options);
     default:
       return { configured: true, item: null, error: "Unknown content type." };
   }
@@ -247,15 +252,15 @@ async function getPublishedCollection(type, options = {}) {
   const status = getWixConnectionStatus(type);
   if (!status.configured) return unconfiguredResult(status);
 
+  const definition = CONTENT_TYPES[type];
+  const collectionId = readWixConfig().collections[definition.collectionKey];
   const paging = normalizePaging(options);
   const needsLocalFiltering = Boolean(paging.search || paging.category);
   const wixLimit = needsLocalFiltering ? MAX_FILTER_FETCH : paging.limit;
   const wixSkip = needsLocalFiltering ? 0 : paging.skip;
 
   try {
-    const definition = CONTENT_TYPES[type];
     const client = createWixClient();
-    const collectionId = readWixConfig().collections[definition.collectionKey];
     let query = client.items
       .query(collectionId)
       .descending("featured", definition.dateField, "_createdDate")
@@ -287,21 +292,26 @@ async function getPublishedCollection(type, options = {}) {
 
     return listResult(items, paging, total, result.hasNext?.());
   } catch (error) {
-    return errorResult(error, `${CONTENT_TYPES[type].label} could not be loaded.`);
+    return errorResult(error, `${CONTENT_TYPES[type].label} could not be loaded.`, false, {
+      collectionId,
+      debug: options.debug,
+      operation: "list",
+      type
+    });
   }
 }
 
-async function getCollectionItemBySlug(type, slug) {
+async function getCollectionItemBySlug(type, slug, options = {}) {
   const cleanSlug = normalizeSlug(slug);
   if (!cleanSlug) return { configured: true, item: null };
 
   const status = getWixConnectionStatus(type);
   if (!status.configured) return unconfiguredResult(status, true);
+  const definition = CONTENT_TYPES[type];
+  const collectionId = readWixConfig().collections[definition.collectionKey];
 
   try {
-    const definition = CONTENT_TYPES[type];
     const client = createWixClient();
-    const collectionId = readWixConfig().collections[definition.collectionKey];
     let query = client.items.query(collectionId).eq("slug", cleanSlug).limit(1);
 
     if (definition.requiresConsent) {
@@ -320,7 +330,13 @@ async function getCollectionItemBySlug(type, slug) {
 
     return { configured: true, item };
   } catch (error) {
-    return errorResult(error, `${CONTENT_TYPES[type].singular} could not be loaded.`, true);
+    return errorResult(error, `${CONTENT_TYPES[type].singular} could not be loaded.`, true, {
+      collectionId,
+      debug: options.debug,
+      operation: "detail",
+      slug: cleanSlug,
+      type
+    });
   }
 }
 
@@ -353,13 +369,22 @@ async function findItems(query, options = {}) {
     return query.find(findOptions);
   }
 
+  let referenceError = null;
+
   try {
     return await query.find({
       ...findOptions,
       includeReferences: [{ field: "category", limit: 1 }]
     });
-  } catch {
-    return query.find(findOptions);
+  } catch (error) {
+    referenceError = error;
+  }
+
+  try {
+    return await query.find(findOptions);
+  } catch (error) {
+    error.referenceQueryError = referenceError;
+    throw error;
   }
 }
 
@@ -717,13 +742,63 @@ function unconfiguredResult(status, itemMode = false) {
   return itemMode ? { ...base, item: null } : { ...base, items: [] };
 }
 
-function errorResult(error, message, itemMode = false) {
-  console.error(message, error);
+function errorResult(error, message, itemMode = false, context = {}) {
+  const wixError = serializeWixError(error);
+  const logPayload = {
+    message,
+    context: logContext(context),
+    wixError
+  };
+
+  console.error("EduReach Wix CMS request failed.", JSON.stringify(logPayload));
+
   const base = {
     configured: true,
     error: message,
     message
   };
 
+  if (context.debug) {
+    base.wixError = wixError;
+    base.debugContext = logPayload.context;
+  }
+
   return itemMode ? { ...base, item: null } : { ...base, items: [] };
+}
+
+function logContext(context = {}) {
+  return {
+    collectionId: text(context.collectionId),
+    operation: text(context.operation),
+    slug: text(context.slug),
+    type: text(context.type)
+  };
+}
+
+function serializeWixError(error) {
+  if (!error) return null;
+
+  const serialized = {
+    name: text(error.name),
+    message: text(error.message),
+    code: text(error.code || error.details?.applicationError?.code),
+    status: error.response?.status || error.status || error.statusCode || "",
+    details: safeJson(error.details || error.response?.data || error.data)
+  };
+
+  if (error.referenceQueryError) {
+    serialized.referenceQueryError = serializeWixError(error.referenceQueryError);
+  }
+
+  return serialized;
+}
+
+function safeJson(value) {
+  if (!value) return null;
+
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch {
+    return text(value);
+  }
 }

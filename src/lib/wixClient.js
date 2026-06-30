@@ -14,19 +14,47 @@ export const WIX_ENV_KEYS = Object.freeze([
   "WIX_CATEGORIES_COLLECTION_ID"
 ]);
 
+export const WIX_COLLECTION_ID_DEFAULTS = Object.freeze({
+  articles: "Import1",
+  downloads: "Import2",
+  workshops: "Import3",
+  gallery: "Import4",
+  ebooks: "Import5",
+  categories: "Import6"
+});
+
+const WIX_COLLECTION_ID_ALIASES = Object.freeze({
+  articles: { Articles: "Import1" },
+  downloads: {
+    DownloadableResources: "Import2",
+    "Downloadable Resources": "Import2"
+  },
+  workshops: {
+    WorkshopAlbums: "Import3",
+    "Workshop Albums": "Import3"
+  },
+  gallery: {
+    GalleryAlbums: "Import4",
+    "Gallery Albums": "Import4"
+  },
+  ebooks: { Ebooks: "Import5" },
+  categories: { Categories: "Import6" },
+  blog: { Blogs: "" }
+});
+
 export function readWixConfig(env = process.env) {
   return {
     clientId: env.NEXT_PUBLIC_WIX_CLIENT_ID || "",
     accountId: env.WIX_ACCOUNT_ID || "",
     siteId: env.WIX_SITE_ID || "",
     collections: {
-      articles: env.WIX_ARTICLES_COLLECTION_ID || "",
-      blog: env.WIX_BLOGS_COLLECTION_ID || "",
-      ebooks: env.WIX_EBOOKS_COLLECTION_ID || "",
-      downloads: env.WIX_DOWNLOADS_COLLECTION_ID || "",
-      workshops: env.WIX_WORKSHOP_ALBUMS_COLLECTION_ID || "",
-      gallery: env.WIX_GALLERY_ALBUMS_COLLECTION_ID || "",
-      categories: env.WIX_CATEGORIES_COLLECTION_ID || ""
+      articles: collectionId("articles", env.WIX_ARTICLES_COLLECTION_ID),
+      blog: collectionId("blog", env.WIX_BLOGS_COLLECTION_ID),
+      ebooks: collectionId("ebooks", env.WIX_EBOOKS_COLLECTION_ID),
+      downloads: collectionId("downloads", env.WIX_DOWNLOADS_COLLECTION_ID),
+      workshops: collectionId("workshops", env.WIX_WORKSHOP_ALBUMS_COLLECTION_ID),
+      gallery: collectionId("gallery", env.WIX_GALLERY_ALBUMS_COLLECTION_ID),
+      categories: collectionId("categories", env.WIX_CATEGORIES_COLLECTION_ID)
     }
   };
 }
@@ -147,4 +175,15 @@ function firstMediaValue(value) {
   if (Array.isArray(value.items)) return value.items[0] || null;
   if (Array.isArray(value.media)) return value.media[0] || null;
   return value;
+}
+
+function collectionId(key, value) {
+  const configured = String(value || "").trim();
+  const aliases = WIX_COLLECTION_ID_ALIASES[key] || {};
+
+  if (Object.prototype.hasOwnProperty.call(aliases, configured)) {
+    return aliases[configured];
+  }
+
+  return configured || WIX_COLLECTION_ID_DEFAULTS[key] || "";
 }

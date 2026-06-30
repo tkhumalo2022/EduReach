@@ -32,6 +32,7 @@ export default async function handler(req, res) {
   const page = url.searchParams.get("page") || "";
   const search = url.searchParams.get("search") || "";
   const category = url.searchParams.get("category") || "";
+  const debug = url.searchParams.get("debug") === "1";
 
   if (url.searchParams.get("status") === "1") {
     sendJson(res, {
@@ -43,7 +44,7 @@ export default async function handler(req, res) {
   }
 
   if (rawType === "categories") {
-    sendJson(res, { ok: true, ...(await getCategories()) });
+    sendJson(res, { ok: true, ...(await getCategories({ debug })) });
     return;
   }
 
@@ -56,7 +57,7 @@ export default async function handler(req, res) {
     sendJson(res, {
       ok: true,
       type,
-      ...(await getContentBySlug(type, slug))
+      ...(await getContentBySlug(type, slug, { debug }))
     });
     return;
   }
@@ -64,6 +65,6 @@ export default async function handler(req, res) {
   sendJson(res, {
     ok: true,
     type,
-    ...(await getContentList(type, { limit, page, search, category }))
+    ...(await getContentList(type, { limit, page, search, category, debug }))
   });
 }

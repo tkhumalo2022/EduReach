@@ -43,16 +43,18 @@ Add these in Vercel Project Settings -> Environment Variables for Production, Pr
 ```text
 NEXT_PUBLIC_WIX_CLIENT_ID=
 WIX_SITE_ID=
-WIX_ARTICLES_COLLECTION_ID=Articles
-WIX_BLOGS_COLLECTION_ID=Blogs
-WIX_EBOOKS_COLLECTION_ID=Ebooks
-WIX_DOWNLOADS_COLLECTION_ID=DownloadableResources
-WIX_WORKSHOP_ALBUMS_COLLECTION_ID=WorkshopAlbums
-WIX_GALLERY_ALBUMS_COLLECTION_ID=GalleryAlbums
+WIX_ARTICLES_COLLECTION_ID=Import1
+WIX_EBOOKS_COLLECTION_ID=Import5
+WIX_DOWNLOADS_COLLECTION_ID=Import2
+WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
+WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
+WIX_BLOGS_COLLECTION_ID=
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
+
+`WIX_BLOGS_COLLECTION_ID` is optional. Add it only if Wix has a separate Blogs CMS collection with its own real collection ID. Do not use the display name `Blogs` as a collection ID.
 
 Use `.env.example` as a reference only. Do not commit `.env.local`.
 
@@ -69,7 +71,7 @@ For every CMS collection:
 
 ## 7. Articles collection
 
-Collection ID: `Articles`
+Collection ID: `Import1`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -90,7 +92,7 @@ Collection ID: `Articles`
 
 ## 8. Blogs collection
 
-Collection ID: `Blogs`
+Optional collection ID: set `WIX_BLOGS_COLLECTION_ID` only if Wix has a separate Blogs CMS collection with its own real collection ID.
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -110,7 +112,7 @@ Collection ID: `Blogs`
 
 ## 9. Ebooks collection
 
-Collection ID: `Ebooks`
+Collection ID: `Import5`
 
 This collection is intentionally simple. The owner should not need Wix Stores for the basic ebook workflow.
 
@@ -135,7 +137,7 @@ Website behavior:
 
 ## 10. DownloadableResources collection
 
-Collection ID: `DownloadableResources`
+Collection ID: `Import2`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -164,7 +166,7 @@ For paid resources, do not place the protected final file in `resourceFile`. Use
 
 ## 11. WorkshopAlbums collection
 
-Collection ID: `WorkshopAlbums`
+Collection ID: `Import3`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -185,7 +187,7 @@ Only publish albums after written media consent has been confirmed.
 
 ## 12. GalleryAlbums collection
 
-Collection ID: `GalleryAlbums`
+Collection ID: `Import4`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -218,11 +220,12 @@ Collection ID: `Import6`
 
 ## 14. Blogs setup
 
-1. Open CMS -> Blogs.
-2. Add real blog posts in the `Blogs` CMS collection.
-3. Publish the posts in Wix.
+1. Open CMS -> Blogs if a separate Blogs collection exists.
+2. Add its real collection ID to `WIX_BLOGS_COLLECTION_ID`.
+3. Add real blog posts in the Blogs CMS collection.
+4. Publish the posts in Wix.
 
-If the `Blogs` collection is missing or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts.
+If a Blogs collection ID is missing or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts.
 
 ## 15. Paid digital products
 
@@ -265,6 +268,7 @@ The website displays the price and Buy button for paid resources, but it never p
 3. Check `/api/wix-content?status=1` on the preview deployment.
 4. Check `/`, `/resources/articles`, `/resources/ebooks`, `/resources/downloads`, `/resources/workshops`, `/resources/gallery`, and `/blog`.
 5. Confirm pages work when a collection is empty.
+6. If a collection fails, add `debug=1` to the API URL, for example `/api/wix-content?type=articles&limit=1&debug=1`, and check the sanitized Wix error in the JSON response and Vercel logs.
 
 ## 19. Cache and revalidation
 
