@@ -706,9 +706,10 @@ function richContentToBlocks(value) {
   if (!value) return [];
 
   if (typeof value === "string") {
-    if (containsHtml(value)) return htmlToBlocks(value);
+    const decodedValue = decodeHtmlEntities(value);
+    if (containsHtml(decodedValue)) return htmlToBlocks(decodedValue);
 
-    return decodeHtmlEntities(value)
+    return decodedValue
       .split(/\n{2,}/)
       .map((paragraph) => ({ type: "paragraph", text: paragraph.trim() }))
       .filter((block) => block.text);
@@ -903,18 +904,22 @@ function decodeHtmlEntities(value) {
 
     if (normalized.startsWith("#x")) {
       const codePoint = Number.parseInt(normalized.slice(2), 16);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+      return isValidCodePoint(codePoint) ? String.fromCodePoint(codePoint) : match;
     }
 
     if (normalized.startsWith("#")) {
       const codePoint = Number.parseInt(normalized.slice(1), 10);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+      return isValidCodePoint(codePoint) ? String.fromCodePoint(codePoint) : match;
     }
 
     return Object.prototype.hasOwnProperty.call(entities, normalized)
       ? entities[normalized]
       : match;
   });
+}
+
+function isValidCodePoint(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 0x10ffff;
 }
 
 function uniqueSorted(values) {

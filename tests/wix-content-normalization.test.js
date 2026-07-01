@@ -25,6 +25,23 @@ test("cleans raw HTML descriptions for ebook cards and detail blocks", () => {
   ]);
 });
 
+test("cleans entity-encoded HTML descriptions", () => {
+  const item = normalizeCmsItem("ebooks", {
+    data: {
+      title: "Encoded HTML Ebook",
+      description: '&lt;p class="font_8"&gt;Entity&nbsp;encoded guide.&lt;/p&gt;',
+      isFree: true,
+      price: 0
+    }
+  });
+
+  assert.equal(item.excerpt, "Entity encoded guide.");
+  assert.equal(item.excerpt.includes("<"), false);
+  assert.deepEqual(item.contentBlocks, [
+    { type: "paragraph", text: "Entity encoded guide." }
+  ]);
+});
+
 test("marks ebooks paid when isFree is false", () => {
   const item = normalizeCmsItem("ebooks", {
     data: {
