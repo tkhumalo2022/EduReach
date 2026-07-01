@@ -40,7 +40,7 @@ const WIX_COLLECTION_ID_ALIASES = Object.freeze({
   },
   ebooks: { Ebooks: "Import5" },
   categories: { Categories: "Import6" },
-  blogs: { Blogs: "Import2" }
+  blogs: {}
 });
 
 export function readWixConfig(env = process.env) {

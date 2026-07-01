@@ -48,7 +48,7 @@ WIX_DOWNLOADS_COLLECTION_ID=Import2
 WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
 WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
-# Set to Import2 only if that is the real Blogs collection ID.
+# Set to the exact Blogs collection ID Wix shows, for example Blogs or Import2.
 WIX_BLOGS_COLLECTION_ID=
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
@@ -58,7 +58,7 @@ PAYFAST_MODE=sandbox
 WIX_ACCOUNT_ID=
 ```
 
-Set `WIX_BLOGS_COLLECTION_ID` to the real Blogs CMS collection ID. Use `Import2` only if that is the ID Wix shows for the Blogs collection.
+Set `WIX_BLOGS_COLLECTION_ID` to the exact Blogs CMS collection ID Wix shows. Use `Import2` only if that is the ID Wix shows for the Blogs collection.
 
 Use `.env.example` as a reference only. Do not commit `.env.local`.
 
@@ -96,7 +96,7 @@ Collection ID: `Import1`
 
 ## 8. Blogs collection
 
-Collection ID: set `WIX_BLOGS_COLLECTION_ID` to the Blogs CMS collection ID, for example `Import2` if that is the ID Wix shows.
+Collection ID: set `WIX_BLOGS_COLLECTION_ID` to the exact Blogs CMS collection ID Wix shows, for example `Blogs` or `Import2`.
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
