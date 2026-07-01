@@ -1,5 +1,6 @@
 (() => {
   const EMPTY_MESSAGE = "New EduReach resources will be available soon.";
+  const CHECKOUT_PATH = "/checkout";
   const DEFAULT_PAGE_SIZE = 9;
   const SOCIAL_LINKS = {
     facebook: "https://www.facebook.com/share/1EuwmMShrs/",
@@ -586,7 +587,9 @@
   function createInlineNote(message) {
     const note = document.createElement("p");
     note.className = "cms-empty cms-inline-note";
+    note.dataset.cmsActionNote = "true";
     note.textContent = message;
+    if (!message) note.hidden = true;
     return note;
   }
 
@@ -758,7 +761,7 @@
 
   function resolveAccessActionHref(item, accessState = { accessGranted: false, downloadUrl: "" }) {
     if (item.accessType === "paid" && !accessState.accessGranted) {
-      return item.paymentLink || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+      return CHECKOUT_PATH;
     }
 
     return accessState.downloadUrl || item.downloadLink || item.fileUrl || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
@@ -815,6 +818,7 @@
     action.href = href;
     action.textContent = resolveAccessActionLabel(item, accessState);
     action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
+    bindPaidCheckoutAction(action, item, null, accessState);
 
     if (item.accessType === "paid" && !accessState.accessGranted) {
       if (isExternalUrl(href)) {
@@ -841,6 +845,7 @@
     action.href = href;
     action.textContent = resolveAccessActionLabel(item, accessState);
     action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
+    bindPaidCheckoutAction(action, item, note, accessState);
 
     if (item.accessType === "paid" && !accessState.accessGranted) {
       if (isExternalUrl(href)) {
@@ -862,6 +867,70 @@
       action.removeAttribute("rel");
       if (note) note.remove();
     }
+  }
+
+  function bindPaidCheckoutAction(action, item, note, accessState) {
+    if (item.accessType !== "paid" || accessState.accessGranted || action.dataset.paidCheckoutBound) return;
+
+    action.dataset.paidCheckoutBound = "true";
+    action.addEventListener("click", (event) => {
+      event.preventDefault();
+      startPaidResourceCheckout(item, action, note);
+    });
+  }
+
+  function startPaidResourceCheckout(item, action, note) {
+    const cartApi = window.EDUREACH_CART;
+    const product = cartApi?.productFromCmsItem?.(item);
+
+    if (!cartApi?.addItem || !product) {
+      showCheckoutActionError(
+        action,
+        note,
+        "Checkout could not be started for this resource. Please try again or contact EduReach."
+      );
+      return;
+    }
+
+    try {
+      cartApi.addItem(product, 1);
+      action.textContent = "Opening checkout...";
+      action.setAttribute("aria-busy", "true");
+      if (note) {
+        note.hidden = false;
+        note.classList.remove("is-error");
+        note.textContent = "Opening secure checkout...";
+      }
+      window.location.assign(CHECKOUT_PATH);
+    } catch (error) {
+      console.error("EduReach checkout handoff failed.", error);
+      showCheckoutActionError(
+        action,
+        note,
+        "Checkout could not be started. Please try again."
+      );
+    }
+  }
+
+  function showCheckoutActionError(action, note, message) {
+    const target = note || ensureActionNote(action);
+    if (!target) return;
+
+    action.removeAttribute("aria-busy");
+    target.hidden = false;
+    target.classList.add("is-error");
+    target.textContent = message;
+  }
+
+  function ensureActionNote(action) {
+    if (!action.parentElement) return null;
+
+    const existing = action.parentElement.querySelector("[data-cms-action-note]");
+    if (existing) return existing;
+
+    const note = createInlineNote("");
+    action.insertAdjacentElement("afterend", note);
+    return note;
   }
 
   function shouldDownload(item, accessState = { accessGranted: false, downloadUrl: "" }) {

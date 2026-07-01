@@ -1326,6 +1326,12 @@ h3 {
   width: fit-content;
 }
 
+.cms-inline-note.is-error {
+  border-color: rgba(184, 54, 54, 0.35);
+  color: #9f1d1d;
+  background: #fff4f2;
+}
+
 .cms-reference-block,
 .cms-related {
   display: grid;

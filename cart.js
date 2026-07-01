@@ -643,11 +643,24 @@
       return value > 10000 ? Math.round(value) : Math.round(value * 100);
     }
 
-    const normalized = clean(value)
-      .replace(/[^\d.,-]/g, "")
-      .replace(/,/g, ".");
-    const number = Number(normalized);
+    const number = normalizedPriceNumber(value);
     return Number.isFinite(number) ? Math.round(number * 100) : 0;
+  }
+
+  function normalizedPriceNumber(value) {
+    const digitsOnly = clean(value).replace(/[^\d.,-]/g, "");
+    if (!digitsOnly) return 0;
+
+    const lastComma = digitsOnly.lastIndexOf(",");
+    const lastDot = digitsOnly.lastIndexOf(".");
+    const decimalIndex = Math.max(lastComma, lastDot);
+    const decimalPart = decimalIndex > -1 ? digitsOnly.slice(decimalIndex + 1) : "";
+    const hasDecimalPart = decimalPart.length > 0 && decimalPart.length <= 2;
+    const normalized = hasDecimalPart
+      ? `${digitsOnly.slice(0, decimalIndex).replace(/[.,]/g, "")}.${decimalPart}`
+      : digitsOnly.replace(/[.,]/g, "");
+
+    return Number(normalized);
   }
 
   function clampQuantity(value) {

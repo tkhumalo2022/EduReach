@@ -241,11 +241,24 @@ export function parsePriceToCents(price) {
     return Number.isFinite(price) ? Math.round(price * 100) : 0;
   }
 
-  const normalized = String(price || "")
-    .replace(/[^\d.,-]/g, "")
-    .replace(/,/g, ".");
-  const number = Number(normalized);
+  const number = normalizedPriceNumber(price);
   return Number.isFinite(number) ? Math.round(number * 100) : 0;
+}
+
+function normalizedPriceNumber(value) {
+  const digitsOnly = String(value || "").replace(/[^\d.,-]/g, "");
+  if (!digitsOnly) return 0;
+
+  const lastComma = digitsOnly.lastIndexOf(",");
+  const lastDot = digitsOnly.lastIndexOf(".");
+  const decimalIndex = Math.max(lastComma, lastDot);
+  const decimalPart = decimalIndex > -1 ? digitsOnly.slice(decimalIndex + 1) : "";
+  const hasDecimalPart = decimalPart.length > 0 && decimalPart.length <= 2;
+  const normalized = hasDecimalPart
+    ? `${digitsOnly.slice(0, decimalIndex).replace(/[.,]/g, "")}.${decimalPart}`
+    : digitsOnly.replace(/[.,]/g, "");
+
+  return Number(normalized);
 }
 
 function createOrderId() {

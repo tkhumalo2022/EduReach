@@ -7,6 +7,7 @@ import {
   getResourceAccessState,
   markOrderFailed,
   markOrderPaid,
+  parsePriceToCents,
   toPublicOrder
 } from "../src/lib/orders.js";
 
@@ -87,4 +88,10 @@ test("failed payment status cannot downgrade or unlock a paid order", () => {
   const confirmedOrder = getConfirmedOrder(order.id);
   assert.equal(confirmedOrder?.status, "paid");
   assert.equal(toPublicOrder(confirmedOrder, { includeDownloads: true }).items[0].downloadUrl, "https://example.com/support-template.pdf");
+});
+
+test("parses formatted paid resource prices into cents", () => {
+  assert.equal(parsePriceToCents("R1,250.00"), 125000);
+  assert.equal(parsePriceToCents("R 75"), 7500);
+  assert.equal(parsePriceToCents("75.50"), 7550);
 });
