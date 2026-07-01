@@ -280,8 +280,7 @@
 
   async function loadOrderWithPolling(container, orderId, attempt) {
     const order = await fetchOrder(orderId);
-    const fallback = readOrderSnapshot(orderId);
-    const resolvedOrder = order || fallback;
+    const resolvedOrder = order || null;
 
     if (resolvedOrder?.status === "paid" || attempt >= 12) {
       container.innerHTML = "";
@@ -299,15 +298,25 @@
     if (!container) return;
 
     const orderId = new URLSearchParams(window.location.search).get("order") || readLatestOrderId();
-    const snapshot = orderId ? readOrderSnapshot(orderId) : null;
     container.innerHTML = "";
-    renderOrderResult(container, snapshot, "cancelled");
+
+    if (!orderId) {
+      renderOrderResult(container, null, "cancelled");
+      return;
+    }
+
+    container.append(stateMessage("Checking your payment status..."));
+    void fetchOrder(orderId).then((order) => {
+      container.innerHTML = "";
+      renderOrderResult(container, order, "cancelled");
+    });
   }
 
   async function fetchOrder(orderId) {
     try {
       const response = await fetch(`/api/orders?orderId=${encodeURIComponent(orderId)}`, {
-        headers: { Accept: "application/json" }
+        headers: { Accept: "application/json" },
+        cache: "no-store"
       });
       const result = await response.json().catch(() => null);
       if (!response.ok || !result?.order) return null;
@@ -674,10 +683,6 @@
     orders[order.id] = order;
     orders.__latest = order.id;
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-  }
-
-  function readOrderSnapshot(orderId) {
-    return readOrders()[orderId] || null;
   }
 
   function readLatestOrderId() {

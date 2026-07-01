@@ -72,10 +72,17 @@ PayFast credentials must be stored in Vercel environment variables:
 
 - `PAYFAST_MERCHANT_ID`
 - `PAYFAST_MERCHANT_KEY`
-- `PAYFAST_PASSPHRASE`
-- `PAYFAST_MODE` as `sandbox` or `production`
+- `PAYFAST_PASSPHRASE` if the same passphrase is configured in the PayFast dashboard
+- `PAYFAST_MODE` as `sandbox` or `production`, or `PAYFAST_SANDBOX=true/false`
+- `SITE_URL` or `NEXT_PUBLIC_SITE_URL` for the public site origin
 
-The checkout API validates cart items against Wix CMS before signing the PayFast payload. Do not add manual payment links to CMS products.
+Set the PayFast ITN/notify URL to:
+
+```text
+https://edureach-website.vercel.app/api/payfast/notify
+```
+
+The checkout API validates cart items against Wix CMS before signing the PayFast payload. The ITN webhook at `/api/payfast/notify` validates the PayFast signature, posts the ITN data back to PayFast for server-side confirmation, checks the merchant ID, amount and `payment_status`, and only then marks the order paid. Pending, cancelled or failed orders never receive `downloadUrl` values from `/api/orders`. Do not add manual payment links to CMS products.
 
 ## Images
 

@@ -1,5 +1,7 @@
-const ORDER_STORE = globalThis.__EDUREACH_ORDER_STORE__ || new Map();
-globalThis.__EDUREACH_ORDER_STORE__ = ORDER_STORE;
+const PENDING_ORDER_STORE = globalThis.__EDUREACH_PENDING_ORDER_STORE__ || new Map();
+const CONFIRMED_ORDER_STORE = globalThis.__EDUREACH_CONFIRMED_ORDER_STORE__ || new Map();
+globalThis.__EDUREACH_PENDING_ORDER_STORE__ = PENDING_ORDER_STORE;
+globalThis.__EDUREACH_CONFIRMED_ORDER_STORE__ = CONFIRMED_ORDER_STORE;
 
 const ORDER_STATUSES = Object.freeze({
   pending: "pending",
@@ -39,12 +41,17 @@ export function createOrder({ customer, items, amountCents, currency = "ZAR", mo
     payment: null
   };
 
-  ORDER_STORE.set(order.id, order);
+  PENDING_ORDER_STORE.set(order.id, order);
   return order;
 }
 
 export function getOrder(orderId) {
-  return ORDER_STORE.get(text(orderId)) || null;
+  const id = text(orderId);
+  return CONFIRMED_ORDER_STORE.get(id) || PENDING_ORDER_STORE.get(id) || null;
+}
+
+export function getConfirmedOrder(orderId) {
+  return CONFIRMED_ORDER_STORE.get(text(orderId)) || null;
 }
 
 export function markOrderPaid(orderId, payment = {}) {
@@ -61,23 +68,25 @@ export function markOrderPaid(orderId, payment = {}) {
     amountFee: text(payment.amountFee),
     amountNet: text(payment.amountNet)
   };
-  ORDER_STORE.set(order.id, order);
+  PENDING_ORDER_STORE.delete(order.id);
+  CONFIRMED_ORDER_STORE.set(order.id, order);
   return order;
 }
 
 export function markOrderCancelled(orderId) {
   const order = getOrder(orderId);
-  if (!order) return null;
+  if (!order || order.status === ORDER_STATUSES.paid) return order;
 
   order.status = ORDER_STATUSES.cancelled;
   order.updatedAt = new Date().toISOString();
-  ORDER_STORE.set(order.id, order);
+  PENDING_ORDER_STORE.set(order.id, order);
+  CONFIRMED_ORDER_STORE.delete(order.id);
   return order;
 }
 
 export function markOrderFailed(orderId, payment = {}) {
   const order = getOrder(orderId);
-  if (!order) return null;
+  if (!order || order.status === ORDER_STATUSES.paid) return order;
 
   order.status = ORDER_STATUSES.failed;
   order.updatedAt = new Date().toISOString();
@@ -85,7 +94,8 @@ export function markOrderFailed(orderId, payment = {}) {
     provider: "PayFast",
     status: text(payment.status || "FAILED")
   };
-  ORDER_STORE.set(order.id, order);
+  PENDING_ORDER_STORE.set(order.id, order);
+  CONFIRMED_ORDER_STORE.delete(order.id);
   return order;
 }
 
@@ -118,6 +128,29 @@ export function toPublicOrder(order, options = {}) {
   };
 }
 
+export function getResourceAccessState(resource, orders = []) {
+  const normalizedResource = normalizeResource(resource);
+  if (!normalizedResource) return { accessGranted: false, order: null, downloadUrl: "" };
+
+  const paidOrders = (Array.isArray(orders) ? orders : [orders]).filter((order) => {
+    return order && order.status === ORDER_STATUSES.paid;
+  });
+
+  const matchingOrder = paidOrders.find((order) => {
+    return (order.items || []).some((item) => matchesResource(normalizedResource, item));
+  });
+
+  if (!matchingOrder) return { accessGranted: false, order: null, downloadUrl: "" };
+
+  const matchingItem = (matchingOrder.items || []).find((item) => matchesResource(normalizedResource, item));
+
+  return {
+    accessGranted: true,
+    order: matchingOrder,
+    downloadUrl: text(matchingItem?.fileUrl || matchingItem?.downloadUrl || "")
+  };
+}
+
 export function parsePriceToCents(price) {
   if (typeof price === "number") {
     return Number.isFinite(price) ? Math.round(price * 100) : 0;
@@ -147,4 +180,19 @@ function positiveInteger(value) {
 
 function text(value) {
   return String(value || "").trim();
+}
+
+function normalizeResource(resource) {
+  if (!resource) return null;
+  const type = text(resource.type || resource.resourceType);
+  const slug = text(resource.slug || resource.key || resource.id);
+  if (!type || !slug) return null;
+  return { type: type.toLowerCase(), slug };
+}
+
+function matchesResource(resource, item) {
+  if (!resource || !item) return false;
+  const itemType = text(item.type || item.resourceType).toLowerCase();
+  const itemSlug = text(item.slug || item.key || item.id);
+  return itemType === resource.type && itemSlug === resource.slug;
 }

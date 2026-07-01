@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "lint": "node scripts/validate-js.mjs",
+    "test": "node --test",
     "typecheck": "tsc --noEmit",
     "build": "node scripts/validate-js.mjs"
   },

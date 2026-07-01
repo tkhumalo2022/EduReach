@@ -196,19 +196,10 @@
 
   function createCardAction(item) {
     const action = document.createElement("a");
-    const href = resolveAccessActionHref(item);
     action.className = "button button-primary button-small";
-    action.href = href;
-    action.textContent = resolveAccessActionLabel(item);
-    action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
-
-    if (item.accessType === "paid") {
-      action.target = "_blank";
-      action.rel = "noopener noreferrer";
-    } else if (item.downloadLink || item.fileUrl) {
-      action.setAttribute("download", "");
-    }
-
+    action.textContent = "Checking access...";
+    action.setAttribute("aria-label", `Checking access for ${item.title || TYPE_LABELS[item.type] || "resource"}`);
+    void hydrateCardAction(action, item);
     return action;
   }
 
@@ -487,14 +478,15 @@
       actions.append(createDetailLink(item.previewUrl, "Preview", `Preview ${item.title}`));
     }
 
-    if (!item.downloadLink && !item.paymentLink && !item.fileUrl && !item.detailUrl) {
-      actions.append(createInlineNote("The resource will be available soon."));
-      wrapper.append(actions);
-      return;
-    }
+    const accessNote = item.accessType === "paid"
+      ? createInlineNote("Checking payment status...")
+      : null;
+    const actionLink = createDetailLink("#", "Checking access...", "Checking access", false);
+    actions.append(actionLink);
+    if (accessNote) actions.append(accessNote);
 
-    actions.append(createDetailLink(resolveAccessActionHref(item), resolveAccessActionLabel(item), `${resolveAccessActionLabel(item)} ${item.title}`, item.accessType === "free"));
     wrapper.append(actions);
+    void hydrateDetailAction(actionLink, item, accessNote);
   }
 
   function createDetailLink(href, label, ariaLabel, download = false) {
@@ -764,22 +756,134 @@
     return decodeURIComponent(pathname.slice(base.length + 1)).trim();
   }
 
-  function resolveAccessActionHref(item) {
-    if (item.accessType === "paid") {
-      return item.paymentLink || item.downloadLink || item.fileUrl || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+  function resolveAccessActionHref(item, accessState = { accessGranted: false, downloadUrl: "" }) {
+    if (item.accessType === "paid" && !accessState.accessGranted) {
+      return item.paymentLink || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
     }
 
-    return item.downloadLink || item.fileUrl || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+    return accessState.downloadUrl || item.downloadLink || item.fileUrl || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
   }
 
-  function resolveAccessActionLabel(item) {
+  function resolveAccessActionLabel(item, accessState = { accessGranted: false, downloadUrl: "" }) {
     if (item.accessButtonLabel) return item.accessButtonLabel;
-    if (item.accessType === "paid") return "Buy / Access Resource";
+    if (item.accessType === "paid" && !accessState.accessGranted) return "Buy / Access Resource";
+    if (item.accessType === "paid") return "Download Resource";
     return "Download Free Resource";
   }
 
   function actionHref(item) {
     return resolveAccessActionHref(item);
+  }
+
+  async function getResourceAccessState(item) {
+    if (!item || item.accessType !== "paid") {
+      return { accessGranted: true, order: null, downloadUrl: "" };
+    }
+
+    const orderId = readLatestOrderId();
+    if (!orderId) {
+      return { accessGranted: false, order: null, downloadUrl: "" };
+    }
+
+    try {
+      const response = await fetch(`/api/orders?orderId=${encodeURIComponent(orderId)}`, {
+        headers: { Accept: "application/json" },
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.order) {
+        return { accessGranted: false, order: null, downloadUrl: "" };
+      }
+
+      const order = result.order;
+      const matchingItem = (order.items || []).find((orderItem) => matchesResource(item, orderItem));
+      const accessGranted = order.status === "paid" && Boolean(matchingItem);
+
+      return {
+        accessGranted,
+        order,
+        downloadUrl: accessGranted ? matchingItem?.downloadUrl || "" : ""
+      };
+    } catch {
+      return { accessGranted: false, order: null, downloadUrl: "" };
+    }
+  }
+
+  async function hydrateCardAction(action, item) {
+    const accessState = await getResourceAccessState(item);
+    const href = resolveAccessActionHref(item, accessState);
+    action.href = href;
+    action.textContent = resolveAccessActionLabel(item, accessState);
+    action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
+
+    if (item.accessType === "paid" && !accessState.accessGranted) {
+      if (isExternalUrl(href)) {
+        action.target = "_blank";
+        action.rel = "noopener noreferrer";
+      } else {
+        action.removeAttribute("target");
+        action.removeAttribute("rel");
+      }
+    } else if (shouldDownload(item, accessState)) {
+      action.setAttribute("download", "");
+      action.removeAttribute("target");
+      action.removeAttribute("rel");
+    } else {
+      action.removeAttribute("download");
+      action.removeAttribute("target");
+      action.removeAttribute("rel");
+    }
+  }
+
+  async function hydrateDetailAction(action, item, note) {
+    const accessState = await getResourceAccessState(item);
+    const href = resolveAccessActionHref(item, accessState);
+    action.href = href;
+    action.textContent = resolveAccessActionLabel(item, accessState);
+    action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
+
+    if (item.accessType === "paid" && !accessState.accessGranted) {
+      if (isExternalUrl(href)) {
+        action.target = "_blank";
+        action.rel = "noopener noreferrer";
+      } else {
+        action.removeAttribute("target");
+        action.removeAttribute("rel");
+      }
+      if (note) note.textContent = "Payment confirmation is still required to unlock this resource.";
+    } else if (shouldDownload(item, accessState)) {
+      action.setAttribute("download", "");
+      action.removeAttribute("target");
+      action.removeAttribute("rel");
+      if (note) note.remove();
+    } else {
+      action.removeAttribute("download");
+      action.removeAttribute("target");
+      action.removeAttribute("rel");
+      if (note) note.remove();
+    }
+  }
+
+  function shouldDownload(item, accessState = { accessGranted: false, downloadUrl: "" }) {
+    if (item.accessType === "paid" && !accessState.accessGranted) return false;
+    return Boolean(accessState.downloadUrl || item.downloadLink || item.fileUrl);
+  }
+
+  function matchesResource(item, orderItem) {
+    const itemType = String(item?.type || "").trim().toLowerCase();
+    const orderType = String(orderItem?.type || "").trim().toLowerCase();
+    const itemSlug = String(item?.slug || "").trim();
+    const orderSlug = String(orderItem?.slug || orderItem?.key || orderItem?.id || "").trim();
+    return itemType === orderType && itemSlug === orderSlug;
+  }
+
+  function readLatestOrderId() {
+    try {
+      const stored = JSON.parse(localStorage.getItem("edureach.orders.v1") || "{}");
+      return stored?.__latest || "";
+    } catch {
+      return "";
+    }
   }
 
   function isExternalUrl(href) {

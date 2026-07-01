@@ -5,6 +5,11 @@ export const PAYFAST_ENDPOINTS = Object.freeze({
   production: "https://www.payfast.co.za/eng/process"
 });
 
+export const PAYFAST_VALIDATE_ENDPOINTS = Object.freeze({
+  sandbox: "https://sandbox.payfast.co.za/eng/query/validate",
+  production: "https://www.payfast.co.za/eng/query/validate"
+});
+
 const PAYMENT_FIELD_ORDER = Object.freeze([
   "merchant_id",
   "merchant_key",
@@ -40,24 +45,22 @@ const PAYMENT_FIELD_ORDER = Object.freeze([
 ]);
 
 export function readPayFastConfig(env = process.env) {
-  const mode = String(env.PAYFAST_MODE || "sandbox").toLowerCase() === "production"
-    ? "production"
-    : "sandbox";
+  const mode = resolvePayFastMode(env);
 
   return {
     merchantId: trim(env.PAYFAST_MERCHANT_ID),
     merchantKey: trim(env.PAYFAST_MERCHANT_KEY),
     passphrase: trim(env.PAYFAST_PASSPHRASE),
     mode,
-    endpoint: PAYFAST_ENDPOINTS[mode]
+    endpoint: PAYFAST_ENDPOINTS[mode],
+    validateEndpoint: trim(env.PAYFAST_VALIDATE_URL) || PAYFAST_VALIDATE_ENDPOINTS[mode]
   };
 }
 
 export function getMissingPayFastConfig(config = readPayFastConfig()) {
   return [
     ["PAYFAST_MERCHANT_ID", config.merchantId],
-    ["PAYFAST_MERCHANT_KEY", config.merchantKey],
-    ["PAYFAST_PASSPHRASE", config.passphrase]
+    ["PAYFAST_MERCHANT_KEY", config.merchantKey]
   ]
     .filter(([, value]) => !value)
     .map(([key]) => key);
@@ -84,6 +87,45 @@ export function createNotificationSignature(entries, passphrase = "") {
   );
 }
 
+export function verifyPayFastSignature(submittedSignature, expectedSignature) {
+  const submitted = Buffer.from(String(submittedSignature || "").trim(), "utf8");
+  const expected = Buffer.from(String(expectedSignature || "").trim(), "utf8");
+  return submitted.length === expected.length && crypto.timingSafeEqual(submitted, expected);
+}
+
+export async function validatePayFastNotification(entries, config = readPayFastConfig(), fetchImpl = globalThis.fetch) {
+  if (typeof fetchImpl !== "function") {
+    return { ok: false, message: "Fetch API is not available." };
+  }
+
+  const body = createNotificationValidationBody(entries);
+  const result = {
+    ok: false,
+    endpoint: config.validateEndpoint,
+    statusCode: 0,
+    responseText: ""
+  };
+
+  try {
+    const validationResponse = await fetchImpl(config.validateEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "EduReach PayFast ITN"
+      },
+      body
+    });
+
+    result.statusCode = validationResponse.status;
+    result.responseText = String(await validationResponse.text()).trim();
+    result.ok = validationResponse.ok && result.responseText === "VALID";
+  } catch (error) {
+    result.message = error instanceof Error ? error.message : "PayFast validation request failed.";
+  }
+
+  return result;
+}
+
 export function parseFormEncoded(rawBody = "") {
   return String(rawBody)
     .split("&")
@@ -105,14 +147,27 @@ export function formatPayFastAmount(cents) {
   return (Number(cents || 0) / 100).toFixed(2);
 }
 
-export function getRequestOrigin(req) {
-  if (process.env.EDUREACH_SITE_URL) {
-    return process.env.EDUREACH_SITE_URL.replace(/\/$/, "");
+export function parsePayFastAmountToCents(value) {
+  const number = Number(String(value || "").replace(/,/g, "."));
+  return Number.isFinite(number) ? Math.round(number * 100) : 0;
+}
+
+export function getRequestOrigin(req, env = process.env) {
+  const siteUrl = readSiteUrl(env);
+  if (siteUrl) {
+    return siteUrl.replace(/\/$/, "");
   }
 
   const host = req.headers?.["x-forwarded-host"] || req.headers?.host || "localhost:3000";
   const proto = req.headers?.["x-forwarded-proto"] || (String(host).includes("localhost") ? "http" : "https");
   return `${proto}://${host}`;
+}
+
+function createNotificationValidationBody(entries) {
+  return entries
+    .filter(([key, value]) => key !== "signature" && value != null && String(value).trim() !== "")
+    .map(([key, value]) => `${key}=${payFastEncode(String(value).trim())}`)
+    .join("&");
 }
 
 function hashFields(entries, passphrase) {
@@ -129,6 +184,28 @@ function hashFields(entries, passphrase) {
 
 function decodeFormValue(value = "") {
   return decodeURIComponent(String(value).replace(/\+/g, " "));
+}
+
+function resolvePayFastMode(env = process.env) {
+  const sandboxFlag = env.PAYFAST_SANDBOX;
+  if (sandboxFlag != null) {
+    return normalizeBoolean(sandboxFlag) ? "sandbox" : "production";
+  }
+
+  return String(env.PAYFAST_MODE || "sandbox").trim().toLowerCase() === "production"
+    ? "production"
+    : "sandbox";
+}
+
+function readSiteUrl(env = process.env) {
+  return [env.SITE_URL, env.NEXT_PUBLIC_SITE_URL, env.EDUREACH_SITE_URL]
+    .map((value) => trim(value))
+    .find(Boolean) || "";
+}
+
+function normalizeBoolean(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return ["1", "true", "yes", "on"].includes(normalized);
 }
 
 function payFastEncode(value) {

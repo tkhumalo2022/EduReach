@@ -68,8 +68,12 @@ WIX_CATEGORIES_COLLECTION_ID=Import6
 WIX_BLOGS_COLLECTION_ID=
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
+# Optional if the same passphrase is configured in PayFast.
 PAYFAST_PASSPHRASE=
 PAYFAST_MODE=sandbox
+PAYFAST_SANDBOX=true
+SITE_URL=https://edureach-website.vercel.app
+NEXT_PUBLIC_SITE_URL=https://edureach-website.vercel.app
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
@@ -80,6 +84,8 @@ Check each value:
 - `WIX_SITE_ID`: copied from Wix site/project settings.
 - `WIX_ACCOUNT_ID`: optional/reference only; CMS loading does not require it.
 - Collection env vars: match the exact collection IDs above.
+- PayFast ITN/notify URL: `https://edureach-website.vercel.app/api/payfast/notify`.
+- Paid downloads unlock only after PayFast sends a validated `COMPLETE` ITN.
 - Do not add real values to `.env.example`.
 - Do not commit `.env.local`.
 

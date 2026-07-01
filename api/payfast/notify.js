@@ -3,7 +3,10 @@ import {
   entriesToObject,
   formatPayFastAmount,
   parseFormEncoded,
-  readPayFastConfig
+  parsePayFastAmountToCents,
+  readPayFastConfig,
+  validatePayFastNotification,
+  verifyPayFastSignature
 } from "../../src/lib/payfast.js";
 import {
   getOrder,
@@ -24,11 +27,22 @@ export default async function handler(request, response) {
   const submittedSignature = String(data.signature || "").trim();
   const expectedSignature = createNotificationSignature(entries, config.passphrase);
 
-  if (!submittedSignature || submittedSignature !== expectedSignature) {
+  if (!submittedSignature || !verifyPayFastSignature(submittedSignature, expectedSignature)) {
     console.error("PayFast ITN signature validation failed.", {
       orderId: data.m_payment_id || data.custom_str1
     });
     return sendText(response, 400, "Invalid signature");
+  }
+
+  const validation = await validatePayFastNotification(entries, config);
+  if (!validation.ok) {
+    console.error("PayFast ITN server validation failed.", {
+      orderId: data.m_payment_id || data.custom_str1,
+      statusCode: validation.statusCode,
+      responseText: validation.responseText,
+      endpoint: validation.endpoint
+    });
+    return sendText(response, 400, "Invalid PayFast confirmation");
   }
 
   if (String(data.merchant_id || "") !== config.merchantId) {
@@ -48,7 +62,7 @@ export default async function handler(request, response) {
 
   const expectedAmount = formatPayFastAmount(order.amountCents);
 
-  if (String(data.amount_gross || "") !== expectedAmount) {
+  if (parsePayFastAmountToCents(data.amount_gross) !== order.amountCents) {
     console.error("PayFast ITN amount mismatch.", {
       orderId,
       expectedAmount,
@@ -57,17 +71,20 @@ export default async function handler(request, response) {
     return sendText(response, 400, "Invalid amount");
   }
 
-  if (String(data.payment_status || "").toUpperCase() === "COMPLETE") {
+  const paymentStatus = String(data.payment_status || "").trim().toUpperCase();
+  const isConfirmed = paymentStatus === "COMPLETE";
+
+  if (isConfirmed) {
     markOrderPaid(orderId, {
       pfPaymentId: data.pf_payment_id,
-      status: data.payment_status,
+      status: paymentStatus,
       amountGross: data.amount_gross,
       amountFee: data.amount_fee,
       amountNet: data.amount_net
     });
   } else {
     markOrderFailed(orderId, {
-      status: data.payment_status
+      status: paymentStatus
     });
   }
 

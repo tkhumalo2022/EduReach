@@ -1,4 +1,4 @@
-import { getOrder, toPublicOrder } from "../src/lib/orders.js";
+import { getConfirmedOrder, getOrder, toPublicOrder } from "../src/lib/orders.js";
 
 export default async function handler(request, response) {
   if (request.method !== "GET") {
@@ -23,7 +23,7 @@ export default async function handler(request, response) {
 
   return sendJson(response, 200, {
     ok: true,
-    order: toPublicOrder(order, { includeDownloads: true })
+    order: toPublicOrder(order, { includeDownloads: Boolean(getConfirmedOrder(orderId)) })
   });
 }
 

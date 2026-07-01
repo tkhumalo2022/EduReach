@@ -52,8 +52,12 @@ WIX_CATEGORIES_COLLECTION_ID=Import6
 WIX_BLOGS_COLLECTION_ID=
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
+# Optional if the same passphrase is configured in PayFast.
 PAYFAST_PASSPHRASE=
 PAYFAST_MODE=sandbox
+PAYFAST_SANDBOX=true
+SITE_URL=https://edureach-website.vercel.app
+NEXT_PUBLIC_SITE_URL=https://edureach-website.vercel.app
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
@@ -239,8 +243,9 @@ Paid ebooks and downloadable resources use the site cart plus PayFast checkout. 
 3. Set `isFree` to false for paid ebooks, or `accessType` to `paid` for paid downloads.
 4. Add the paid `price`.
 5. Confirm PayFast environment variables are configured in Vercel.
+6. Set the PayFast ITN/notify URL to `https://edureach-website.vercel.app/api/payfast/notify`.
 
-The website displays the price and Add to Cart button for paid resources, but it never prints protected paid file URLs in public CMS responses.
+The website displays the price and Add to Cart button for paid resources, but it never prints protected paid file URLs in public CMS responses. The `/payment-success` page and resource detail pages ask `/api/orders` for server-confirmed status; pending, cancelled and failed payments do not receive download URLs.
 
 ## 16. Create test content
 
