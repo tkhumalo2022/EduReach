@@ -90,6 +90,16 @@
       <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
       <path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" />
     </symbol>
+
+    <symbol id="icon-instagram" viewBox="0 0 24 24">
+      <rect x="4" y="4" width="16" height="16" rx="4" />
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M16.8 7.2h.01" />
+    </symbol>
+
+    <symbol id="icon-facebook" viewBox="0 0 24 24">
+      <path d="M14 8.5h2V5h-2.4C10.8 5 9 6.8 9 9.7V12H7v3.5h2V21h3.6v-5.5H15l.5-3.5h-2.9V9.8c0-.8.4-1.3 1.4-1.3Z" />
+    </symbol>
   </svg>
 
   <header class="site-header" data-header>
@@ -1040,6 +1050,41 @@
           </address>
 
           <div
+            class="social-panel"
+            aria-label="EduReach Africa social media"
+          >
+            <h3>Follow EduReach Africa</h3>
+
+            <div class="social-actions">
+              <a
+                class="social-button"
+                href="https://www.instagram.com/edureach.africa?igsh=YmcxMXpweGR1d3Nq"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow EduReach Africa on Instagram"
+              >
+                <svg class="social-icon" aria-hidden="true">
+                  <use href="#icon-instagram"></use>
+                </svg>
+                <span>Instagram</span>
+              </a>
+
+              <a
+                class="social-button"
+                href="https://www.facebook.com/share/1EuwmMShrs/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow EduReach Africa on Facebook"
+              >
+                <svg class="social-icon" aria-hidden="true">
+                  <use href="#icon-facebook"></use>
+                </svg>
+                <span>Facebook</span>
+              </a>
+            </div>
+          </div>
+
+          <div
             class="map-placeholder"
             aria-label="EduReach location map"
           >
@@ -1227,18 +1272,33 @@
       <nav class="footer-links" aria-label="Social media">
         <h2>Social Media</h2>
 
-        <!-- TODO: Replace with EduReach's live social media links. -->
-        <a href="#" aria-label="EduReach Facebook placeholder">
-          Facebook
-        </a>
+        <div class="footer-social-links">
+          <a
+            class="footer-social-link"
+            href="https://www.facebook.com/share/1EuwmMShrs/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit EduReach Africa on Facebook"
+          >
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#icon-facebook"></use>
+            </svg>
+            <span>Facebook</span>
+          </a>
 
-        <a href="#" aria-label="EduReach LinkedIn placeholder">
-          LinkedIn
-        </a>
-
-        <a href="#" aria-label="EduReach Instagram placeholder">
-          Instagram
-        </a>
+          <a
+            class="footer-social-link"
+            href="https://www.instagram.com/edureach.africa?igsh=YmcxMXpweGR1d3Nq"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit EduReach Africa on Instagram"
+          >
+            <svg class="social-icon" aria-hidden="true">
+              <use href="#icon-instagram"></use>
+            </svg>
+            <span>Instagram</span>
+          </a>
+        </div>
       </nav>
     </div>
 

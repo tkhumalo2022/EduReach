@@ -1,6 +1,10 @@
 (() => {
   const EMPTY_MESSAGE = "New EduReach resources will be available soon.";
   const DEFAULT_PAGE_SIZE = 9;
+  const SOCIAL_LINKS = {
+    facebook: "https://www.facebook.com/share/1EuwmMShrs/",
+    instagram: "https://www.instagram.com/edureach.africa?igsh=YmcxMXpweGR1d3Nq"
+  };
   const TYPE_LABELS = {
     articles: "Articles",
     ebooks: "Ebooks",
@@ -175,6 +179,9 @@
     heading.textContent = item.title || TYPE_LABELS[item.type] || "EduReach resource";
     article.append(heading);
 
+    const badge = createAccessBadge(item);
+    if (badge) article.append(badge);
+
     const description = document.createElement("p");
     description.textContent = item.excerpt || item.content || EMPTY_MESSAGE;
     article.append(description);
@@ -188,24 +195,18 @@
   }
 
   function createCardAction(item) {
-    if (isPurchasableProduct(item) && window.EDUREACH_CART?.createAddToCartButton) {
-      return window.EDUREACH_CART.createAddToCartButton(item);
-    }
-
     const action = document.createElement("a");
-    const href = cardActionHref(item);
+    const href = resolveAccessActionHref(item);
     action.className = "button button-primary button-small";
     action.href = href;
-    action.textContent = cardActionLabel(item);
+    action.textContent = resolveAccessActionLabel(item);
     action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
 
-    if (item.fileUrl && (item.type === "downloads" || item.type === "ebooks") && item.accessType !== "paid") {
-      action.setAttribute("download", "");
-    }
-
-    if (isExternalUrl(href)) {
+    if (item.accessType === "paid") {
       action.target = "_blank";
       action.rel = "noopener noreferrer";
+    } else if (item.downloadLink || item.fileUrl) {
+      action.setAttribute("download", "");
     }
 
     return action;
@@ -248,8 +249,14 @@
     meta.textContent = cardMeta(item);
     wrapper.append(meta);
 
+    const badge = createAccessBadge(item, true);
+    if (badge) wrapper.append(badge);
+
     const facts = createFacts(item);
     if (facts) wrapper.append(facts);
+
+    const benefits = createBenefitsSection(item);
+    if (benefits) wrapper.append(benefits);
 
     wrapper.append(renderContent(item));
 
@@ -478,24 +485,13 @@
       actions.append(createDetailLink(item.previewUrl, "Preview", `Preview ${item.title}`));
     }
 
-    if (isPurchasableProduct(item)) {
-      if (window.EDUREACH_CART?.createAddToCartButton) {
-        actions.append(window.EDUREACH_CART.createAddToCartButton(item, { small: false }));
-        actions.append(createDetailLink("/cart", "View Cart", "View your cart"));
-      } else {
-        actions.append(createInlineNote("Cart is loading. Please refresh and try again."));
-      }
+    if (!item.downloadLink && !item.paymentLink && !item.fileUrl && !item.detailUrl) {
+      actions.append(createInlineNote("The resource will be available soon."));
       wrapper.append(actions);
       return;
     }
 
-    if ((item.type === "downloads" || item.type === "ebooks") && !item.fileUrl) {
-      actions.append(createInlineNote("The file will be available soon."));
-      wrapper.append(actions);
-      return;
-    }
-
-    actions.append(createDetailLink(actionHref(item), item.ctaLabel || "View", `${item.ctaLabel || "View"} ${item.title}`, Boolean(item.fileUrl)));
+    actions.append(createDetailLink(resolveAccessActionHref(item), resolveAccessActionLabel(item), `${resolveAccessActionLabel(item)} ${item.title}`, item.accessType === "free"));
     wrapper.append(actions);
   }
 
@@ -514,6 +510,45 @@
     }
 
     return link;
+  }
+
+  function createAccessBadge(item, detail = false) {
+    if (!item?.accessType) return null;
+
+    const badge = document.createElement("span");
+    badge.className = "cms-access-badge";
+    badge.textContent = item.accessType === "paid" ? formatPrice(item) : "Free";
+    if (item.accessType === "paid") badge.classList.add("is-paid");
+    if (detail) badge.classList.add("cms-access-badge-detail");
+    return badge;
+  }
+
+  function createBenefitsSection(item) {
+    if (!item?.previewText) return null;
+
+    const section = document.createElement("section");
+    section.className = "cms-benefits-section";
+
+    const heading = document.createElement("h2");
+    heading.textContent = "What you’ll get";
+    section.append(heading);
+
+    const previewText = String(item.previewText).trim();
+    if (previewText.includes("\n")) {
+      const list = document.createElement("ul");
+      previewText.split(/\n+/).filter(Boolean).forEach((entry) => {
+        const li = document.createElement("li");
+        li.textContent = entry.trim();
+        list.append(li);
+      });
+      section.append(list);
+    } else {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = previewText;
+      section.append(paragraph);
+    }
+
+    return section;
   }
 
   function createInlineNote(message) {
@@ -689,23 +724,22 @@
     return decodeURIComponent(pathname.slice(base.length + 1)).trim();
   }
 
-  function cardActionHref(item) {
-    if (isPurchasableProduct(item)) return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
-    if (item.accessType === "paid") return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
-    return actionHref(item);
+  function resolveAccessActionHref(item) {
+    if (item.accessType === "paid") {
+      return item.paymentLink || item.downloadLink || item.fileUrl || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+    }
+
+    return item.downloadLink || item.fileUrl || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
   }
 
-  function cardActionLabel(item) {
-    if (isPurchasableProduct(item)) return "Add to Cart";
-    if (item.accessType === "paid") return "View details";
-    if ((item.type === "downloads" || item.type === "ebooks") && !item.fileUrl && item.accessType !== "paid") return "View";
-    return item.ctaLabel || "View";
+  function resolveAccessActionLabel(item) {
+    if (item.accessButtonLabel) return item.accessButtonLabel;
+    if (item.accessType === "paid") return "Buy / Access Resource";
+    return "Download Free Resource";
   }
 
   function actionHref(item) {
-    if (isPurchasableProduct(item)) return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
-    if (item.fileUrl && (item.type === "downloads" || item.type === "ebooks")) return item.fileUrl;
-    return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+    return resolveAccessActionHref(item);
   }
 
   function isExternalUrl(href) {
@@ -885,9 +919,20 @@
 
         <nav class="footer-links" aria-label="Social media">
           <h2>Social Media</h2>
-          <a href="#" aria-label="EduReach Facebook placeholder">Facebook</a>
-          <a href="#" aria-label="EduReach LinkedIn placeholder">LinkedIn</a>
-          <a href="#" aria-label="EduReach Instagram placeholder">Instagram</a>
+          <a class="footer-social-link" href="${SOCIAL_LINKS.facebook}" target="_blank" rel="noopener noreferrer" aria-label="Visit EduReach Africa on Facebook">
+            <svg class="social-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path d="M14 8.5h2V5h-2.4C10.8 5 9 6.8 9 9.7V12H7v3.5h2V21h3.6v-5.5H15l.5-3.5h-2.9V9.8c0-.8.4-1.3 1.4-1.3Z"></path>
+            </svg>
+            <span>Facebook</span>
+          </a>
+          <a class="footer-social-link" href="${SOCIAL_LINKS.instagram}" target="_blank" rel="noopener noreferrer" aria-label="Visit EduReach Africa on Instagram">
+            <svg class="social-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <rect x="4" y="4" width="16" height="16" rx="4"></rect>
+              <circle cx="12" cy="12" r="3.2"></circle>
+              <path d="M16.8 7.2h.01"></path>
+            </svg>
+            <span>Instagram</span>
+          </a>
         </nav>
       </div>
 

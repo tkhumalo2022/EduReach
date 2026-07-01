@@ -417,6 +417,10 @@ function normalizeCmsItem(type, rawItem, options = {}) {
   const rawContent = data.content || data.description || data.fullDescription;
   const contentBlocks = richContentToBlocks(rawContent);
   const slug = normalizeSlug(data.slug || data.title);
+  const paymentLink = resolveResourceLink(data.paymentLink || data.paymentUrl || data.purchaseLink || data.checkoutLink);
+  const downloadLink = resolveResourceLink(data.downloadLink || data.downloadUrl || data.resourceLink || data.fileLink || data.fileUrl || data.resourceFile);
+  const accessButtonLabel = text(data.accessButtonLabel || data.buttonLabel || data.ctaLabel);
+  const previewText = text(data.previewText || data.previewDescription || data.whatYouGet || data.whatYoullGet || data.benefits || data.previewCopy);
 
   return {
     id: rawItem?._id || data._id || "",
@@ -443,6 +447,10 @@ function normalizeCmsItem(type, rawItem, options = {}) {
     price: data.price || "",
     currency: text(data.currency || "ZAR"),
     storeProductId: text(data.storeProductId),
+    paymentLink,
+    downloadLink,
+    accessButtonLabel,
+    previewText,
     fileUrl,
     previewUrl: !isPaid && previewAllowed ? resolveWixFile(data.previewFile) : "",
     fileType: text(data.fileType || (type === "ebooks" ? "PDF" : "")),
@@ -563,7 +571,11 @@ function normalizeAccessType(value) {
 }
 
 function normalizeProductAccessType(data) {
-  if ("isFree" in data) {
+  if (Object.prototype.hasOwnProperty.call(data, "isPaid")) {
+    return normalizeBoolean(data.isPaid) ? "paid" : "free";
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, "isFree")) {
     return normalizeBoolean(data.isFree) ? "free" : "paid";
   }
 
@@ -622,6 +634,29 @@ function ctaLabel(type, accessType) {
 function resolveProductFile(type, data) {
   if (type === "ebooks") return resolveWixFile(data.pdfFile || data.ebookFile || data.resourceFile);
   if (type === "downloads") return resolveWixFile(data.resourceFile || data.pdfFile || data.downloadFile);
+  return "";
+}
+
+function resolveResourceLink(value) {
+  if (!value) return "";
+
+  if (typeof value === "string") {
+    return /^https?:\/\//i.test(value) ? value : "";
+  }
+
+  if (typeof value === "object") {
+    return (
+      value.url ||
+      value.href ||
+      value.link ||
+      value.src ||
+      value.fileUrl ||
+      value.documentUrl ||
+      value.mediaUrl ||
+      ""
+    );
+  }
+
   return "";
 }
 
