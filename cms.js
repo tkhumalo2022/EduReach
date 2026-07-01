@@ -10,7 +10,7 @@
     ebooks: "Ebooks",
     downloads: "DownloadableResources",
     workshops: "WorkshopAlbums",
-    gallery: "GalleryAlbums",
+    gallery: "Gallery Albums",
     blogs: "Blogs",
     blog: "Blogs"
   };
@@ -30,7 +30,7 @@
     ebooks: "Search ebooks and filter by category when Wix content is available.",
     downloads: "Search DownloadableResources by title, topic or category.",
     workshops: "Browse approved WorkshopAlbums with confirmed consent.",
-    gallery: "Browse approved GalleryAlbums with confirmed consent.",
+    gallery: "Browse approved Gallery Albums with confirmed consent.",
     blogs: "Search EduReach blogs by title, topic or category.",
     blog: "Search EduReach blogs by title, topic or category."
   };
