@@ -1,3 +1,3 @@
 title,coverImage,description,pdfFile,price,isFree,paymentLink,featured,publishedDate
 "Sample Ebook: Parent Support Guide","Upload sample cover in Wix","Sample only. Replace this with the real ebook description.","Upload ebook PDF in Wix","0","true","","true","2026-07-01"
-"Sample Paid Ebook: Classroom Support Pack","Upload sample cover in Wix","Sample paid ebook record for testing Buy Now or Coming Soon.","Upload ebook PDF in Wix","150","false","https://example.com/payment-link","false","2026-07-01"
+"Sample Paid Ebook: Classroom Support Pack","Upload sample cover in Wix","Sample paid ebook record for testing Add to Cart and PayFast checkout.","Upload ebook PDF in Wix","150","false","","false","2026-07-01"

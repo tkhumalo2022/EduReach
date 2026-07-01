@@ -323,9 +323,9 @@ async function getCollectionItemBySlug(type, slug, options = {}) {
       includeCategoryReference: true
     });
     const item = result.items?.[0]
-      ? normalizeCmsItem(type, result.items[0])
+      ? normalizeCmsItem(type, result.items[0], options)
       : type === "ebooks" || type === "blog"
-        ? await findItemByGeneratedSlug(type, collectionId, cleanSlug)
+        ? await findItemByGeneratedSlug(type, collectionId, cleanSlug, options)
         : null;
 
     return { configured: true, item };
@@ -340,7 +340,7 @@ async function getCollectionItemBySlug(type, slug, options = {}) {
   }
 }
 
-async function findItemByGeneratedSlug(type, collectionId, slug) {
+async function findItemByGeneratedSlug(type, collectionId, slug, options = {}) {
   const definition = CONTENT_TYPES[type];
   const client = createWixClient();
   let query = client.items
@@ -358,7 +358,7 @@ async function findItemByGeneratedSlug(type, collectionId, slug) {
   });
 
   return (result.items || [])
-    .map((item) => normalizeCmsItem(type, item))
+    .map((item) => normalizeCmsItem(type, item, options))
     .find((item) => item.slug === slug) || null;
 }
 
@@ -388,11 +388,11 @@ async function findItems(query, options = {}) {
   }
 }
 
-function normalizeCmsItem(type, rawItem) {
+function normalizeCmsItem(type, rawItem, options = {}) {
   const definition = CONTENT_TYPES[type];
   const data = rawItem?.data || rawItem || {};
-  const accessType = type === "ebooks"
-    ? normalizeEbookAccessType(data)
+  const accessType = type === "ebooks" || type === "downloads"
+    ? normalizeProductAccessType(data)
     : normalizeAccessType(data.accessType);
   const image =
     withFallbackAlt(resolveWixImage(data.featuredImage || data.coverImage || data.thumbnail || data.image), [
@@ -403,13 +403,10 @@ function normalizeCmsItem(type, rawItem) {
     ]);
   const mediaGallery = normalizeMediaGallery(data.mediaGallery);
   const isPaid = accessType === "paid";
-  const paymentLink = text(data.paymentLink || data.purchaseLink);
   const fileUrl =
-    !isPaid && type === "downloads"
-      ? resolveWixFile(data.resourceFile)
-      : !isPaid && type === "ebooks"
-        ? resolveWixFile(data.pdfFile || data.ebookFile)
-        : "";
+    (options.includePaidFile || !isPaid) && (type === "downloads" || type === "ebooks")
+      ? resolveProductFile(type, data)
+      : "";
   const previewAllowed = Boolean(data.previewAllowed);
   const rawContent = data.content || data.description || data.fullDescription;
   const contentBlocks = richContentToBlocks(rawContent);
@@ -439,7 +436,6 @@ function normalizeCmsItem(type, rawItem) {
     accessType,
     price: data.price || "",
     currency: text(data.currency || "ZAR"),
-    purchaseLink: paymentLink,
     storeProductId: text(data.storeProductId),
     fileUrl,
     previewUrl: !isPaid && previewAllowed ? resolveWixFile(data.previewFile) : "",
@@ -455,7 +451,7 @@ function normalizeCmsItem(type, rawItem) {
     seoTitle: text(data.seoTitle || data.title),
     seoDescription: text(data.seoDescription || data.excerpt || data.description || data.shortDescription),
     detailUrl: `${definition.detailPath}/${encodeURIComponent(slug)}`,
-    ctaLabel: ctaLabel(type, accessType, paymentLink)
+    ctaLabel: ctaLabel(type, accessType)
   };
 }
 
@@ -560,7 +556,7 @@ function normalizeAccessType(value) {
   return normalized === "paid" ? "paid" : "free";
 }
 
-function normalizeEbookAccessType(data) {
+function normalizeProductAccessType(data) {
   if ("isFree" in data) {
     return normalizeBoolean(data.isFree) ? "free" : "paid";
   }
@@ -606,14 +602,21 @@ function sortFeaturedNewest(a, b) {
   return new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime();
 }
 
-function ctaLabel(type, accessType, paymentLink = "") {
+function ctaLabel(type, accessType) {
   if (type === "ebooks") {
-    if (accessType === "paid") return paymentLink ? "Buy Now" : "Coming Soon";
+    if (accessType === "paid") return "Add to Cart";
     return "Download";
   }
 
+  if (type === "downloads" && accessType === "paid") return "Add to Cart";
   if (accessType === "paid") return "Buy";
   return CONTENT_TYPES[type].ctaLabel;
+}
+
+function resolveProductFile(type, data) {
+  if (type === "ebooks") return resolveWixFile(data.pdfFile || data.ebookFile || data.resourceFile);
+  if (type === "downloads") return resolveWixFile(data.resourceFile || data.pdfFile || data.downloadFile);
+  return "";
 }
 
 function withFallbackAlt(image, values) {

@@ -2,6 +2,22 @@
   "outputDirectory": ".",
   "rewrites": [
     {
+      "source": "/cart",
+      "destination": "/cart/index.html"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/checkout/index.html"
+    },
+    {
+      "source": "/payment-success",
+      "destination": "/payment-success/index.html"
+    },
+    {
+      "source": "/payment-cancelled",
+      "destination": "/payment-cancelled/index.html"
+    },
+    {
       "source": "/resources/articles/:slug",
       "destination": "/resources/articles/detail.html"
     },

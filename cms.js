@@ -185,6 +185,10 @@
   }
 
   function createCardAction(item) {
+    if (isPurchasableProduct(item) && window.EDUREACH_CART?.createAddToCartButton) {
+      return window.EDUREACH_CART.createAddToCartButton(item);
+    }
+
     const action = document.createElement("a");
     const href = cardActionHref(item);
     action.className = "button button-primary button-small";
@@ -192,7 +196,7 @@
     action.textContent = cardActionLabel(item);
     action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
 
-    if (item.fileUrl && (item.type === "downloads" || item.type === "ebooks")) {
+    if (item.fileUrl && (item.type === "downloads" || item.type === "ebooks") && item.accessType !== "paid") {
       action.setAttribute("download", "");
     }
 
@@ -331,6 +335,7 @@
       ["ISBN", item.isbn],
       ["Pages", item.pageCount],
       ["Language", item.language],
+      ["Price", isProduct(item) ? productPriceLabel(item) : ""],
       ["File type", item.fileType],
       ["Credit", item.photographerCredit]
     ].filter(([, value]) => value);
@@ -470,11 +475,12 @@
       actions.append(createDetailLink(item.previewUrl, "Preview", `Preview ${item.title}`));
     }
 
-    if (item.accessType === "paid") {
-      if (item.purchaseLink) {
-        actions.append(createDetailLink(item.purchaseLink, item.ctaLabel || "Buy", `${item.ctaLabel || "Buy"} ${item.title}`));
+    if (isPurchasableProduct(item)) {
+      if (window.EDUREACH_CART?.createAddToCartButton) {
+        actions.append(window.EDUREACH_CART.createAddToCartButton(item, { small: false }));
+        actions.append(createDetailLink("/cart", "View Cart", "View your cart"));
       } else {
-        actions.append(createInlineNote(item.type === "ebooks" ? "Coming Soon" : "Buy button will appear after payment is connected."));
+        actions.append(createInlineNote("Cart is loading. Please refresh and try again."));
       }
       wrapper.append(actions);
       return;
@@ -681,18 +687,20 @@
   }
 
   function cardActionHref(item) {
-    if (item.accessType === "paid" && !item.purchaseLink) return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+    if (isPurchasableProduct(item)) return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+    if (item.accessType === "paid") return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
     return actionHref(item);
   }
 
   function cardActionLabel(item) {
-    if (item.accessType === "paid" && !item.purchaseLink) return item.type === "ebooks" ? "Coming Soon" : "View details";
+    if (isPurchasableProduct(item)) return "Add to Cart";
+    if (item.accessType === "paid") return "View details";
     if ((item.type === "downloads" || item.type === "ebooks") && !item.fileUrl && item.accessType !== "paid") return "View";
     return item.ctaLabel || "View";
   }
 
   function actionHref(item) {
-    if (item.accessType === "paid" && item.purchaseLink) return item.purchaseLink;
+    if (isPurchasableProduct(item)) return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
     if (item.fileUrl && (item.type === "downloads" || item.type === "ebooks")) return item.fileUrl;
     return item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
   }
@@ -707,6 +715,19 @@
     if (item.date) parts.push(formatDate(item.date));
     if (item.accessType === "paid") parts.push(formatPrice(item));
     return parts.filter(Boolean).join(" | ") || item.label || TYPE_LABELS[item.type] || "Resource";
+  }
+
+  function isProduct(item) {
+    return item?.type === "downloads" || item?.type === "ebooks";
+  }
+
+  function isPurchasableProduct(item) {
+    return isProduct(item) && item.accessType === "paid";
+  }
+
+  function productPriceLabel(item) {
+    if (!isProduct(item)) return "";
+    return item.accessType === "paid" ? formatPrice(item) : "Free";
   }
 
   function formatDate(value) {

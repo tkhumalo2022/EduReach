@@ -21,7 +21,6 @@ export interface WixBaseContent {
   contentBlocks: WixContentBlock[];
   price: number | string;
   currency: string;
-  purchaseLink: string;
   storeProductId: string;
   fileUrl: string;
   previewUrl: string;

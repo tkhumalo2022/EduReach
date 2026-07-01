@@ -21,17 +21,15 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 6. Add the `price`.
 7. Set `isFree` to true/yes if the ebook should be free.
 8. Set `isFree` to false/no if the ebook should be paid.
-9. Add `paymentLink` only for paid ebooks that are ready to sell.
-10. Turn on `featured` only if the ebook should appear first.
-11. Add `publishedDate`.
-12. Publish in Wix when it is ready.
+9. Turn on `featured` only if the ebook should appear first.
+10. Add `publishedDate`.
+11. Publish in Wix when it is ready.
 
 ## Free and paid ebook behavior
 
 - Free ebook: set `isFree` to yes. The website shows a Download button for the uploaded PDF.
-- Paid ebook with payment link: set `isFree` to no and add `paymentLink`. The website shows Buy Now.
-- Paid ebook without payment link: set `isFree` to no and leave `paymentLink` empty. The website shows Coming Soon.
-- Wix Stores is not required for the basic ebook workflow.
+- Paid ebook: set `isFree` to no and add the paid price. The website shows Add to Cart.
+- Wix Stores and manual payment links are not required. PayFast checkout handles paid orders.
 
 ## Add a downloadable resource
 
@@ -39,7 +37,7 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 2. Add title, slug, short description, full description, thumbnail, thumbnail alt text, category and tags.
 3. For a free resource, upload the public file to `resourceFile`.
 4. Add `fileType`, such as PDF, DOCX or ZIP.
-5. For a paid resource, use Wix Stores, add `storeProductId`, add `purchaseLink`, and do not upload the protected file to `resourceFile`.
+5. For a paid resource, upload the file to `resourceFile`, set `accessType` to paid and add the paid price. The website shows Add to Cart and only unlocks the download after PayFast confirms the order.
 
 ## Create a workshop photo album
 
@@ -91,7 +89,7 @@ Turn on `featured`. Featured items sort ahead of standard items.
 
 ## Safe deletion and archiving
 
-Unpublish content first if you only want to hide it. Delete content only when it should be removed permanently. For paid products, check any payment links, refunds or delivery steps before deleting the related CMS item.
+Unpublish content first if you only want to hide it. Delete content only when it should be removed permanently. For paid products, check any PayFast orders, refunds or delivery steps before deleting the related CMS item.
 
 ## Cache timing
 

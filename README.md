@@ -64,6 +64,19 @@ Read:
 
 The expected Wix CMS collection IDs are `Articles`, `Ebooks`, `DownloadableResources`, `WorkshopAlbums`, `GalleryAlbums` and `Import6` for the category helper collection. Wix's built-in draft/publish controls manage visibility; do not add a separate manual status field.
 
+## Shopping cart and PayFast checkout
+
+Paid `Ebooks` and `DownloadableResources` are added to a local shopping cart and checked out through `/checkout`. Free items still download directly from Wix.
+
+PayFast credentials must be stored in Vercel environment variables:
+
+- `PAYFAST_MERCHANT_ID`
+- `PAYFAST_MERCHANT_KEY`
+- `PAYFAST_PASSPHRASE`
+- `PAYFAST_MODE` as `sandbox` or `production`
+
+The checkout API validates cart items against Wix CMS before signing the PayFast payload. Do not add manual payment links to CMS products.
+
 ## Images
 
 Current images are placeholder assets in `assets/images`. Replace them with final approved images when ready. Do not add personal founder images until the founder has approved the final file.

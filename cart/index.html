@@ -3,37 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="EduReach WorkshopAlbums." />
-  <title>WorkshopAlbums | EduReach</title>
+  <meta name="description" content="Review EduReach ebooks and downloadable resources in your shopping cart." />
+  <meta name="robots" content="noindex, follow" />
+  <title>Cart | EduReach</title>
   <link rel="icon" href="/assets/logo-mark.png" type="image/png" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
-<body class="cms-page">
+<body class="cms-page commerce-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
   <header class="site-header" data-header>
     <div class="container header-inner">
       <a class="brand" href="/#home" aria-label="EduReach home"><img src="/assets/logo.png" alt="EduReach" width="320" height="92" /></a>
       <nav class="primary-nav" aria-label="Primary navigation">
         <a href="/#home">Home</a>
-        <a href="/#resources" aria-current="page">Resources</a>
+        <a href="/#resources">Resources</a>
         <a href="/#contact">Contact</a>
       </nav>
     </div>
   </header>
-  <main>
-    <section class="resources section cms-listing-page">
+
+  <main id="main-content">
+    <section class="resources section cms-listing-page commerce-section" aria-labelledby="cart-title">
       <div class="container">
         <div class="section-heading section-heading-left">
-          <p class="eyebrow">Resources</p>
-          <h1>WorkshopAlbums</h1>
-          <p>Published workshop albums with confirmed consent.</p>
+          <p class="eyebrow">Digital Resources</p>
+          <h1 id="cart-title">Shopping Cart</h1>
+          <p>Review your selected EduReach ebooks and downloadable resources before checkout.</p>
         </div>
-        <div class="resource-grid cms-grid" data-cms-list data-cms-type="workshops" data-empty-message="New EduReach resources will be available soon."></div>
+
+        <div data-cart-page></div>
       </div>
     </section>
   </main>
+
   <script src="/site-config.js"></script>
   <script src="/cart.js"></script>
   <script src="/script.js"></script>
-  <script src="/cms.js"></script>
 </body>
 </html>

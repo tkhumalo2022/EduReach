@@ -14,7 +14,7 @@ EduReach remains a GitHub/Vercel website. Wix is used only as the headless conte
 Install these Wix apps:
 
 - Wix CMS / Content Manager
-- Wix Stores, only if paid downloadable resources need Wix-managed checkout or secure store delivery
+- Wix CMS / Content Manager is enough for the PayFast digital marketplace
 
 ## 3. Create the OAuth application
 
@@ -32,7 +32,6 @@ Enable these permissions for the Wix Headless project:
 
 - Read Data Items
 - Read Data Collections
-- Read Products / Checkout, only if Wix Stores is used for paid downloadable resources
 
 The website only reads published content. It does not create, update or delete Wix content.
 
@@ -50,6 +49,10 @@ WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
 WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
 WIX_BLOGS_COLLECTION_ID=
+PAYFAST_MERCHANT_ID=
+PAYFAST_MERCHANT_KEY=
+PAYFAST_PASSPHRASE=
+PAYFAST_MODE=sandbox
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
@@ -114,7 +117,7 @@ Optional collection ID: set `WIX_BLOGS_COLLECTION_ID` only if Wix has a separate
 
 Collection ID: `Import5`
 
-This collection is intentionally simple. The owner should not need Wix Stores for the basic ebook workflow.
+This collection is intentionally simple. The owner should not need Wix Stores or manual payment links for the ebook workflow.
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -124,15 +127,14 @@ This collection is intentionally simple. The owner should not need Wix Stores fo
 | `pdfFile` | Document | Uploaded PDF file |
 | `price` | Number | Use `0` for free ebooks |
 | `isFree` | Boolean | Yes/true means the PDF is downloadable |
-| `paymentLink` | URL | Optional link for paid ebooks |
+| `paymentLink` | URL | Legacy/reference only. PayFast checkout ignores manual payment links. |
 | `featured` | Boolean | Featured ebooks sort first |
 | `publishedDate` | Date and Time | Used for sorting |
 
 Website behavior:
 
 - If `isFree` is true, the website shows a Download button for `pdfFile`.
-- If `isFree` is false and `paymentLink` is filled in, the website shows a Buy Now button.
-- If `isFree` is false and `paymentLink` is empty, the website shows Coming Soon.
+- If `isFree` is false, the website shows Add to Cart and uses the CMS `price` during checkout validation.
 - The code can generate a URL slug from the title, so the owner does not need to manage a slug for basic ebook setup.
 
 ## 10. DownloadableResources collection
@@ -149,20 +151,20 @@ Collection ID: `Import2`
 | `thumbnailAlt` | Text | Alternative text |
 | `category` | Reference to Categories or Text | Category label |
 | `tags` | Tags | Optional keywords |
-| `resourceFile` | Document | Free resource file only |
+| `resourceFile` | Document | Resource file. Paid files are hidden until PayFast confirms the order. |
 | `fileType` | Text | PDF, DOCX, ZIP, etc. |
 | `author` | Text | Optional author |
 | `publicationDate` | Date and Time | Used for sorting |
 | `accessType` | Dropdown | `free` or `paid` |
 | `price` | Number | Paid resources |
-| `purchaseLink` | URL | Wix Stores product or checkout URL |
-| `storeProductId` | Text | Wix Stores product ID for owner reference |
+| `purchaseLink` | URL | Legacy/reference only. PayFast checkout ignores manual payment links. |
+| `storeProductId` | Text | Optional reference field |
 | `previewAllowed` | Boolean | Whether public preview is allowed |
 | `featured` | Boolean | Featured items sort first |
 | `seoTitle` | Text | Optional SEO title |
 | `seoDescription` | Text | Optional meta description |
 
-For paid resources, do not place the protected final file in `resourceFile`. Use Wix Stores for secure delivery.
+For paid resources, set `accessType` to `paid`, add `price`, and upload the final file to `resourceFile`. The public CMS API hides paid file URLs; downloads are returned only for paid orders.
 
 ## 11. WorkshopAlbums collection
 
@@ -229,25 +231,22 @@ If a Blogs collection ID is missing or permissions are missing, `/blog` and `/bl
 
 ## 15. Paid digital products
 
-For basic paid ebooks, Wix Stores is not required. Add the payment page URL to the ebook `paymentLink` field. This can be a Wix payment link, Stripe link, PayFast link, invoice link or any approved checkout URL.
+Paid ebooks and downloadable resources use the site cart plus PayFast checkout. Do not add manual payment links.
 
-For paid downloadable resources that need protected file delivery through Wix Stores:
+1. Add the product to Wix CMS.
+2. Upload the PDF or resource file to the correct CMS file field.
+3. Set `isFree` to false for paid ebooks, or `accessType` to `paid` for paid downloads.
+4. Add the paid `price`.
+5. Confirm PayFast environment variables are configured in Vercel.
 
-1. Create the digital product in Wix Stores.
-2. Upload the protected file to Wix Stores, not to a public CMS file field.
-3. Configure checkout, payment and delivery in Wix Stores.
-4. Copy the Wix Stores product ID into `storeProductId`.
-5. Copy the product or checkout URL into `purchaseLink`.
-6. Set `accessType` to `paid`, add `price`, and set `currency` to `ZAR` unless another currency is required.
-
-The website displays the price and Buy button for paid resources, but it never prints protected paid file URLs.
+The website displays the price and Add to Cart button for paid resources, but it never prints protected paid file URLs in public CMS responses.
 
 ## 16. Create test content
 
 1. Create one draft article and confirm it does not appear publicly.
 2. Publish one article and confirm it appears under Resources and `/resources/articles`.
 3. Create one free download with a public test PDF.
-4. Create one paid ebook with `isFree` false and a test `paymentLink`.
+4. Create one paid ebook with `isFree` false and a test price.
 5. Create one workshop album with `consentConfirmed` false and confirm it stays hidden.
 6. Set `consentConfirmed` true and publish the album to confirm it appears.
 
@@ -259,7 +258,7 @@ The website displays the price and Buy button for paid resources, but it never p
 4. Run `npm run lint`.
 5. Run `npm run typecheck`.
 6. Run `npm run build`.
-7. Start a local server or Vercel dev environment and open the Resources pages.
+7. Start a local server or Vercel dev environment and open the Resources and cart pages.
 
 ## 18. Test the connection on Vercel
 

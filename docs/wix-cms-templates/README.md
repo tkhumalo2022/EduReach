@@ -51,11 +51,11 @@ Use the `.sample.csv` files as copy-paste references while creating test records
 | `pdfFile` | Document | Upload the ebook PDF in Wix. |
 | `price` | Number | 0 for free sample |
 | `isFree` | Boolean | true for free, false for paid |
-| `paymentLink` | URL | Optional link for paid ebooks |
+| `paymentLink` | URL | Legacy/reference only. PayFast checkout ignores manual payment links. |
 | `featured` | Boolean | true |
 | `publishedDate` | Date and Time | 2026-07-01 |
 
-Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: set `isFree` to false and add `paymentLink`. If a paid ebook has no `paymentLink`, the website shows Coming Soon.
+Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: set `isFree` to false, add the paid price and upload the PDF. The website shows Add to Cart for paid ebooks.
 
 ## DownloadableResources fields
 
@@ -69,14 +69,14 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `thumbnailAlt` | Text | Sample checklist thumbnail |
 | `category` | Reference to Categories or Text | Learner Support |
 | `tags` | Tags | checklist, school support |
-| `resourceFile` | Document | Upload only if this is a free public sample. |
+| `resourceFile` | Document | Upload the resource file. Paid files stay hidden until a paid order is confirmed. |
 | `fileType` | Text | PDF |
 | `author` | Text | EduReach Team |
 | `publicationDate` | Date and Time | 2026-07-01 |
 | `accessType` | Dropdown | free or paid |
 | `price` | Number | 0 for free sample |
-| `purchaseLink` | URL | Use only for paid sample products. |
-| `storeProductId` | Text | Use only for paid Wix Stores products. |
+| `purchaseLink` | URL | Legacy/reference only. PayFast checkout ignores manual payment links. |
+| `storeProductId` | Text | Optional reference field. |
 | `previewAllowed` | Boolean | true |
 | `featured` | Boolean | true |
 | `seoTitle` | Text | Sample Download: Learner Support Checklist |

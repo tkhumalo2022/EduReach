@@ -8,8 +8,8 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 - Use Wix only as the content dashboard.
 - Do not create a separate admin dashboard.
 - Do not create a manual `status` field. Use Wix draft, publish and unpublish controls.
-- For paid ebooks, use `paymentLink`; Wix Stores is not required for the basic ebook workflow.
-- Do not upload protected paid resource files to public CMS file fields.
+- For paid ebooks and resources, use CMS price fields plus PayFast checkout. Do not add manual payment links.
+- Paid files can be uploaded to CMS file fields; the website hides them until PayFast confirms a paid order.
 - Do not publish workshop or gallery albums unless `consentConfirmed` is true.
 - Delete or unpublish the sample records before the real site goes live.
 
@@ -17,17 +17,16 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 
 1. Open the EduReach Wix site or Wix Headless project.
 2. Install Wix CMS / Content Manager.
-3. Install Wix Stores only if paid downloadable resources need Wix-managed checkout or secure store delivery.
-4. Create the six CMS collections listed below.
-5. Add the exact fields listed in `docs/wix-cms-templates/README.md`.
-6. Set CMS read permissions so the Headless API can read published items.
-7. Create or open the Wix OAuth app for the website.
-8. Copy the Wix Client ID and Site ID. Copy the Account ID only if you want to keep it for reference.
-9. Add the Vercel environment variables listed below.
-10. Add one sample item to each Wix collection.
-11. Publish only the sample items you want to test.
-12. Redeploy or refresh the Vercel preview after adding env vars.
-13. Run the testing checklist at the bottom of this file.
+3. Create the six CMS collections listed below.
+4. Add the exact fields listed in `docs/wix-cms-templates/README.md`.
+5. Set CMS read permissions so the Headless API can read published items.
+6. Create or open the Wix OAuth app for the website.
+7. Copy the Wix Client ID and Site ID. Copy the Account ID only if you want to keep it for reference.
+8. Add the Vercel environment variables listed below, including PayFast.
+9. Add one sample item to each Wix collection.
+10. Publish only the sample items you want to test.
+11. Redeploy or refresh the Vercel preview after adding env vars.
+12. Run the testing checklist at the bottom of this file.
 
 ## Collections to create
 
@@ -66,6 +65,10 @@ WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
 WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
 WIX_BLOGS_COLLECTION_ID=
+PAYFAST_MERCHANT_ID=
+PAYFAST_MERCHANT_KEY=
+PAYFAST_PASSPHRASE=
+PAYFAST_MODE=sandbox
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
@@ -82,10 +85,8 @@ Check each value:
 ## Wix app and permission checklist
 
 - Wix CMS / Content Manager is installed.
-- Wix Stores is installed only if paid downloadable resources need Wix-managed checkout or secure store delivery.
 - Headless project has Read Data Items permission.
 - Headless project has Read Data Collections permission.
-- Headless project has Store/Product/Checkout read permissions only if Wix Stores is used.
 
 ## Final testing checklist
 
@@ -104,9 +105,9 @@ After Vercel env vars are saved and a preview/production deployment is available
 Also check:
 
 - Free ebooks show a Download button when `isFree` is true and `pdfFile` is uploaded.
-- Paid ebooks show a Buy Now button when `isFree` is false and `paymentLink` is filled in.
-- Paid ebooks show Coming Soon when `isFree` is false and `paymentLink` is empty.
-- Paid resources show a Buy button only when `purchaseLink` is filled in.
+- Paid ebooks show Add to Cart when `isFree` is false and a paid price is set.
+- Paid resources show Add to Cart when `accessType` is paid and a paid price is set.
+- `/cart` and `/checkout` load with the cart badge and PayFast checkout button.
 - Paid resources do not expose protected file URLs.
 - Free resources show a download button only when the public file is uploaded.
 - Search, category filter and Load More work on listing pages when enough content exists.
