@@ -1,4 +1,4 @@
-import { getConfirmedOrder, getOrder, toPublicOrder } from "../src/lib/orders.js";
+import { getStoredConfirmedOrder, getStoredOrder, toPublicOrder } from "../src/lib/orders.js";
 
 export default async function handler(request, response) {
   if (request.method !== "GET") {
@@ -12,7 +12,7 @@ export default async function handler(request, response) {
   const host = request.headers?.host || "edureach.local";
   const url = new URL(request.url || "/api/orders", `https://${host}`);
   const orderId = url.searchParams.get("orderId") || url.searchParams.get("order") || "";
-  const order = getOrder(orderId);
+  const order = await getStoredOrder(orderId);
 
   if (!order) {
     return sendJson(response, 404, {
@@ -23,7 +23,7 @@ export default async function handler(request, response) {
 
   return sendJson(response, 200, {
     ok: true,
-    order: toPublicOrder(order, { includeDownloads: Boolean(getConfirmedOrder(orderId)) })
+    order: toPublicOrder(order, { includeDownloads: Boolean(await getStoredConfirmedOrder(orderId)) })
   });
 }
 

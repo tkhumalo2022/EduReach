@@ -1,7 +1,12 @@
+import { getCache } from "@vercel/functions";
+
 const PENDING_ORDER_STORE = globalThis.__EDUREACH_PENDING_ORDER_STORE__ || new Map();
 const CONFIRMED_ORDER_STORE = globalThis.__EDUREACH_CONFIRMED_ORDER_STORE__ || new Map();
 globalThis.__EDUREACH_PENDING_ORDER_STORE__ = PENDING_ORDER_STORE;
 globalThis.__EDUREACH_CONFIRMED_ORDER_STORE__ = CONFIRMED_ORDER_STORE;
+
+const ORDER_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
+const ORDER_CACHE_NAMESPACE = "edureach-orders";
 
 const ORDER_STATUSES = Object.freeze({
   pending: "pending",
@@ -52,6 +57,86 @@ export function getOrder(orderId) {
 
 export function getConfirmedOrder(orderId) {
   return CONFIRMED_ORDER_STORE.get(text(orderId)) || null;
+}
+
+export async function saveOrder(order) {
+  if (!order?.id) return order || null;
+
+  if (order.status === ORDER_STATUSES.paid) {
+    CONFIRMED_ORDER_STORE.set(order.id, order);
+    PENDING_ORDER_STORE.delete(order.id);
+    await Promise.all([
+      setCachedOrder(confirmedOrderKey(order.id), order),
+      deleteCachedOrder(pendingOrderKey(order.id))
+    ]);
+  } else {
+    PENDING_ORDER_STORE.set(order.id, order);
+    await setCachedOrder(pendingOrderKey(order.id), order);
+  }
+
+  return order;
+}
+
+export async function getStoredOrder(orderId) {
+  const id = text(orderId);
+  if (!id) return null;
+
+  const localOrder = getOrder(id);
+  if (localOrder) return localOrder;
+
+  const confirmedOrder = await getCachedOrder(confirmedOrderKey(id));
+  if (confirmedOrder) {
+    CONFIRMED_ORDER_STORE.set(id, confirmedOrder);
+    return confirmedOrder;
+  }
+
+  const pendingOrder = await getCachedOrder(pendingOrderKey(id));
+  if (pendingOrder) {
+    PENDING_ORDER_STORE.set(id, pendingOrder);
+    return pendingOrder;
+  }
+
+  return null;
+}
+
+export async function getStoredConfirmedOrder(orderId) {
+  const id = text(orderId);
+  if (!id) return null;
+
+  const localOrder = getConfirmedOrder(id);
+  if (localOrder) return localOrder;
+
+  const confirmedOrder = await getCachedOrder(confirmedOrderKey(id));
+  if (confirmedOrder) {
+    CONFIRMED_ORDER_STORE.set(id, confirmedOrder);
+    return confirmedOrder;
+  }
+
+  return null;
+}
+
+export async function markStoredOrderPaid(orderId, payment = {}) {
+  const order = await getStoredOrder(orderId);
+  if (!order) return null;
+  const paidOrder = markOrderPaid(order.id, payment);
+  await saveOrder(paidOrder);
+  return paidOrder;
+}
+
+export async function markStoredOrderFailed(orderId, payment = {}) {
+  const order = await getStoredOrder(orderId);
+  if (!order) return null;
+  const failedOrder = markOrderFailed(order.id, payment);
+  await saveOrder(failedOrder);
+  return failedOrder;
+}
+
+export async function markStoredOrderCancelled(orderId) {
+  const order = await getStoredOrder(orderId);
+  if (!order) return null;
+  const cancelledOrder = markOrderCancelled(order.id);
+  await saveOrder(cancelledOrder);
+  return cancelledOrder;
 }
 
 export function markOrderPaid(orderId, payment = {}) {
@@ -195,4 +280,70 @@ function matchesResource(resource, item) {
   const itemType = text(item.type || item.resourceType).toLowerCase();
   const itemSlug = text(item.slug || item.key || item.id);
   return itemType === resource.type && itemSlug === resource.slug;
+}
+
+async function getCachedOrder(key) {
+  const cache = getOrderCache();
+  if (!cache) return null;
+
+  try {
+    const order = await cache.get(key);
+    return order && typeof order === "object" ? order : null;
+  } catch (error) {
+    console.warn("Could not read order from runtime cache.", {
+      key,
+      message: error instanceof Error ? error.message : "Unknown error"
+    });
+    return null;
+  }
+}
+
+async function setCachedOrder(key, order) {
+  const cache = getOrderCache();
+  if (!cache || !order) return;
+
+  try {
+    await cache.set(key, order, {
+      ttl: ORDER_CACHE_TTL_SECONDS,
+      tags: ["orders", `order:${order.id}`],
+      name: `EduReach order ${order.id}`
+    });
+  } catch (error) {
+    console.warn("Could not write order to runtime cache.", {
+      key,
+      message: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+}
+
+async function deleteCachedOrder(key) {
+  const cache = getOrderCache();
+  if (!cache) return;
+
+  try {
+    await cache.delete(key);
+  } catch (error) {
+    console.warn("Could not delete order from runtime cache.", {
+      key,
+      message: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+}
+
+function getOrderCache() {
+  try {
+    return getCache({
+      namespace: ORDER_CACHE_NAMESPACE
+    });
+  } catch {
+    return null;
+  }
+}
+
+function pendingOrderKey(orderId) {
+  return `pending:${orderId}`;
+}
+
+function confirmedOrderKey(orderId) {
+  return `confirmed:${orderId}`;
 }

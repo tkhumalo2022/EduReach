@@ -82,7 +82,7 @@ Set the PayFast ITN/notify URL to:
 https://edureach-website.vercel.app/api/payfast/notify
 ```
 
-The checkout API validates cart items against Wix CMS before signing the PayFast payload. The ITN webhook at `/api/payfast/notify` validates the PayFast signature, posts the ITN data back to PayFast for server-side confirmation, checks the merchant ID, amount and `payment_status`, and only then marks the order paid. Pending, cancelled or failed orders never receive `downloadUrl` values from `/api/orders`. Do not add manual payment links to CMS products.
+The checkout API validates cart items against Wix CMS before signing the PayFast payload. The ITN webhook at `/api/payfast/notify` validates the PayFast signature, posts the ITN data back to PayFast for server-side confirmation, checks the merchant ID, amount and `payment_status`, and only then marks the order paid. Pending, cancelled or failed orders never receive `downloadUrl` values from `/api/orders`. Confirmed order state is stored server-side through Vercel Runtime Cache as a lightweight bridge until a permanent database is added. Do not add manual payment links to CMS products.
 
 ## Images
 

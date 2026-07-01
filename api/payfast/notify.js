@@ -9,9 +9,9 @@ import {
   verifyPayFastSignature
 } from "../../src/lib/payfast.js";
 import {
-  getOrder,
-  markOrderFailed,
-  markOrderPaid
+  getStoredOrder,
+  markStoredOrderFailed,
+  markStoredOrderPaid
 } from "../../src/lib/orders.js";
 
 export default async function handler(request, response) {
@@ -53,7 +53,7 @@ export default async function handler(request, response) {
   }
 
   const orderId = String(data.m_payment_id || data.custom_str1 || "").trim();
-  const order = getOrder(orderId);
+  const order = await getStoredOrder(orderId);
 
   if (!order) {
     console.error("PayFast ITN order not found.", { orderId });
@@ -75,7 +75,7 @@ export default async function handler(request, response) {
   const isConfirmed = paymentStatus === "COMPLETE";
 
   if (isConfirmed) {
-    markOrderPaid(orderId, {
+    await markStoredOrderPaid(orderId, {
       pfPaymentId: data.pf_payment_id,
       status: paymentStatus,
       amountGross: data.amount_gross,
@@ -83,7 +83,7 @@ export default async function handler(request, response) {
       amountNet: data.amount_net
     });
   } else {
-    markOrderFailed(orderId, {
+    await markStoredOrderFailed(orderId, {
       status: paymentStatus
     });
   }

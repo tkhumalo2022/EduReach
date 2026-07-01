@@ -10,6 +10,7 @@
     "build": "node scripts/validate-js.mjs"
   },
   "dependencies": {
+    "@vercel/functions": "^3.7.5",
     "@wix/data": "^1.0.482",
     "@wix/sdk": "^1.21.12"
   },

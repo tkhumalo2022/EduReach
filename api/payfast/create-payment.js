@@ -8,6 +8,7 @@ import {
 import {
   createOrder,
   parsePriceToCents,
+  saveOrder,
   toPublicOrder
 } from "../../src/lib/orders.js";
 import { getContentBySlug } from "../../src/lib/wixContent.js";
@@ -100,6 +101,8 @@ export default async function handler(request, response) {
     currency: "ZAR",
     mode: config.mode
   });
+  await saveOrder(order);
+
   const origin = getRequestOrigin(request);
   const fields = {
     merchant_id: config.merchantId,
