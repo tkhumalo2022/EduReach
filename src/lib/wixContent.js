@@ -394,11 +394,13 @@ async function findItems(query, options = {}) {
   }
 }
 
-function normalizeCmsItem(type, rawItem, options = {}) {
+export function normalizeCmsItem(type, rawItem, options = {}) {
   const definition = CONTENT_TYPES[type];
   const data = rawItem?.data || rawItem || {};
-  const accessType = type === "ebooks" || type === "downloads"
-    ? normalizeProductAccessType(data)
+  const accessType = type === "ebooks"
+    ? normalizeEbookAccessType(data)
+    : type === "downloads"
+      ? normalizeProductAccessType(data)
     : normalizeAccessType(data.accessType);
   const image =
     withFallbackAlt(resolveWixImage(data.featuredImage || data.coverImage || data.thumbnail || data.image), [
@@ -416,6 +418,8 @@ function normalizeCmsItem(type, rawItem, options = {}) {
   const previewAllowed = Boolean(data.previewAllowed);
   const rawContent = data.content || data.description || data.fullDescription;
   const contentBlocks = richContentToBlocks(rawContent);
+  const contentText = blocksToPlainText(contentBlocks);
+  const excerpt = cleanSummaryText(data.excerpt || data.shortDescription) || cleanSummaryText(data.description) || contentText;
   const slug = normalizeSlug(data.slug || data.title);
   const paymentLink = resolveResourceLink(data.paymentLink || data.paymentUrl || data.purchaseLink || data.checkoutLink);
   const downloadLink = resolveResourceLink(data.downloadLink || data.downloadUrl || data.resourceLink || data.fileLink || data.fileUrl || data.resourceFile);
@@ -428,8 +432,8 @@ function normalizeCmsItem(type, rawItem, options = {}) {
     label: definition.label,
     title: text(data.title),
     slug,
-    excerpt: text(data.excerpt || data.shortDescription || data.description),
-    content: blocksToPlainText(contentBlocks),
+    excerpt,
+    content: contentText,
     contentBlocks,
     image,
     author: text(data.author),
@@ -463,7 +467,7 @@ function normalizeCmsItem(type, rawItem, options = {}) {
     photographerCredit: text(data.photographerCredit || data.imageCredits),
     mediaGallery,
     seoTitle: text(data.seoTitle || data.title),
-    seoDescription: text(data.seoDescription || data.excerpt || data.description || data.shortDescription),
+    seoDescription: cleanSummaryText(data.seoDescription || data.excerpt || data.shortDescription || data.description),
     detailUrl: `${definition.detailPath}/${encodeURIComponent(slug)}`,
     ctaLabel: ctaLabel(type, accessType)
   };
@@ -582,6 +586,36 @@ function normalizeProductAccessType(data) {
   return normalizeAccessType(data.accessType);
 }
 
+function normalizeEbookAccessType(data) {
+  const isFree = Object.prototype.hasOwnProperty.call(data, "isFree") && normalizeBoolean(data.isFree);
+  const hasPaidPrice = priceGreaterThanZero(data.price);
+  return isFree && !hasPaidPrice ? "free" : "paid";
+}
+
+function priceGreaterThanZero(value) {
+  const number = normalizedPriceNumber(value);
+  return Number.isFinite(number) && number > 0;
+}
+
+function normalizedPriceNumber(value) {
+  if (typeof value === "number") return value;
+
+  const digitsOnly = String(value ?? "").replace(/[^\d.,-]/g, "");
+  if (!digitsOnly) return 0;
+
+  const lastComma = digitsOnly.lastIndexOf(",");
+  const lastDot = digitsOnly.lastIndexOf(".");
+  const decimalIndex = Math.max(lastComma, lastDot);
+  const decimalPart = decimalIndex > -1 ? digitsOnly.slice(decimalIndex + 1) : "";
+  const hasDecimalPart = decimalPart.length > 0 && decimalPart.length <= 2;
+
+  const normalized = hasDecimalPart
+    ? `${digitsOnly.slice(0, decimalIndex).replace(/[.,]/g, "")}.${decimalPart}`
+    : digitsOnly.replace(/[.,]/g, "");
+
+  return Number(normalized);
+}
+
 function normalizeBoolean(value) {
   if (typeof value === "boolean") return value;
   const normalized = String(value || "").trim().toLowerCase();
@@ -672,7 +706,9 @@ function richContentToBlocks(value) {
   if (!value) return [];
 
   if (typeof value === "string") {
-    return stripHtml(value)
+    if (containsHtml(value)) return htmlToBlocks(value);
+
+    return decodeHtmlEntities(value)
       .split(/\n{2,}/)
       .map((paragraph) => ({ type: "paragraph", text: paragraph.trim() }))
       .filter((block) => block.text);
@@ -761,15 +797,124 @@ function blocksToPlainText(blocks) {
     .join("\n\n");
 }
 
+function cleanSummaryText(value) {
+  return blocksToPlainText(richContentToBlocks(value))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function htmlToBlocks(value) {
+  const html = removeUnsafeHtml(value).replace(/<br\s*\/?>/gi, "\n");
+  const blocks = [];
+  const blockPattern = /<(h[1-6]|p|div|blockquote|ul|ol)[^>]*>([\s\S]*?)<\/\1>/gi;
+  let match;
+
+  while ((match = blockPattern.exec(html)) !== null) {
+    const tag = match[1].toLowerCase();
+    const innerHtml = match[2];
+
+    if (tag === "ul" || tag === "ol") {
+      const items = htmlListItems(innerHtml);
+      if (items.length) blocks.push({ type: "list", items });
+      continue;
+    }
+
+    const blockText = htmlToText(innerHtml);
+    if (!blockText) continue;
+
+    if (tag.startsWith("h")) {
+      blocks.push({ type: "heading", text: blockText });
+    } else if (tag === "blockquote") {
+      blocks.push({ type: "quote", text: blockText });
+    } else {
+      blocks.push({ type: "paragraph", text: blockText });
+    }
+  }
+
+  if (blocks.length) return blocks;
+
+  return stripHtml(value)
+    .split(/\n{2,}/)
+    .map((paragraph) => ({ type: "paragraph", text: paragraph.trim() }))
+    .filter((block) => block.text);
+}
+
+function htmlListItems(value) {
+  const items = [];
+  const itemPattern = /<li[^>]*>([\s\S]*?)<\/li>/gi;
+  let match;
+
+  while ((match = itemPattern.exec(value)) !== null) {
+    const itemText = htmlToText(match[1]);
+    if (itemText) items.push(itemText);
+  }
+
+  return items;
+}
+
+function htmlToText(value) {
+  return decodeHtmlEntities(
+    removeUnsafeHtml(value)
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(p|div|h[1-6]|li|blockquote)>/gi, "\n")
+      .replace(/<[^>]+>/g, " ")
+  )
+    .replace(/[ \t]+/g, " ")
+    .replace(/\s*\n\s*/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 function stripHtml(value) {
-  return String(value)
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
+  return decodeHtmlEntities(removeUnsafeHtml(value)
     .replace(/<\/(p|div|h[1-6]|li|blockquote)>/gi, "\n\n")
     .replace(/<[^>]+>/g, " ")
+  )
     .replace(/[ \t]+/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+function removeUnsafeHtml(value) {
+  return String(value || "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "");
+}
+
+function containsHtml(value) {
+  return /<\/?[a-z][\s\S]*>/i.test(String(value || ""));
+}
+
+function decodeHtmlEntities(value) {
+  const entities = {
+    amp: "&",
+    apos: "'",
+    gt: ">",
+    lt: "<",
+    nbsp: " ",
+    quot: "\"",
+    ndash: "-",
+    mdash: "-",
+    hellip: "..."
+  };
+
+  return String(value || "").replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+    const normalized = String(entity).toLowerCase();
+
+    if (normalized.startsWith("#x")) {
+      const codePoint = Number.parseInt(normalized.slice(2), 16);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+    }
+
+    if (normalized.startsWith("#")) {
+      const codePoint = Number.parseInt(normalized.slice(1), 10);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+    }
+
+    return Object.prototype.hasOwnProperty.call(entities, normalized)
+      ? entities[normalized]
+      : match;
+  });
 }
 
 function uniqueSorted(values) {
