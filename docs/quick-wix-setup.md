@@ -39,7 +39,7 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 | Ebooks | `Import5` | `docs/wix-cms-templates/Ebooks.sample.csv` |
 | Category helper collection | `Import6` | `docs/wix-cms-templates/Categories.sample.csv` |
 
-Set `WIX_BLOGS_COLLECTION_ID` to the exact Blogs CMS collection ID Wix shows, for example `Blogs` or `Import2`.
+Set `WIX_BLOGS_COLLECTION_ID` to the real Blogs CMS collection ID, for example `Import2` if that is the ID Wix shows.
 
 ## Fast sample data workflow
 
@@ -64,7 +64,7 @@ WIX_DOWNLOADS_COLLECTION_ID=Import2
 WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
 WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
-# Set to the exact Blogs collection ID Wix shows, for example Blogs or Import2.
+# Set to Import2 if that is the real Blogs collection ID.
 WIX_BLOGS_COLLECTION_ID=
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
