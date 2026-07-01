@@ -3,6 +3,45 @@ import test from "node:test";
 
 import { normalizeCmsItem } from "../src/lib/wixContent.js";
 
+test("keeps explicit article slugs for backward compatibility", () => {
+  const item = normalizeCmsItem("articles", {
+    data: {
+      title: "Inclusive Classroom Support",
+      slug: "custom-inclusive-classroom-support"
+    }
+  });
+
+  assert.equal(item.slug, "custom-inclusive-classroom-support");
+  assert.equal(item.detailUrl, "/resources/articles/custom-inclusive-classroom-support");
+});
+
+test("generates article slugs from titles when slug is missing", () => {
+  const item = normalizeCmsItem("articles", {
+    data: {
+      title: "Inclusive Education: A Teacher's Guide!"
+    }
+  });
+
+  assert.equal(item.slug, "inclusive-education-a-teacher-s-guide");
+  assert.equal(item.detailUrl, "/resources/articles/inclusive-education-a-teacher-s-guide");
+});
+
+test("normalizes special-character article titles consistently", () => {
+  const first = normalizeCmsItem("articles", {
+    data: {
+      title: "Learner Support & Care!"
+    }
+  });
+  const duplicate = normalizeCmsItem("articles", {
+    data: {
+      title: "Learner Support Care"
+    }
+  });
+
+  assert.equal(first.slug, "learner-support-care");
+  assert.equal(duplicate.slug, "learner-support-care");
+});
+
 test("cleans raw HTML descriptions for ebook cards and detail blocks", () => {
   const item = normalizeCmsItem("ebooks", {
     _id: "ebook-html",

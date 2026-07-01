@@ -9,7 +9,7 @@ Use the `.sample.csv` files as copy-paste references while creating test records
 | Field ID | Wix field type | Sample value |
 |---|---|---|
 | `title` | Text | Sample Article: Inclusive Classroom Support |
-| `slug` | Text | sample-inclusive-classroom-support |
+| `slug` | Text | Optional; sample-inclusive-classroom-support |
 | `excerpt` | Text | A short sample summary for testing the Articles page. |
 | `content` | Rich Content | Use a few paragraphs in Wix Rich Content. |
 | `featuredImage` | Image | Upload a sample image in Wix. |

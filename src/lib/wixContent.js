@@ -318,19 +318,26 @@ async function getCollectionItemBySlug(type, slug, options = {}) {
 
   try {
     const client = createWixClient();
-    let query = client.items.query(collectionId).eq("slug", cleanSlug).limit(1);
+    let result = null;
 
-    if (definition.requiresConsent) {
-      query = query.eq("consentConfirmed", true);
+    try {
+      let query = client.items.query(collectionId).eq("slug", cleanSlug).limit(1);
+
+      if (definition.requiresConsent) {
+        query = query.eq("consentConfirmed", true);
+      }
+
+      result = await findItems(query, {
+        showDrafts: false,
+        includeCategoryReference: true
+      });
+    } catch (error) {
+      if (!usesGeneratedSlugFallback(type)) throw error;
     }
 
-    const result = await findItems(query, {
-      showDrafts: false,
-      includeCategoryReference: true
-    });
-    const item = result.items?.[0]
+    const item = result?.items?.[0]
       ? normalizeCmsItem(type, result.items[0], options)
-      : type === "ebooks" || type === "blogs"
+      : usesGeneratedSlugFallback(type)
         ? await findItemByGeneratedSlug(type, collectionId, cleanSlug, options)
         : null;
 
@@ -344,6 +351,10 @@ async function getCollectionItemBySlug(type, slug, options = {}) {
       type
     });
   }
+}
+
+function usesGeneratedSlugFallback(type) {
+  return ["articles", "ebooks", "blogs"].includes(type);
 }
 
 async function findItemByGeneratedSlug(type, collectionId, slug, options = {}) {

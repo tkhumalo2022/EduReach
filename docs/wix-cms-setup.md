@@ -84,7 +84,7 @@ Collection ID: `Import1`
 | Field ID | Wix field type | Notes |
 |---|---|---|
 | `title` | Text | Required |
-| `slug` | Text | Required, URL-safe and unique |
+| `slug` | Text | Optional; if missing, the website generates a URL-safe slug from `title` |
 | `excerpt` | Text | Short card summary |
 | `content` | Rich Content | Article body |
 | `featuredImage` | Image | Main image |

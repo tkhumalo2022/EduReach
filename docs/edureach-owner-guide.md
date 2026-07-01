@@ -6,7 +6,7 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 
 1. Open Wix Dashboard -> CMS -> Articles.
 2. Add a new item.
-3. Add `title`, `slug`, `excerpt`, `content`, `featuredImage`, `imageAlt`, `author`, `publishDate`, `category`, `tags`, and SEO fields.
+3. Add `title`, `excerpt`, `content`, `featuredImage`, `imageAlt`, `author`, `publishDate`, `category`, `tags`, and SEO fields. Add `slug` only if the field already exists and you need a custom URL.
 4. Turn on `featured` only if the article should appear first.
 5. Save the item as a draft if it is not ready.
 6. Use Wix Publish when it is ready for the website.
