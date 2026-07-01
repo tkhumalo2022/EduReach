@@ -3,6 +3,41 @@
   const body = document.body;
   const menuButton = document.querySelector(".menu-toggle");
   const navigation = document.querySelector(".primary-nav");
+  const socialLinks = [
+    {
+      label: "Instagram",
+      href: "https://www.instagram.com/edureach.africa?igsh=YmcxMXpweGR1d3Nq",
+      icon: '<svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="4"></rect><circle cx="12" cy="12" r="3.2"></circle><path d="M16.8 7.2h.01"></path></svg>'
+    },
+    {
+      label: "Facebook",
+      href: "https://www.facebook.com/share/1EuwmMShrs/",
+      icon: '<svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 8.5h2V5h-2.4C10.8 5 9 6.8 9 9.7V12H7v3.5h2V21h3.6v-5.5H15l.5-3.5h-2.9V9.8c0-.8.4-1.3 1.4-1.3Z"></path></svg>'
+    }
+  ];
+
+  const injectHeaderSocialLinks = () => {
+    if (!navigation || navigation.querySelector(".header-social-links")) return;
+
+    const container = document.createElement("div");
+    container.className = "header-social-links";
+    container.setAttribute("aria-label", "Follow EduReach on social media");
+
+    socialLinks.forEach((link) => {
+      const anchor = document.createElement("a");
+      anchor.className = "header-social-link";
+      anchor.href = link.href;
+      anchor.target = "_blank";
+      anchor.rel = "noopener noreferrer";
+      anchor.setAttribute("aria-label", `Follow EduReach on ${link.label}`);
+      anchor.innerHTML = link.icon;
+      container.append(anchor);
+    });
+
+    navigation.append(container);
+  };
+
+  injectHeaderSocialLinks();
   const navLinks = navigation ? [...navigation.querySelectorAll("a")] : [];
   const whatsappButtons = [...document.querySelectorAll(".js-whatsapp")];
   const emailButtons = [...document.querySelectorAll(".js-email, a[href^='mailto:']")];

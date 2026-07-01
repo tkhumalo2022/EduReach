@@ -249,6 +249,8 @@
     meta.textContent = cardMeta(item);
     wrapper.append(meta);
 
+    wrapper.append(createDetailSocialActions());
+
     const badge = createAccessBadge(item, true);
     if (badge) wrapper.append(badge);
 
@@ -510,6 +512,44 @@
     }
 
     return link;
+  }
+
+  function createDetailSocialActions() {
+    const section = document.createElement("div");
+    section.className = "cms-detail-social";
+
+    const label = document.createElement("p");
+    label.className = "cms-detail-social-label";
+    label.textContent = "Follow EduReach";
+    section.append(label);
+
+    const actions = document.createElement("div");
+    actions.className = "cms-detail-social-actions";
+
+    [
+      {
+        label: "Instagram",
+        href: "https://www.instagram.com/edureach.africa?igsh=YmcxMXpweGR1d3Nq",
+        icon: '<svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="4" width="16" height="16" rx="4"></rect><circle cx="12" cy="12" r="3.2"></circle><path d="M16.8 7.2h.01"></path></svg>'
+      },
+      {
+        label: "Facebook",
+        href: "https://www.facebook.com/share/1EuwmMShrs/",
+        icon: '<svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 8.5h2V5h-2.4C10.8 5 9 6.8 9 9.7V12H7v3.5h2V21h3.6v-5.5H15l.5-3.5h-2.9V9.8c0-.8.4-1.3 1.4-1.3Z"></path></svg>'
+      }
+    ].forEach((link) => {
+      const anchor = document.createElement("a");
+      anchor.className = "cms-detail-social-link";
+      anchor.href = link.href;
+      anchor.target = "_blank";
+      anchor.rel = "noopener noreferrer";
+      anchor.setAttribute("aria-label", `Follow EduReach on ${link.label}`);
+      anchor.innerHTML = `${link.icon}<span>${link.label}</span>`;
+      actions.append(anchor);
+    });
+
+    section.append(actions);
+    return section;
   }
 
   function createAccessBadge(item, detail = false) {
