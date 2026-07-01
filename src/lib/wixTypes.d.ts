@@ -1,6 +1,6 @@
 export interface WixBaseContent {
   id: string;
-  type: "articles" | "ebooks" | "downloads" | "workshops" | "gallery" | "blog";
+  type: "articles" | "ebooks" | "downloads" | "workshops" | "gallery" | "blogs";
   label: string;
   title: string;
   slug: string;
@@ -69,7 +69,7 @@ export interface WixGalleryAlbum extends WixBaseContent {
 }
 
 export interface WixBlogPost extends WixBaseContent {
-  type: "blog";
+  type: "blogs";
 }
 
 export interface WixCategory {

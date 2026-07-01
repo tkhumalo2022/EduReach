@@ -39,7 +39,7 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 | Ebooks | `Import5` | `docs/wix-cms-templates/Ebooks.sample.csv` |
 | Category helper collection | `Import6` | `docs/wix-cms-templates/Categories.sample.csv` |
 
-Only add `WIX_BLOGS_COLLECTION_ID` if Wix has a separate Blogs CMS collection with its own real collection ID. Do not use the display name `Blogs` as a collection ID.
+Set `WIX_BLOGS_COLLECTION_ID` to the real Blogs CMS collection ID, for example `Import2` if that is the ID Wix shows.
 
 ## Fast sample data workflow
 
@@ -64,6 +64,7 @@ WIX_DOWNLOADS_COLLECTION_ID=Import2
 WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
 WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
+# Set to Import2 only if that is the real Blogs collection ID.
 WIX_BLOGS_COLLECTION_ID=
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
@@ -101,6 +102,7 @@ After Vercel env vars are saved and a preview/production deployment is available
 | `/resources/workshops` | Page loads and only published albums with `consentConfirmed=true` appear |
 | `/resources/gallery` | Page loads and only published albums with `consentConfirmed=true` appear |
 | `/blog` | Page loads and published Blogs appear, or the empty state appears |
+| `/api/wix-content?type=blogs` | JSON response with the Blogs CMS list or the normal empty state |
 
 Also check:
 

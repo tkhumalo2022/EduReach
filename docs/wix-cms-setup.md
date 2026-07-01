@@ -48,6 +48,7 @@ WIX_DOWNLOADS_COLLECTION_ID=Import2
 WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
 WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
+# Set to Import2 only if that is the real Blogs collection ID.
 WIX_BLOGS_COLLECTION_ID=
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
@@ -57,7 +58,7 @@ PAYFAST_MODE=sandbox
 WIX_ACCOUNT_ID=
 ```
 
-`WIX_BLOGS_COLLECTION_ID` is optional. Add it only if Wix has a separate Blogs CMS collection with its own real collection ID. Do not use the display name `Blogs` as a collection ID.
+Set `WIX_BLOGS_COLLECTION_ID` to the real Blogs CMS collection ID. Use `Import2` only if that is the ID Wix shows for the Blogs collection.
 
 Use `.env.example` as a reference only. Do not commit `.env.local`.
 
@@ -95,7 +96,7 @@ Collection ID: `Import1`
 
 ## 8. Blogs collection
 
-Optional collection ID: set `WIX_BLOGS_COLLECTION_ID` only if Wix has a separate Blogs CMS collection with its own real collection ID.
+Collection ID: set `WIX_BLOGS_COLLECTION_ID` to the Blogs CMS collection ID, for example `Import2` if that is the ID Wix shows.
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -227,7 +228,7 @@ Collection ID: `Import6`
 3. Add real blog posts in the Blogs CMS collection.
 4. Publish the posts in Wix.
 
-If a Blogs collection ID is missing or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts.
+If a Blogs collection ID is missing or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts. The API type is `blogs`, for example `/api/wix-content?type=blogs`.
 
 ## 15. Paid digital products
 

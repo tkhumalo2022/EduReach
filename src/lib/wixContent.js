@@ -60,10 +60,10 @@ export const CONTENT_TYPES = Object.freeze({
     emptyMessage: EMPTY_MESSAGE,
     requiresConsent: true
   },
-  blog: {
+  blogs: {
     label: "Blogs",
     singular: "Blog Post",
-    collectionKey: "blog",
+    collectionKey: "blogs",
     dateField: "publishDate",
     detailPath: "/blog",
     ctaLabel: "Read More",
@@ -73,7 +73,7 @@ export const CONTENT_TYPES = Object.freeze({
 
 const COLLECTION_ENV_KEYS = Object.freeze({
   articles: "WIX_ARTICLES_COLLECTION_ID",
-  blog: "WIX_BLOGS_COLLECTION_ID",
+  blogs: "WIX_BLOGS_COLLECTION_ID",
   ebooks: "WIX_EBOOKS_COLLECTION_ID",
   downloads: "WIX_DOWNLOADS_COLLECTION_ID",
   workshops: "WIX_WORKSHOP_ALBUMS_COLLECTION_ID",
@@ -81,8 +81,14 @@ const COLLECTION_ENV_KEYS = Object.freeze({
   categories: "WIX_CATEGORIES_COLLECTION_ID"
 });
 
+const CONTENT_TYPE_ALIASES = Object.freeze({
+  blog: "blogs"
+});
+
 export function getContentType(type) {
-  return CONTENT_TYPES[type] ? type : "";
+  const normalized = String(type || "").trim().toLowerCase();
+  const canonical = CONTENT_TYPE_ALIASES[normalized] || normalized;
+  return CONTENT_TYPES[canonical] ? canonical : "";
 }
 
 export function getWixConnectionStatus(type = "") {
@@ -199,7 +205,7 @@ export async function getCategories(options = {}) {
 }
 
 export async function getPublishedBlogPosts(options = {}) {
-  return getPublishedCollection("blog", options);
+  return getPublishedCollection("blogs", options);
 }
 
 export async function getFeaturedBlogPosts(options = {}) {
@@ -207,7 +213,7 @@ export async function getFeaturedBlogPosts(options = {}) {
 }
 
 export async function getBlogPostBySlug(slug) {
-  return getCollectionItemBySlug("blog", slug);
+  return getCollectionItemBySlug("blogs", slug);
 }
 
 export async function getContentList(type, options = {}) {
@@ -222,7 +228,7 @@ export async function getContentList(type, options = {}) {
       return getPublishedWorkshopAlbums(options);
     case "gallery":
       return getPublishedGalleryAlbums(options);
-    case "blog":
+    case "blogs":
       return getPublishedBlogPosts(options);
     default:
       return { configured: true, items: [], error: "Unknown content type." };
@@ -241,8 +247,8 @@ export async function getContentBySlug(type, slug, options = {}) {
       return getCollectionItemBySlug("workshops", slug, options);
     case "gallery":
       return getCollectionItemBySlug("gallery", slug, options);
-    case "blog":
-      return getCollectionItemBySlug("blog", slug, options);
+    case "blogs":
+      return getCollectionItemBySlug("blogs", slug, options);
     default:
       return { configured: true, item: null, error: "Unknown content type." };
   }
@@ -324,7 +330,7 @@ async function getCollectionItemBySlug(type, slug, options = {}) {
     });
     const item = result.items?.[0]
       ? normalizeCmsItem(type, result.items[0], options)
-      : type === "ebooks" || type === "blog"
+      : type === "ebooks" || type === "blogs"
         ? await findItemByGeneratedSlug(type, collectionId, cleanSlug, options)
         : null;
 

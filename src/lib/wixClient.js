@@ -16,6 +16,7 @@ export const WIX_ENV_KEYS = Object.freeze([
 
 export const WIX_COLLECTION_ID_DEFAULTS = Object.freeze({
   articles: "Import1",
+  blogs: "",
   downloads: "Import2",
   workshops: "Import3",
   gallery: "Import4",
@@ -39,7 +40,7 @@ const WIX_COLLECTION_ID_ALIASES = Object.freeze({
   },
   ebooks: { Ebooks: "Import5" },
   categories: { Categories: "Import6" },
-  blog: { Blogs: "" }
+  blogs: { Blogs: "Import2" }
 });
 
 export function readWixConfig(env = process.env) {
@@ -49,7 +50,7 @@ export function readWixConfig(env = process.env) {
     siteId: env.WIX_SITE_ID || "",
     collections: {
       articles: collectionId("articles", env.WIX_ARTICLES_COLLECTION_ID),
-      blog: collectionId("blog", env.WIX_BLOGS_COLLECTION_ID),
+      blogs: collectionId("blogs", env.WIX_BLOGS_COLLECTION_ID),
       ebooks: collectionId("ebooks", env.WIX_EBOOKS_COLLECTION_ID),
       downloads: collectionId("downloads", env.WIX_DOWNLOADS_COLLECTION_ID),
       workshops: collectionId("workshops", env.WIX_WORKSHOP_ALBUMS_COLLECTION_ID),

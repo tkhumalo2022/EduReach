@@ -7,6 +7,7 @@
     downloads: "DownloadableResources",
     workshops: "WorkshopAlbums",
     gallery: "GalleryAlbums",
+    blogs: "Blogs",
     blog: "Blogs"
   };
 
@@ -16,6 +17,7 @@
     downloads: "/resources/downloads",
     workshops: "/resources/workshops",
     gallery: "/resources/gallery",
+    blogs: "/blog",
     blog: "/blog"
   };
 
@@ -25,6 +27,7 @@
     downloads: "Search DownloadableResources by title, topic or category.",
     workshops: "Browse approved WorkshopAlbums with confirmed consent.",
     gallery: "Browse approved GalleryAlbums with confirmed consent.",
+    blogs: "Search EduReach blogs by title, topic or category.",
     blog: "Search EduReach blogs by title, topic or category."
   };
 
