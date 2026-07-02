@@ -11,7 +11,6 @@ export const WIX_ENV_KEYS = Object.freeze([
   "WIX_DOWNLOADS_COLLECTION_ID",
   "WIX_WORKSHOP_ALBUMS_COLLECTION_ID",
   "WIX_GALLERY_ALBUMS_COLLECTION_ID",
-  "WIX_CATEGORIES_COLLECTION_ID",
   "WIX_TEAM_MEMBERS_COLLECTION_ID",
   "WIX_PARTNERS_COLLECTION_ID",
   "WIX_PARTNERS_SPONSORS_COLLECTION_ID",
@@ -20,42 +19,46 @@ export const WIX_ENV_KEYS = Object.freeze([
 ]);
 
 export const WIX_COLLECTION_ID_DEFAULTS = Object.freeze({
-  articles: "Import1",
-  blogs: "",
-  downloads: "Import2",
-  workshops: "Import3",
-  gallery: "Import4",
+  articles: "articles",
+  blogs: "blogPosts",
+  downloads: "downloadableResources",
+  workshops: "workshopAlbums",
+  gallery: "galleryAlbums",
   ebooks: "Import5",
-  categories: "Import6",
-  team: "TeamMembers",
-  partners: "PartnersSponsors",
-  testimonials: "Testimonials"
+  team: "teamMembers",
+  partners: "partnersSponsors",
+  testimonials: "testimonials"
 });
 
 const WIX_COLLECTION_ID_ALIASES = Object.freeze({
-  articles: { Articles: "Import1" },
+  articles: { Articles: "articles" },
   downloads: {
-    DownloadableResources: "Import2",
-    "Downloadable Resources": "Import2"
+    DownloadableResources: "downloadableResources",
+    "Downloadable Resources": "downloadableResources"
   },
   workshops: {
-    WorkshopAlbums: "Import3",
-    "Workshop Albums": "Import3"
+    WorkshopAlbums: "workshopAlbums",
+    "Workshop Albums": "workshopAlbums"
   },
   gallery: {
-    GalleryAlbums: "Import4",
-    "Gallery Albums": "Import4"
+    GalleryAlbums: "galleryAlbums",
+    "Gallery Albums": "galleryAlbums"
   },
   ebooks: { Ebooks: "Import5" },
-  categories: { Categories: "Import6" },
-  blogs: { Blogs: "Import2" },
+  blogs: {
+    Blogs: "blogPosts",
+    "Blog Posts": "blogPosts"
+  },
   team: {
-    "Team Members": "TeamMembers"
+    TeamMembers: "teamMembers",
+    "Team Members": "teamMembers"
   },
   partners: {
-    "Partners / Sponsors": "PartnersSponsors",
-    "Partners and Sponsors": "PartnersSponsors"
-  }
+    PartnersSponsors: "partnersSponsors",
+    "Partners / Sponsors": "partnersSponsors",
+    "Partners and Sponsors": "partnersSponsors"
+  },
+  testimonials: { Testimonials: "testimonials" }
 });
 
 export function readWixConfig(env = process.env) {
@@ -70,7 +73,6 @@ export function readWixConfig(env = process.env) {
       downloads: collectionId("downloads", env.WIX_DOWNLOADS_COLLECTION_ID),
       workshops: collectionId("workshops", env.WIX_WORKSHOP_ALBUMS_COLLECTION_ID),
       gallery: collectionId("gallery", env.WIX_GALLERY_ALBUMS_COLLECTION_ID),
-      categories: collectionId("categories", env.WIX_CATEGORIES_COLLECTION_ID),
       team: collectionId("team", env.WIX_TEAM_MEMBERS_COLLECTION_ID),
       partners: collectionId(
         "partners",
@@ -204,10 +206,14 @@ function firstMediaValue(value) {
 function collectionId(key, value) {
   const configured = String(value || "").trim();
   const aliases = WIX_COLLECTION_ID_ALIASES[key] || {};
+  const fallback = WIX_COLLECTION_ID_DEFAULTS[key] || "";
 
   if (Object.prototype.hasOwnProperty.call(aliases, configured)) {
     return aliases[configured];
   }
 
-  return configured || WIX_COLLECTION_ID_DEFAULTS[key] || "";
+  const allowedIds = new Set([fallback, ...Object.values(aliases)].filter(Boolean));
+  if (configured && allowedIds.has(configured)) return configured;
+
+  return fallback;
 }

@@ -1,6 +1,5 @@
 import {
   CONTENT_TYPES,
-  getCategories,
   getContentBySlug,
   getContentList,
   getContentType,
@@ -40,11 +39,6 @@ export default async function handler(req, res) {
       types: CONTENT_TYPES,
       wix: getWixConnectionStatus(type)
     });
-    return;
-  }
-
-  if (rawType === "categories") {
-    sendJson(res, { ok: true, ...(await getCategories({ debug })) });
     return;
   }
 

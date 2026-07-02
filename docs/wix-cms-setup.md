@@ -42,17 +42,15 @@ Add these in Vercel Project Settings -> Environment Variables for Production, Pr
 ```text
 NEXT_PUBLIC_WIX_CLIENT_ID=
 WIX_SITE_ID=
-WIX_ARTICLES_COLLECTION_ID=Import1
+WIX_ARTICLES_COLLECTION_ID=articles
+WIX_BLOGS_COLLECTION_ID=blogPosts
 WIX_EBOOKS_COLLECTION_ID=Import5
-WIX_DOWNLOADS_COLLECTION_ID=Import2
-WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
-WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
-WIX_CATEGORIES_COLLECTION_ID=Import6
-# Set to Import2 if that is the real Blogs collection ID.
-WIX_BLOGS_COLLECTION_ID=
-WIX_TEAM_MEMBERS_COLLECTION_ID=TeamMembers
-WIX_PARTNERS_SPONSORS_COLLECTION_ID=PartnersSponsors
-WIX_TESTIMONIALS_COLLECTION_ID=Testimonials
+WIX_DOWNLOADS_COLLECTION_ID=downloadableResources
+WIX_WORKSHOP_ALBUMS_COLLECTION_ID=workshopAlbums
+WIX_GALLERY_ALBUMS_COLLECTION_ID=galleryAlbums
+WIX_TEAM_MEMBERS_COLLECTION_ID=teamMembers
+WIX_PARTNERS_SPONSORS_COLLECTION_ID=partnersSponsors
+WIX_TESTIMONIALS_COLLECTION_ID=testimonials
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
 # Optional if the same passphrase is configured in PayFast.
@@ -64,8 +62,6 @@ NEXT_PUBLIC_SITE_URL=https://edureach.network
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
-
-Set `WIX_BLOGS_COLLECTION_ID` to the real Blogs CMS collection ID. Use `Import2` if that is the ID Wix shows for the Blogs collection.
 
 Use `.env.example` as a reference only. Do not commit `.env.local`.
 
@@ -82,7 +78,7 @@ For every CMS collection:
 
 ## 7. Articles collection
 
-Collection ID: `Import1`
+Collection ID: `articles`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -94,16 +90,16 @@ Collection ID: `Import1`
 | `imageAlt` | Text | Alternative text for the image |
 | `author` | Text | Author name |
 | `publishDate` | Date and Time | Used for sorting |
-| `category` | Reference to Categories or Text | Category label |
+| `category` | Text | Category label |
 | `tags` | Tags | Optional keywords |
 | `references` | Rich Content or Text | Citations or reading list |
 | `featured` | Boolean | Featured items sort first |
 | `seoTitle` | Text | Optional SEO title |
 | `seoDescription` | Text | Optional meta description |
 
-## 8. Blogs collection
+## 8. Blog Posts collection
 
-Collection ID: set `WIX_BLOGS_COLLECTION_ID` to the Blogs CMS collection ID, for example `Import2` if that is the ID Wix shows.
+Collection ID: `blogPosts`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -115,7 +111,7 @@ Collection ID: set `WIX_BLOGS_COLLECTION_ID` to the Blogs CMS collection ID, for
 | `imageAlt` | Text | Alternative text |
 | `author` | Text | Optional |
 | `publishDate` | Date and Time | Used for sorting |
-| `category` | Reference to Import6 or Text | Category label |
+| `category` | Text | Category label |
 | `tags` | Tags or Text | Optional |
 | `featured` | Boolean | Featured posts sort first |
 | `seoTitle` | Text | Optional SEO title |
@@ -145,9 +141,9 @@ Website behavior:
 - If `isFree` is false, the website shows Add to Cart and uses the CMS `price` during checkout validation.
 - The code can generate a URL slug from the title, so the owner does not need to manage a slug for basic ebook setup.
 
-## 10. DownloadableResources collection
+## 10. Downloadable Resources collection
 
-Collection ID: `Import2`
+Collection ID: `downloadableResources`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -157,7 +153,7 @@ Collection ID: `Import2`
 | `fullDescription` | Rich Content | Detail page content |
 | `thumbnail` | Image | Card image |
 | `thumbnailAlt` | Text | Alternative text |
-| `category` | Reference to Categories or Text | Category label |
+| `category` | Text | Category label |
 | `tags` | Tags | Optional keywords |
 | `resourceFile` | Document | Resource file. Paid files are hidden until PayFast confirms the order. |
 | `fileType` | Text | PDF, DOCX, ZIP, etc. |
@@ -174,9 +170,9 @@ Collection ID: `Import2`
 
 For paid resources, set `accessType` to `paid`, add `price`, and upload the final file to `resourceFile`. The public CMS API hides paid file URLs; downloads are returned only for paid orders.
 
-## 11. WorkshopAlbums collection
+## 11. Workshop Albums collection
 
-Collection ID: `Import3`
+Collection ID: `workshopAlbums`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -195,9 +191,9 @@ Collection ID: `Import3`
 
 Only publish albums after written media consent has been confirmed.
 
-## 12. GalleryAlbums collection
+## 12. Gallery Albums collection
 
-Collection ID: `Import4`
+Collection ID: `galleryAlbums`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -206,7 +202,7 @@ Collection ID: `Import4`
 | `description` | Rich Content or Text | Album description |
 | `albumDate` | Date and Time | Used for sorting |
 | `location` | Text | Optional |
-| `category` | Reference to Categories or Text | Category label |
+| `category` | Text | Category label |
 | `coverImage` | Image | Album cover |
 | `coverAlt` | Text | Alternative text |
 | `mediaGallery` | Media Gallery | Multiple approved images |
@@ -216,30 +212,22 @@ Collection ID: `Import4`
 
 Only publish albums after written media consent has been confirmed.
 
-## 13. Category helper collection
+## 13. Category labels
 
-Collection ID: `Import6`
+No separate category collection is required. Use the `category` text field inside Articles, Blog Posts, Downloadable Resources and Gallery Albums. Keep category names short and consistent, such as Inclusion, Parent Guidance or Learner Support.
 
-| Field ID | Wix field type | Notes |
-|---|---|---|
-| `name` | Text | Required |
-| `slug` | Text | Required, URL-safe and unique |
-| `description` | Text | Optional |
-| `resourceType` | Dropdown | Article, Ebook, Download, Workshop, Gallery, Blog |
-| `active` | Boolean | Only active categories are used |
+## 14. Blog Posts setup
 
-## 14. Blogs setup
-
-1. Open CMS -> Blogs if a separate Blogs collection exists.
-2. Add its real collection ID to `WIX_BLOGS_COLLECTION_ID`.
-3. Add real blog posts in the Blogs CMS collection.
+1. Open CMS -> Blog Posts.
+2. Confirm the collection ID is `blogPosts`.
+3. Add real blog posts in the Blog Posts CMS collection.
 4. Publish the posts in Wix.
 
-If a Blogs collection ID is missing or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts. The API type is `blogs`, for example `/api/wix-content?type=blogs`.
+If Blog Posts permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts. The API type is `blogs`, for example `/api/wix-content?type=blogs`.
 
-## 15. TeamMembers collection
+## 15. Team Members collection
 
-Collection ID: `TeamMembers`
+Collection ID: `teamMembers`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -256,9 +244,9 @@ Collection ID: `TeamMembers`
 | `linkedinUrl` | URL | Optional public profile link |
 | `featured` | Boolean | Optional homepage priority |
 
-## 16. PartnersSponsors collection
+## 16. Partners / Sponsors collection
 
-Collection ID: `PartnersSponsors`
+Collection ID: `partnersSponsors`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|
@@ -275,7 +263,7 @@ Collection ID: `PartnersSponsors`
 
 ## 17. Testimonials collection
 
-Collection ID: `Testimonials`
+Collection ID: `testimonials`
 
 | Field ID | Wix field type | Notes |
 |---|---|---|

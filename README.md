@@ -62,11 +62,11 @@ Read:
 - `docs/wix-cms-setup.md`
 - `docs/edureach-owner-guide.md`
 
-The expected Wix CMS collection IDs are `Articles`, `Blogs`, `Ebooks`, `DownloadableResources`, `WorkshopAlbums`, `GalleryAlbums`, `TeamMembers`, `PartnersSponsors`, `Testimonials` and `Import6` for the category helper collection. Wix's built-in draft/publish controls manage visibility; do not add a separate manual status field.
+The expected Wix CMS collection IDs are `articles`, `blogPosts`, `Import5`, `downloadableResources`, `workshopAlbums`, `galleryAlbums`, `teamMembers`, `partnersSponsors` and `testimonials`. Wix's built-in draft/publish controls manage visibility; do not add a separate manual status field.
 
 ## Shopping cart and PayFast checkout
 
-Paid `Ebooks` and `DownloadableResources` are added to a local shopping cart and checked out through `/checkout`. Free items still download directly from Wix.
+Paid `Ebooks` and `Downloadable Resources` are added to a local shopping cart and checked out through `/checkout`. Free items still download directly from Wix.
 
 PayFast credentials must be stored in Vercel environment variables:
 

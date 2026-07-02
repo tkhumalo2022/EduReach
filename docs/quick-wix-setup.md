@@ -32,17 +32,17 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 
 | Collection name in Wix | Collection ID expected by code | Template file |
 |---|---|---|
-| Articles | `Import1` | `docs/wix-cms-templates/Articles.sample.csv` |
-| DownloadableResources | `Import2` | `docs/wix-cms-templates/DownloadableResources.sample.csv` |
-| WorkshopAlbums | `Import3` | `docs/wix-cms-templates/WorkshopAlbums.sample.csv` |
-| GalleryAlbums | `Import4` | `docs/wix-cms-templates/GalleryAlbums.sample.csv` |
+| Articles | `articles` | `docs/wix-cms-templates/Articles.sample.csv` |
+| Blog Posts | `blogPosts` | `docs/wix-cms-templates/Blogs.sample.csv` |
+| Downloadable Resources | `downloadableResources` | `docs/wix-cms-templates/DownloadableResources.sample.csv` |
+| Workshop Albums | `workshopAlbums` | `docs/wix-cms-templates/WorkshopAlbums.sample.csv` |
+| Gallery Albums | `galleryAlbums` | `docs/wix-cms-templates/GalleryAlbums.sample.csv` |
 | Ebooks | `Import5` | `docs/wix-cms-templates/Ebooks.sample.csv` |
-| Category helper collection | `Import6` | `docs/wix-cms-templates/Categories.sample.csv` |
-| TeamMembers | `TeamMembers` | `docs/wix-cms-templates/TeamMembers.sample.csv` |
-| PartnersSponsors | `PartnersSponsors` | `docs/wix-cms-templates/PartnersSponsors.sample.csv` |
-| Testimonials | `Testimonials` | `docs/wix-cms-templates/Testimonials.sample.csv` |
+| Team Members | `teamMembers` | `docs/wix-cms-templates/TeamMembers.sample.csv` |
+| Partners / Sponsors | `partnersSponsors` | `docs/wix-cms-templates/PartnersSponsors.sample.csv` |
+| Testimonials | `testimonials` | `docs/wix-cms-templates/Testimonials.sample.csv` |
 
-Set `WIX_BLOGS_COLLECTION_ID` to the real Blogs CMS collection ID, for example `Import2` if that is the ID Wix shows.
+Use category fields inside each content collection as text labels. A separate category-helper collection is no longer required.
 
 ## Fast sample data workflow
 
@@ -61,17 +61,15 @@ Add these in Vercel Project Settings -> Environment Variables for Production, Pr
 ```text
 NEXT_PUBLIC_WIX_CLIENT_ID=
 WIX_SITE_ID=
-WIX_ARTICLES_COLLECTION_ID=Import1
+WIX_ARTICLES_COLLECTION_ID=articles
+WIX_BLOGS_COLLECTION_ID=blogPosts
 WIX_EBOOKS_COLLECTION_ID=Import5
-WIX_DOWNLOADS_COLLECTION_ID=Import2
-WIX_WORKSHOP_ALBUMS_COLLECTION_ID=Import3
-WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
-WIX_CATEGORIES_COLLECTION_ID=Import6
-# Set to Import2 if that is the real Blogs collection ID.
-WIX_BLOGS_COLLECTION_ID=
-WIX_TEAM_MEMBERS_COLLECTION_ID=TeamMembers
-WIX_PARTNERS_SPONSORS_COLLECTION_ID=PartnersSponsors
-WIX_TESTIMONIALS_COLLECTION_ID=Testimonials
+WIX_DOWNLOADS_COLLECTION_ID=downloadableResources
+WIX_WORKSHOP_ALBUMS_COLLECTION_ID=workshopAlbums
+WIX_GALLERY_ALBUMS_COLLECTION_ID=galleryAlbums
+WIX_TEAM_MEMBERS_COLLECTION_ID=teamMembers
+WIX_PARTNERS_SPONSORS_COLLECTION_ID=partnersSponsors
+WIX_TESTIMONIALS_COLLECTION_ID=testimonials
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
 # Optional if the same passphrase is configured in PayFast.
@@ -110,13 +108,13 @@ After Vercel env vars are saved and a preview/production deployment is available
 | `/api/wix-content?status=1` | JSON response with `ok: true`; missing env vars list should be empty after setup |
 | `/resources/articles` | Page loads and published Articles appear, or the empty state appears |
 | `/resources/ebooks` | Page loads and published Ebooks appear, or the empty state appears |
-| `/resources/downloads` | Page loads and published DownloadableResources appear, or the empty state appears |
+| `/resources/downloads` | Page loads and published Downloadable Resources appear, or the empty state appears |
 | `/resources/workshops` | Page loads and only published albums with `consentConfirmed=true` appear |
 | `/resources/gallery` | Page loads and only published albums with `consentConfirmed=true` appear |
-| `/blog` | Page loads and published Blogs appear, or the empty state appears |
-| `/api/wix-content?type=blogs` | JSON response with the Blogs CMS list or the normal empty state |
-| `/team` | Page loads and published TeamMembers appear, or the empty state appears |
-| `/partners` | Page loads and published PartnersSponsors appear, or the empty state appears |
+| `/blog` | Page loads and published Blog Posts appear, or the empty state appears |
+| `/api/wix-content?type=blogs` | JSON response with the Blog Posts CMS list or the normal empty state |
+| `/team` | Page loads and published Team Members appear, or the empty state appears |
+| `/partners` | Page loads and published Partners / Sponsors appear, or the empty state appears |
 | `/testimonials` | Page loads and published Testimonials appear, or the empty state appears |
 
 Also check:

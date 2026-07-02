@@ -9,11 +9,11 @@
   const TYPE_LABELS = {
     articles: "Articles",
     ebooks: "Ebooks",
-    downloads: "DownloadableResources",
-    workshops: "WorkshopAlbums",
+    downloads: "Downloadable Resources",
+    workshops: "Workshop Albums",
     gallery: "Gallery Albums",
-    blogs: "Blogs",
-    blog: "Blogs",
+    blogs: "Blog Posts",
+    blog: "Blog Posts",
     team: "Team Members",
     partners: "Partners / Sponsors",
     testimonials: "Testimonials"
@@ -35,11 +35,11 @@
   const LISTING_COPY = {
     articles: "Search EduReach articles by title, topic or category.",
     ebooks: "Search ebooks and filter by category when Wix content is available.",
-    downloads: "Search DownloadableResources by title, topic or category.",
-    workshops: "Browse approved WorkshopAlbums with confirmed consent.",
+    downloads: "Search downloadable resources by title, topic or category.",
+    workshops: "Browse approved workshop albums with confirmed consent.",
     gallery: "Browse approved Gallery Albums with confirmed consent.",
-    blogs: "Search EduReach blogs by title, topic or category.",
-    blog: "Search EduReach blogs by title, topic or category.",
+    blogs: "Search EduReach blog posts by title, topic or category.",
+    blog: "Search EduReach blog posts by title, topic or category.",
     team: "Search EduReach team members by name, role or area of expertise.",
     partners: "Search partners and sponsors by name, type or contribution.",
     testimonials: "Search testimonials by person, organization or topic."

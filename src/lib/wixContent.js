@@ -32,8 +32,8 @@ export const CONTENT_TYPES = Object.freeze({
     emptyMessage: EMPTY_MESSAGE
   },
   downloads: {
-    label: "DownloadableResources",
-    singular: "DownloadableResources",
+    label: "Downloadable Resources",
+    singular: "Downloadable Resource",
     collectionKey: "downloads",
     dateField: "publicationDate",
     detailPath: "/resources/downloads",
@@ -41,8 +41,8 @@ export const CONTENT_TYPES = Object.freeze({
     emptyMessage: EMPTY_MESSAGE
   },
   workshops: {
-    label: "WorkshopAlbums",
-    singular: "WorkshopAlbums",
+    label: "Workshop Albums",
+    singular: "Workshop Album",
     collectionKey: "workshops",
     dateField: "workshopDate",
     detailPath: "/resources/workshops",
@@ -51,8 +51,8 @@ export const CONTENT_TYPES = Object.freeze({
     requiresConsent: true
   },
   gallery: {
-    label: "GalleryAlbums",
-    singular: "GalleryAlbums",
+    label: "Gallery Albums",
+    singular: "Gallery Album",
     collectionKey: "gallery",
     dateField: "albumDate",
     detailPath: "/resources/gallery",
@@ -61,7 +61,7 @@ export const CONTENT_TYPES = Object.freeze({
     requiresConsent: true
   },
   blogs: {
-    label: "Blogs",
+    label: "Blog Posts",
     singular: "Blog Post",
     collectionKey: "blogs",
     dateField: "publishDate",
@@ -105,7 +105,6 @@ const COLLECTION_ENV_KEYS = Object.freeze({
   downloads: "WIX_DOWNLOADS_COLLECTION_ID",
   workshops: "WIX_WORKSHOP_ALBUMS_COLLECTION_ID",
   gallery: "WIX_GALLERY_ALBUMS_COLLECTION_ID",
-  categories: "WIX_CATEGORIES_COLLECTION_ID",
   team: "WIX_TEAM_MEMBERS_COLLECTION_ID",
   partners: "WIX_PARTNERS_SPONSORS_COLLECTION_ID",
   testimonials: "WIX_TESTIMONIALS_COLLECTION_ID"
@@ -131,10 +130,6 @@ export function getWixConnectionStatus(type = "") {
   const config = readWixConfig();
   const normalizedType = getContentType(type);
   const missing = [...getMissingWixConfig(config)];
-
-  if (type === "categories" && !config.collections.categories) {
-    missing.push(COLLECTION_ENV_KEYS.categories);
-  }
 
   if (normalizedType) {
     const collectionKey = CONTENT_TYPES[normalizedType].collectionKey;
@@ -207,37 +202,6 @@ export async function getFeaturedGalleryAlbums(options = {}) {
 
 export async function getGalleryAlbumBySlug(slug) {
   return getCollectionItemBySlug("gallery", slug);
-}
-
-export async function getCategories(options = {}) {
-  const status = getWixConnectionStatus("categories");
-  if (!status.configured) return unconfiguredResult(status);
-  const config = readWixConfig();
-  const collectionId = config.collections.categories;
-
-  try {
-    const client = createWixClient();
-    let query = client.items
-      .query(collectionId)
-      .eq("active", true)
-      .ascending("name")
-      .limit(safeLimit(options.limit || 100, 100));
-
-    const result = await query.find({ showDrafts: false, returnTotalCount: true });
-    const items = (result.items || []).map(normalizeCategory).filter(Boolean);
-
-    return {
-      configured: true,
-      items,
-      pagination: paginationMeta(1, items.length || DEFAULT_LIMIT, result.totalCount, result.hasNext?.())
-    };
-  } catch (error) {
-    return errorResult(error, "Wix categories could not be loaded.", false, {
-      collectionId,
-      debug: options.debug,
-      operation: "categories"
-    });
-  }
 }
 
 export async function getPublishedBlogPosts(options = {}) {
@@ -593,23 +557,6 @@ export function normalizeCmsItem(type, rawItem, options = {}) {
     seoDescription: cleanSummaryText(data.seoDescription || summaryValue(type, data) || data.description),
     detailUrl: `${definition.detailPath}/${encodeURIComponent(slug)}`,
     ctaLabel: ctaLabel(type, accessType)
-  };
-}
-
-function normalizeCategory(rawItem) {
-  const data = rawItem?.data || rawItem || {};
-  const name = text(data.name || data.title);
-  const slug = normalizeSlug(data.slug || name);
-
-  if (!name || !slug) return null;
-
-  return {
-    id: rawItem?._id || data._id || "",
-    name,
-    slug,
-    description: text(data.description),
-    resourceType: text(data.resourceType),
-    active: data.active !== false
   };
 }
 

@@ -16,14 +16,14 @@ Use the `.sample.csv` files as copy-paste references while creating test records
 | `imageAlt` | Text | Teacher supporting learners in a classroom |
 | `author` | Text | EduReach Team |
 | `publishDate` | Date and Time | 2026-07-01 |
-| `category` | Reference to Categories or Text | Inclusion |
+| `category` | Text | Inclusion |
 | `tags` | Tags | inclusion, learner support |
 | `references` | Rich Content or Text | Sample references for testing only. |
 | `featured` | Boolean | true |
 | `seoTitle` | Text | Sample Article: Inclusive Classroom Support |
 | `seoDescription` | Text | Sample SEO description for testing article pages. |
 
-## Blogs fields
+## Blog Posts fields
 
 | Field ID | Wix field type | Sample value |
 |---|---|---|
@@ -35,11 +35,11 @@ Use the `.sample.csv` files as copy-paste references while creating test records
 | `imageAlt` | Text | Sample inclusive classroom image |
 | `author` | Text | EduReach |
 | `publishDate` | Date and Time | 2026-07-01 |
-| `category` | Reference to Categories or Text | Inclusion |
+| `category` | Text | Inclusion |
 | `tags` | Tags | inclusion, classroom support |
 | `featured` | Boolean | true |
 | `seoTitle` | Text | Sample Blog: Inclusive Classroom Note |
-| `seoDescription` | Text | Sample blog post for testing EduReach Blogs. |
+| `seoDescription` | Text | Sample blog post for testing EduReach Blog Posts. |
 
 ## Ebooks fields
 
@@ -57,7 +57,7 @@ Use the `.sample.csv` files as copy-paste references while creating test records
 
 Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: set `isFree` to false, add the paid price and upload the PDF. The website shows Add to Cart for paid ebooks.
 
-## DownloadableResources fields
+## Downloadable Resources fields
 
 | Field ID | Wix field type | Sample value |
 |---|---|---|
@@ -67,7 +67,7 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `fullDescription` | Rich Content | Use a sample resource description. |
 | `thumbnail` | Image | Upload a sample thumbnail in Wix. |
 | `thumbnailAlt` | Text | Sample checklist thumbnail |
-| `category` | Reference to Categories or Text | Learner Support |
+| `category` | Text | Learner Support |
 | `tags` | Tags | checklist, school support |
 | `resourceFile` | Document | Upload the resource file. Paid files stay hidden until a paid order is confirmed. |
 | `fileType` | Text | PDF |
@@ -82,7 +82,7 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `seoTitle` | Text | Sample Download: Learner Support Checklist |
 | `seoDescription` | Text | Sample SEO description for testing downloads. |
 
-## WorkshopAlbums fields
+## Workshop Albums fields
 
 | Field ID | Wix field type | Sample value |
 |---|---|---|
@@ -99,7 +99,7 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `consentConfirmed` | Boolean | true only after consent is confirmed |
 | `featured` | Boolean | false |
 
-## GalleryAlbums fields
+## Gallery Albums fields
 
 | Field ID | Wix field type | Sample value |
 |---|---|---|
@@ -108,7 +108,7 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `description` | Rich Content or Text | Sample gallery album for testing only. |
 | `albumDate` | Date and Time | 2026-07-01 |
 | `location` | Text | Richards Bay |
-| `category` | Reference to Categories or Text | Community |
+| `category` | Text | Community |
 | `coverImage` | Image | Upload an approved sample image in Wix. |
 | `coverAlt` | Text | Sample gallery image |
 | `mediaGallery` | Media Gallery | Upload approved sample images in Wix. |
@@ -116,17 +116,7 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `consentConfirmed` | Boolean | true only after consent is confirmed |
 | `featured` | Boolean | false |
 
-## Categories fields
-
-| Field ID | Wix field type | Sample value |
-|---|---|---|
-| `name` | Text | Inclusion |
-| `slug` | Text | inclusion |
-| `description` | Text | Inclusive education resources and updates. |
-| `resourceType` | Dropdown | Article, Ebook, Download, Workshop, Gallery or Blog |
-| `active` | Boolean | true |
-
-## TeamMembers fields
+## Team Members fields
 
 | Field ID | Wix field type | Sample value |
 |---|---|---|
@@ -143,7 +133,7 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `linkedinUrl` | URL | https://example.com |
 | `featured` | Boolean | true |
 
-## PartnersSponsors fields
+## Partners / Sponsors fields
 
 | Field ID | Wix field type | Sample value |
 |---|---|---|
@@ -181,7 +171,6 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 - `DownloadableResources.sample.csv`
 - `WorkshopAlbums.sample.csv`
 - `GalleryAlbums.sample.csv`
-- `Categories.sample.csv`
 - `TeamMembers.sample.csv`
 - `PartnersSponsors.sample.csv`
 - `Testimonials.sample.csv`

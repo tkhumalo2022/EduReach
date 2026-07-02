@@ -33,7 +33,7 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 
 ## Add a downloadable resource
 
-1. Open CMS -> DownloadableResources.
+1. Open CMS -> Downloadable Resources.
 2. Add title, slug, short description, full description, thumbnail, thumbnail alt text, category and tags.
 3. For a free resource, upload the public file to `resourceFile`.
 4. Add `fileType`, such as PDF, DOCX or ZIP.
@@ -41,7 +41,7 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 
 ## Create a workshop photo album
 
-1. Open CMS -> WorkshopAlbums.
+1. Open CMS -> Workshop Albums.
 2. Add title, slug, workshop date, location, description, cover image and cover alt text.
 3. Upload approved images to `mediaGallery`.
 4. Add captions and alt text in Wix media settings where possible.
@@ -51,7 +51,7 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 
 ## Create a gallery album
 
-1. Open CMS -> GalleryAlbums.
+1. Open CMS -> Gallery Albums.
 2. Add title, slug, description, album date, location, category, cover image and cover alt text.
 3. Upload approved images to `mediaGallery`.
 4. Add captions, alt text and image credits where needed.
@@ -60,14 +60,11 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 
 ## Upload multiple images
 
-Use the `mediaGallery` field for WorkshopAlbums and GalleryAlbums. Add only approved images. Keep image names clear, add captions where helpful, and add alternative text for accessibility.
+Use the `mediaGallery` field for Workshop Albums and Gallery Albums. Add only approved images. Keep image names clear, add captions where helpful, and add alternative text for accessibility.
 
-## Create and manage categories
+## Manage category labels
 
-1. Open CMS -> Categories.
-2. Add `name`, `slug`, `description`, `resourceType`, and `active`.
-3. Keep category names short and consistent, such as Inclusion, Parent Guidance or Learner Support.
-4. Set `active` to false if the category should no longer be used.
+Use the `category` text field inside Articles, Blog Posts, Downloadable Resources and Gallery Albums. Keep category names short and consistent, such as Inclusion, Parent Guidance or Learner Support.
 
 ## Save as draft, publish or unpublish
 
