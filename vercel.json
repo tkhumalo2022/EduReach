@@ -11,7 +11,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.wixstatic.com https://static.wixstatic.com https://static.parastorage.com https://*.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src https://www.google.com https://maps.google.com; form-action 'self' https://www.payfast.co.za https://payfast.co.za https://sandbox.payfast.co.za; frame-ancestors 'none'; media-src 'self' https://*.wixstatic.com; worker-src 'self'"
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.wixstatic.com https://static.wixstatic.com https://static.parastorage.com https://*.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src https://www.google.com https://maps.google.com; form-action 'self' https://payfast.co.za https://*.payfast.co.za https://payfast.io https://*.payfast.io; frame-ancestors 'none'; media-src 'self' https://*.wixstatic.com; worker-src 'self'"
         },
         {
           "key": "X-Content-Type-Options",
