@@ -18,7 +18,7 @@ export const CONTENT_TYPES = Object.freeze({
     singular: "Article",
     collectionKey: "articles",
     dateField: "publishDate",
-    detailPath: "/resources/articles",
+    detailPath: "/articles",
     ctaLabel: "Read",
     emptyMessage: EMPTY_MESSAGE
   },
@@ -27,7 +27,7 @@ export const CONTENT_TYPES = Object.freeze({
     singular: "Ebook",
     collectionKey: "ebooks",
     dateField: "publishedDate",
-    detailPath: "/resources/ebooks",
+    detailPath: "/ebooks",
     ctaLabel: "Download",
     emptyMessage: EMPTY_MESSAGE
   },
@@ -36,7 +36,7 @@ export const CONTENT_TYPES = Object.freeze({
     singular: "Downloadable Resource",
     collectionKey: "downloads",
     dateField: "publicationDate",
-    detailPath: "/resources/downloads",
+    detailPath: "/resources",
     ctaLabel: "Download",
     emptyMessage: EMPTY_MESSAGE
   },
@@ -45,7 +45,7 @@ export const CONTENT_TYPES = Object.freeze({
     singular: "Workshop Album",
     collectionKey: "workshops",
     dateField: "workshopDate",
-    detailPath: "/resources/workshops",
+    detailPath: "/workshops",
     ctaLabel: "View",
     emptyMessage: EMPTY_MESSAGE,
     requiresConsent: true
@@ -55,7 +55,7 @@ export const CONTENT_TYPES = Object.freeze({
     singular: "Gallery Album",
     collectionKey: "gallery",
     dateField: "albumDate",
-    detailPath: "/resources/gallery",
+    detailPath: "/gallery",
     ctaLabel: "View",
     emptyMessage: EMPTY_MESSAGE,
     requiresConsent: true
@@ -392,7 +392,17 @@ async function getCollectionItemBySlug(type, slug, options = {}) {
 }
 
 function usesGeneratedSlugFallback(type) {
-  return ["articles", "ebooks", "blogs", "team", "partners", "testimonials"].includes(type);
+  return [
+    "articles",
+    "ebooks",
+    "downloads",
+    "workshops",
+    "gallery",
+    "blogs",
+    "team",
+    "partners",
+    "testimonials"
+  ].includes(type);
 }
 
 async function findItemByGeneratedSlug(type, collectionId, slug, options = {}) {
@@ -518,6 +528,7 @@ export function normalizeCmsItem(type, rawItem, options = {}) {
         rawItem?._createdDate ||
         rawItem?._updatedDate
     ),
+    lastModified: dateValue(data.updatedDate || data.modifiedDate || data.lastModified || rawItem?._updatedDate),
     featured: Boolean(data.featured),
     isFree: accessType === "free",
     accessType,

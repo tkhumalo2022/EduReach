@@ -11,6 +11,7 @@ export interface WixBaseContent {
   category: string;
   tags: string[];
   date: string;
+  lastModified: string;
   featured: boolean;
   isFree: boolean;
   accessType: "free" | "paid";

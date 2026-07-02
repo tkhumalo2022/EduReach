@@ -1,6 +1,25 @@
 {
   "outputDirectory": ".",
+  "functions": {
+    "api/cms-page.js": {
+      "includeFiles": [
+        "resources/**/detail.html",
+        "blog/detail.html",
+        "team/detail.html",
+        "partners/detail.html",
+        "testimonials/detail.html"
+      ]
+    }
+  },
   "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    },
     {
       "source": "/cart",
       "destination": "/cart/index.html"
@@ -16,6 +35,54 @@
     {
       "source": "/payment-cancelled",
       "destination": "/payment-cancelled/index.html"
+    },
+    {
+      "source": "/resources/articles",
+      "destination": "/resources/articles/index.html"
+    },
+    {
+      "source": "/resources/downloads",
+      "destination": "/resources/downloads/index.html"
+    },
+    {
+      "source": "/resources/ebooks",
+      "destination": "/resources/ebooks/index.html"
+    },
+    {
+      "source": "/resources/workshops",
+      "destination": "/resources/workshops/index.html"
+    },
+    {
+      "source": "/resources/gallery",
+      "destination": "/resources/gallery/index.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog/index.html"
+    },
+    {
+      "source": "/articles/:slug",
+      "destination": "/api/cms-page?type=articles&slug=:slug"
+    },
+    {
+      "source": "/ebooks/:slug",
+      "destination": "/api/cms-page?type=ebooks&slug=:slug"
+    },
+    {
+      "source": "/resources/:slug",
+      "destination": "/api/cms-page?type=downloads&slug=:slug"
+    },
+    {
+      "source": "/workshops/:slug",
+      "destination": "/api/cms-page?type=workshops&slug=:slug"
+    },
+    {
+      "source": "/gallery/:slug",
+      "destination": "/api/cms-page?type=gallery&slug=:slug"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/api/cms-page?type=blogs&slug=:slug"
     },
     {
       "source": "/resources/articles/:slug",
@@ -36,10 +103,6 @@
     {
       "source": "/resources/gallery/:slug",
       "destination": "/resources/gallery/detail.html"
-    },
-    {
-      "source": "/blog/:slug",
-      "destination": "/blog/detail.html"
     },
     {
       "source": "/team/:slug",

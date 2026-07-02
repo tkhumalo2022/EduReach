@@ -12,7 +12,7 @@ test("keeps explicit article slugs for backward compatibility", () => {
   });
 
   assert.equal(item.slug, "custom-inclusive-classroom-support");
-  assert.equal(item.detailUrl, "/resources/articles/custom-inclusive-classroom-support");
+  assert.equal(item.detailUrl, "/articles/custom-inclusive-classroom-support");
 });
 
 test("generates article slugs from titles when slug is missing", () => {
@@ -23,7 +23,7 @@ test("generates article slugs from titles when slug is missing", () => {
   });
 
   assert.equal(item.slug, "inclusive-education-a-teacher-s-guide");
-  assert.equal(item.detailUrl, "/resources/articles/inclusive-education-a-teacher-s-guide");
+  assert.equal(item.detailUrl, "/articles/inclusive-education-a-teacher-s-guide");
 });
 
 test("normalizes special-character article titles consistently", () => {
@@ -40,6 +40,40 @@ test("normalizes special-character article titles consistently", () => {
 
   assert.equal(first.slug, "learner-support-care");
   assert.equal(duplicate.slug, "learner-support-care");
+});
+
+test("uses canonical public detail routes for CMS item types", () => {
+  assert.equal(
+    normalizeCmsItem("downloads", { data: { title: "Learner Support Checklist", slug: "learner-support-checklist" } }).detailUrl,
+    "/resources/learner-support-checklist"
+  );
+  assert.equal(
+    normalizeCmsItem("ebooks", { data: { title: "Parent Support Guide", isFree: true, price: 0 } }).detailUrl,
+    "/ebooks/parent-support-guide"
+  );
+  assert.equal(
+    normalizeCmsItem("gallery", { data: { title: "Community Gallery", consentConfirmed: true } }).detailUrl,
+    "/gallery/community-gallery"
+  );
+  assert.equal(
+    normalizeCmsItem("workshops", { data: { title: "Teacher Workshop", consentConfirmed: true } }).detailUrl,
+    "/workshops/teacher-workshop"
+  );
+  assert.equal(
+    normalizeCmsItem("blogs", { data: { title: "Inclusive Classroom Note" } }).detailUrl,
+    "/blog/inclusive-classroom-note"
+  );
+});
+
+test("preserves Wix update timestamps for sitemap lastmod values", () => {
+  const item = normalizeCmsItem("articles", {
+    _updatedDate: "2026-07-02T10:30:00.000Z",
+    data: {
+      title: "Updated Article"
+    }
+  });
+
+  assert.equal(item.lastModified, "2026-07-02T10:30:00.000Z");
 });
 
 test("cleans raw HTML descriptions for ebook cards and detail blocks", () => {

@@ -1,4 +1,6 @@
 (() => {
+  const SITE_ORIGIN = "https://edureach.network";
+  const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/assets/images/hero-inclusive-classroom.png`;
   const EMPTY_MESSAGE = "New EduReach resources will be available soon.";
   const CHECKOUT_PATH = "/checkout";
   const DEFAULT_PAGE_SIZE = 9;
@@ -30,6 +32,19 @@
     team: "/team",
     partners: "/partners",
     testimonials: "/testimonials"
+  };
+
+  const DETAIL_PATHS = {
+    articles: ["/articles", "/resources/articles"],
+    ebooks: ["/ebooks", "/resources/ebooks"],
+    downloads: ["/resources", "/resources/downloads"],
+    workshops: ["/workshops", "/resources/workshops"],
+    gallery: ["/gallery", "/resources/gallery"],
+    blogs: ["/blog"],
+    blog: ["/blog"],
+    team: ["/team"],
+    partners: ["/partners"],
+    testimonials: ["/testimonials"]
   };
 
   const LISTING_COPY = {
@@ -791,12 +806,14 @@
   }
 
   function getSlugFromPath(type) {
-    const base = TYPE_PATHS[type];
-    if (!base) return "";
-
     const pathname = window.location.pathname.replace(/\/$/, "");
-    if (!pathname.startsWith(`${base}/`)) return "";
-    return decodeURIComponent(pathname.slice(base.length + 1)).trim();
+    const bases = DETAIL_PATHS[type] || [TYPE_PATHS[type]].filter(Boolean);
+    const base = bases
+      .filter(Boolean)
+      .sort((a, b) => b.length - a.length)
+      .find((candidate) => pathname.startsWith(`${candidate}/`));
+
+    return base ? decodeURIComponent(pathname.slice(base.length + 1)).trim() : "";
   }
 
   function resolveAccessActionHref(item, accessState = { accessGranted: false, downloadUrl: "" }) {
@@ -1052,15 +1069,22 @@
   function updateMetadata(item) {
     const title = item.seoTitle || item.title || "EduReach resource";
     const description = item.seoDescription || item.excerpt || "";
-    const canonical = new URL(item.detailUrl || window.location.pathname, window.location.origin).href;
+    const canonical = new URL(item.detailUrl || window.location.pathname, SITE_ORIGIN).href;
+    const image = item.image?.url ? absoluteUrl(item.image.url) : DEFAULT_SOCIAL_IMAGE;
 
     document.title = `${title} | EduReach`;
     setMeta("description", description);
+    setMeta("robots", "index, follow");
     setMeta("og:title", title, "property");
     setMeta("og:description", description, "property");
     setMeta("og:url", canonical, "property");
-    if (item.image?.url) setMeta("og:image", item.image.url, "property");
+    setMeta("og:image", image, "property");
+    setMeta("twitter:card", "summary_large_image");
+    setMeta("twitter:title", title);
+    setMeta("twitter:description", description);
+    setMeta("twitter:image", image);
     setCanonical(canonical);
+    updateStructuredData(item, canonical, title, description, image);
   }
 
   function setMeta(name, content, attribute = "name") {
@@ -1082,6 +1106,47 @@
       document.head.append(tag);
     }
     tag.href = href;
+  }
+
+  function updateStructuredData(item, canonical, title, description, image) {
+    if (!["articles", "blogs"].includes(item.type)) return;
+
+    let tag = document.querySelector('script[data-cms-structured-data="true"]');
+    if (!tag) {
+      tag = document.createElement("script");
+      tag.type = "application/ld+json";
+      tag.dataset.cmsStructuredData = "true";
+      document.head.append(tag);
+    }
+
+    const data = {
+      "@context": "https://schema.org",
+      "@type": item.type === "blogs" ? "BlogPosting" : "Article",
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonical
+      },
+      headline: title,
+      description,
+      url: canonical,
+      image: [image],
+      publisher: {
+        "@type": "EducationalOrganization",
+        name: "EduReach Inclusive Education Consultancy",
+        url: SITE_ORIGIN
+      }
+    };
+
+    if (item.author) data.author = { "@type": "Person", name: item.author };
+    if (item.date) data.datePublished = item.date;
+    if (item.lastModified || item.date) data.dateModified = item.lastModified || item.date;
+
+    tag.textContent = JSON.stringify(data);
+  }
+
+  function absoluteUrl(value) {
+    if (/^https?:\/\//i.test(value)) return value;
+    return new URL(value || "/assets/images/hero-inclusive-classroom.png", SITE_ORIGIN).href;
   }
 
   function isListingPage(container) {
