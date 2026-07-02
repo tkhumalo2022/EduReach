@@ -1,6 +1,6 @@
 export interface WixBaseContent {
   id: string;
-  type: "articles" | "ebooks" | "downloads" | "workshops" | "gallery" | "blogs";
+  type: "articles" | "ebooks" | "downloads" | "workshops" | "gallery" | "blogs" | "team" | "partners" | "testimonials";
   label: string;
   title: string;
   slug: string;
@@ -25,6 +25,20 @@ export interface WixBaseContent {
   fileUrl: string;
   previewUrl: string;
   mediaGallery: WixImage[];
+  role: string;
+  organization: string;
+  qualifications: string;
+  specialties: string[];
+  email: string;
+  phone: string;
+  linkedinUrl: string;
+  websiteUrl: string;
+  partnerType: string;
+  sponsorTier: string;
+  contribution: string;
+  quote: string;
+  rating: number | string;
+  sortOrder: number | string;
 }
 
 export interface WixImage {
@@ -72,6 +86,18 @@ export interface WixBlogPost extends WixBaseContent {
   type: "blogs";
 }
 
+export interface WixTeamMember extends WixBaseContent {
+  type: "team";
+}
+
+export interface WixPartner extends WixBaseContent {
+  type: "partners";
+}
+
+export interface WixTestimonial extends WixBaseContent {
+  type: "testimonials";
+}
+
 export interface WixCategory {
   name: string;
   slug: string;
@@ -86,4 +112,7 @@ export type WixEduReachContent =
   | WixDownload
   | WixWorkshopAlbum
   | WixGalleryAlbum
-  | WixBlogPost;
+  | WixBlogPost
+  | WixTeamMember
+  | WixPartner
+  | WixTestimonial;

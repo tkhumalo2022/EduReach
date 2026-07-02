@@ -13,7 +13,10 @@
     workshops: "WorkshopAlbums",
     gallery: "Gallery Albums",
     blogs: "Blogs",
-    blog: "Blogs"
+    blog: "Blogs",
+    team: "Team Members",
+    partners: "Partners / Sponsors",
+    testimonials: "Testimonials"
   };
 
   const TYPE_PATHS = {
@@ -23,7 +26,10 @@
     workshops: "/resources/workshops",
     gallery: "/resources/gallery",
     blogs: "/blog",
-    blog: "/blog"
+    blog: "/blog",
+    team: "/team",
+    partners: "/partners",
+    testimonials: "/testimonials"
   };
 
   const LISTING_COPY = {
@@ -33,7 +39,10 @@
     workshops: "Browse approved WorkshopAlbums with confirmed consent.",
     gallery: "Browse approved Gallery Albums with confirmed consent.",
     blogs: "Search EduReach blogs by title, topic or category.",
-    blog: "Search EduReach blogs by title, topic or category."
+    blog: "Search EduReach blogs by title, topic or category.",
+    team: "Search EduReach team members by name, role or area of expertise.",
+    partners: "Search partners and sponsors by name, type or contribution.",
+    testimonials: "Search testimonials by person, organization or topic."
   };
 
   const listStates = new WeakMap();
@@ -332,10 +341,22 @@
   function createFacts(item) {
     const facts = [
       ["Author", item.author],
+      ["Role", item.role],
+      ["Organization", item.organization],
+      ["Type", item.partnerType],
+      ["Sponsor tier", item.sponsorTier],
       ["Category", item.category],
       ["Date", formatDate(item.date)],
       ["Location", item.location],
       ["Programme", item.relatedProgramme],
+      ["Qualifications", item.qualifications],
+      ["Specialties", Array.isArray(item.specialties) ? item.specialties.join(", ") : item.specialties],
+      ["Contribution", item.contribution],
+      ["Rating", item.rating],
+      ["Website", item.websiteUrl],
+      ["LinkedIn", item.linkedinUrl],
+      ["Email", item.email],
+      ["Phone", item.phone],
       ["ISBN", item.isbn],
       ["Pages", item.pageCount],
       ["Language", item.language],
@@ -479,15 +500,34 @@
       actions.append(createDetailLink(item.previewUrl, "Preview", `Preview ${item.title}`));
     }
 
-    const accessNote = item.accessType === "paid"
-      ? createInlineNote("Checking payment status...")
-      : null;
-    const actionLink = createDetailLink("#", "Checking access...", "Checking access", false);
-    actions.append(actionLink);
-    if (accessNote) actions.append(accessNote);
+    if (shouldRenderAccessAction(item)) {
+      const accessNote = item.accessType === "paid"
+        ? createInlineNote("Checking payment status...")
+        : null;
+      const actionLink = createDetailLink("#", "Checking access...", "Checking access", false);
+      actions.append(actionLink);
+      if (accessNote) actions.append(accessNote);
+      wrapper.append(actions);
+      void hydrateDetailAction(actionLink, item, accessNote);
+      return;
+    }
 
-    wrapper.append(actions);
-    void hydrateDetailAction(actionLink, item, accessNote);
+    appendDirectoryActions(actions, item);
+    if (actions.children.length) wrapper.append(actions);
+  }
+
+  function appendDirectoryActions(actions, item) {
+    if (item.websiteUrl) {
+      actions.append(createDetailLink(item.websiteUrl, "Visit Website", `Visit ${item.title} website`));
+    }
+
+    if (item.linkedinUrl) {
+      actions.append(createDetailLink(item.linkedinUrl, "LinkedIn", `View ${item.title} on LinkedIn`));
+    }
+
+    if (item.email) {
+      actions.append(createDetailLink(`mailto:${item.email}`, "Email", `Email ${item.title}`));
+    }
   }
 
   function createDetailLink(href, label, ariaLabel, download = false) {
@@ -546,7 +586,7 @@
   }
 
   function createAccessBadge(item, detail = false) {
-    if (!item?.accessType) return null;
+    if (!isProduct(item) || !item?.accessType) return null;
 
     const badge = document.createElement("span");
     badge.className = "cms-access-badge";
@@ -760,6 +800,10 @@
   }
 
   function resolveAccessActionHref(item, accessState = { accessGranted: false, downloadUrl: "" }) {
+    if (!isProduct(item)) {
+      return item.websiteUrl || item.detailUrl || TYPE_PATHS[item.type] || "/#resources";
+    }
+
     if (item.accessType === "paid" && !accessState.accessGranted) {
       return CHECKOUT_PATH;
     }
@@ -769,9 +813,10 @@
 
   function resolveAccessActionLabel(item, accessState = { accessGranted: false, downloadUrl: "" }) {
     if (item.accessButtonLabel) return item.accessButtonLabel;
+    if (!isProduct(item)) return item.ctaLabel || "View";
     if (item.accessType === "paid" && !accessState.accessGranted) return "Buy / Access Resource";
     if (item.accessType === "paid") return "Download Resource";
-    return "Download Free Resource";
+    return item.ctaLabel || "Download Free Resource";
   }
 
   function actionHref(item) {
@@ -961,6 +1006,11 @@
 
   function cardMeta(item) {
     const parts = [];
+    if (item.role) parts.push(item.role);
+    if (item.organization) parts.push(item.organization);
+    if (item.partnerType) parts.push(item.partnerType);
+    if (item.sponsorTier) parts.push(item.sponsorTier);
+    if (item.author && item.type === "testimonials") parts.push(item.author);
     if (item.category) parts.push(item.category);
     if (item.date) parts.push(formatDate(item.date));
     if (item.accessType === "paid") parts.push(formatPrice(item));
@@ -969,6 +1019,10 @@
 
   function isProduct(item) {
     return item?.type === "downloads" || item?.type === "ebooks";
+  }
+
+  function shouldRenderAccessAction(item) {
+    return isProduct(item) || Boolean(item.downloadLink || item.fileUrl);
   }
 
   function isPurchasableProduct(item) {

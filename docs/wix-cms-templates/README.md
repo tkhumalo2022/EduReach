@@ -126,6 +126,53 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 | `resourceType` | Dropdown | Article, Ebook, Download, Workshop, Gallery or Blog |
 | `active` | Boolean | true |
 
+## TeamMembers fields
+
+| Field ID | Wix field type | Sample value |
+|---|---|---|
+| `name` | Text | Sample Team Member |
+| `slug` | Text | sample-team-member |
+| `role` | Text | Inclusion Specialist |
+| `shortBio` | Text | Short profile summary for the team card. |
+| `biography` | Rich Content | Longer profile body for the detail page. |
+| `profileImage` | Image | Upload a profile photo in Wix. |
+| `photoAlt` | Text | Sample team member portrait |
+| `qualifications` | Text | Sample qualification |
+| `specialties` | Tags | inclusion, learner support |
+| `email` | Text | team@example.com |
+| `linkedinUrl` | URL | https://example.com |
+| `featured` | Boolean | true |
+
+## PartnersSponsors fields
+
+| Field ID | Wix field type | Sample value |
+|---|---|---|
+| `partnerName` | Text | Sample Partner |
+| `slug` | Text | sample-partner |
+| `partnerType` | Text or Dropdown | Community Partner |
+| `sponsorTier` | Text or Dropdown | Gold |
+| `description` | Rich Content or Text | Sample partner description. |
+| `contribution` | Text | Supports inclusive education workshops. |
+| `logo` | Image | Upload a partner logo in Wix. |
+| `logoAlt` | Text | Sample partner logo |
+| `websiteUrl` | URL | https://example.com |
+| `featured` | Boolean | true |
+
+## Testimonials fields
+
+| Field ID | Wix field type | Sample value |
+|---|---|---|
+| `clientName` | Text | Sample Parent Community |
+| `title` | Text | Sample Testimonial |
+| `slug` | Text | sample-testimonial |
+| `quote` | Text or Rich Content | EduReach helped us understand learner support. |
+| `organization` | Text | Sample School |
+| `role` | Text | Parent representative |
+| `photo` | Image | Upload a testimonial image in Wix. |
+| `testimonialDate` | Date and Time | 2026-07-01 |
+| `rating` | Number | 5 |
+| `featured` | Boolean | true |
+
 ## Sample file list
 
 - `Articles.sample.csv`
@@ -135,5 +182,8 @@ Free ebook sample: set `isFree` to true and upload the PDF. Paid ebook sample: s
 - `WorkshopAlbums.sample.csv`
 - `GalleryAlbums.sample.csv`
 - `Categories.sample.csv`
+- `TeamMembers.sample.csv`
+- `PartnersSponsors.sample.csv`
+- `Testimonials.sample.csv`
 
 After testing, unpublish or delete the sample records before adding final EduReach content.

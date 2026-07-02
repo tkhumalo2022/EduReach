@@ -40,6 +40,18 @@
     {
       "source": "/blog/:slug",
       "destination": "/blog/detail.html"
+    },
+    {
+      "source": "/team/:slug",
+      "destination": "/team/detail.html"
+    },
+    {
+      "source": "/partners/:slug",
+      "destination": "/partners/detail.html"
+    },
+    {
+      "source": "/testimonials/:slug",
+      "destination": "/testimonials/detail.html"
     }
   ]
 }

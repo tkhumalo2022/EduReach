@@ -134,3 +134,63 @@ test("marks ebooks free only when isFree is true and price is zero", () => {
   assert.equal(item.isFree, true);
   assert.equal(item.ctaLabel, "Download");
 });
+
+test("normalizes team member fields into profile routes", () => {
+  const item = normalizeCmsItem("team", {
+    data: {
+      name: "Hlakaniphani Buthelezi",
+      role: "Managing Director",
+      shortBio: "Inclusive education specialist.",
+      specialties: ["Autism", "Learner support"],
+      published: true
+    }
+  });
+
+  assert.equal(item.title, "Hlakaniphani Buthelezi");
+  assert.equal(item.role, "Managing Director");
+  assert.deepEqual(item.specialties, ["Autism", "Learner support"]);
+  assert.equal(item.detailUrl, "/team/hlakaniphani-buthelezi");
+  assert.equal(item.ctaLabel, "View Profile");
+});
+
+test("normalizes partner sponsor fields into partner routes", () => {
+  const item = normalizeCmsItem("partners", {
+    data: {
+      partnerName: "Community Inclusion Partner",
+      sponsorTier: "Gold",
+      websiteUrl: "https://example.org",
+      contribution: "Supports school workshops.",
+      visible: true
+    }
+  });
+
+  assert.equal(item.title, "Community Inclusion Partner");
+  assert.equal(item.sponsorTier, "Gold");
+  assert.equal(item.websiteUrl, "https://example.org");
+  assert.equal(item.contribution, "Supports school workshops.");
+  assert.equal(item.detailUrl, "/partners/community-inclusion-partner");
+});
+
+test("normalizes testimonial fields and hides explicitly unpublished items", () => {
+  const item = normalizeCmsItem("testimonials", {
+    data: {
+      clientName: "Parent Community",
+      quote: "EduReach helped us understand practical learner support.",
+      organization: "Richards Bay School",
+      status: "published"
+    }
+  });
+  const hidden = normalizeCmsItem("testimonials", {
+    data: {
+      clientName: "Draft Testimonial",
+      quote: "Hidden draft.",
+      status: "draft"
+    }
+  });
+
+  assert.equal(item.title, "Parent Community testimonial");
+  assert.equal(item.quote, "EduReach helped us understand practical learner support.");
+  assert.equal(item.organization, "Richards Bay School");
+  assert.equal(item.detailUrl, "/testimonials/parent-community-testimonial");
+  assert.equal(hidden, null);
+});

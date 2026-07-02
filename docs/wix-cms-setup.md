@@ -50,6 +50,9 @@ WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
 # Set to Import2 if that is the real Blogs collection ID.
 WIX_BLOGS_COLLECTION_ID=
+WIX_TEAM_MEMBERS_COLLECTION_ID=TeamMembers
+WIX_PARTNERS_SPONSORS_COLLECTION_ID=PartnersSponsors
+WIX_TESTIMONIALS_COLLECTION_ID=Testimonials
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
 # Optional if the same passphrase is configured in PayFast.
@@ -234,7 +237,60 @@ Collection ID: `Import6`
 
 If a Blogs collection ID is missing or permissions are missing, `/blog` and `/blog/[slug]` show the normal empty/error state without fake posts. The API type is `blogs`, for example `/api/wix-content?type=blogs`.
 
-## 15. Paid digital products
+## 15. TeamMembers collection
+
+Collection ID: `TeamMembers`
+
+| Field ID | Wix field type | Notes |
+|---|---|---|
+| `name` | Text | Required; displayed as the team member name |
+| `slug` | Text | Optional; generated from `name` when blank |
+| `role` | Text | Role or professional title |
+| `shortBio` | Text | Card summary |
+| `biography` | Rich Content | Detail page body |
+| `profileImage` | Image | Profile photo |
+| `photoAlt` | Text | Accessible image description |
+| `qualifications` | Text | Optional |
+| `specialties` | Tags | Optional |
+| `email` | Text | Optional public email link |
+| `linkedinUrl` | URL | Optional public profile link |
+| `featured` | Boolean | Optional homepage priority |
+
+## 16. PartnersSponsors collection
+
+Collection ID: `PartnersSponsors`
+
+| Field ID | Wix field type | Notes |
+|---|---|---|
+| `partnerName` | Text | Required; organization or sponsor name |
+| `slug` | Text | Optional; generated from `partnerName` when blank |
+| `partnerType` | Text or Dropdown | Partner, sponsor, funder, school or community organization |
+| `sponsorTier` | Text or Dropdown | Optional sponsorship tier |
+| `description` | Rich Content or Text | Detail page body |
+| `contribution` | Text | Card/detail summary of support |
+| `logo` | Image | Partner or sponsor logo |
+| `logoAlt` | Text | Accessible image description |
+| `websiteUrl` | URL | Optional public website action |
+| `featured` | Boolean | Optional homepage priority |
+
+## 17. Testimonials collection
+
+Collection ID: `Testimonials`
+
+| Field ID | Wix field type | Notes |
+|---|---|---|
+| `clientName` | Text | Required when `title` is blank |
+| `title` | Text | Optional testimonial headline |
+| `slug` | Text | Optional; generated from title/client name when blank |
+| `quote` | Text or Rich Content | Testimonial text |
+| `organization` | Text | School, parent group, partner or community |
+| `role` | Text | Optional person role |
+| `photo` | Image | Optional person or organization image |
+| `testimonialDate` | Date and Time | Optional |
+| `rating` | Number | Optional |
+| `featured` | Boolean | Optional homepage priority |
+
+## 18. Paid digital products
 
 Paid ebooks and downloadable resources use the site cart plus PayFast checkout. Do not add manual payment links.
 
@@ -247,7 +303,7 @@ Paid ebooks and downloadable resources use the site cart plus PayFast checkout. 
 
 The website displays the price and Add to Cart button for paid resources, but it never prints protected paid file URLs in public CMS responses. The `/payment-success` page and resource detail pages ask `/api/orders` for server-confirmed status; pending, cancelled and failed payments do not receive download URLs.
 
-## 16. Create test content
+## 19. Create test content
 
 1. Create one draft article and confirm it does not appear publicly.
 2. Publish one article and confirm it appears under Resources and `/resources/articles`.
@@ -256,7 +312,7 @@ The website displays the price and Add to Cart button for paid resources, but it
 5. Create one workshop album with `consentConfirmed` false and confirm it stays hidden.
 6. Set `consentConfirmed` true and publish the album to confirm it appears.
 
-## 17. Test the connection locally
+## 20. Test the connection locally
 
 1. Copy `.env.example` to `.env.local`.
 2. Fill in real Wix values locally.
@@ -266,15 +322,15 @@ The website displays the price and Add to Cart button for paid resources, but it
 6. Run `npm run build`.
 7. Start a local server or Vercel dev environment and open the Resources and cart pages.
 
-## 18. Test the connection on Vercel
+## 21. Test the connection on Vercel
 
 1. Add the same environment variables in Vercel.
 2. Redeploy after adding variables.
 3. Check `/api/wix-content?status=1` on the preview deployment.
-4. Check `/`, `/resources/articles`, `/resources/ebooks`, `/resources/downloads`, `/resources/workshops`, `/resources/gallery`, and `/blog`.
+4. Check `/`, `/resources/articles`, `/resources/ebooks`, `/resources/downloads`, `/resources/workshops`, `/resources/gallery`, `/blog`, `/team`, `/partners`, and `/testimonials`.
 5. Confirm pages work when a collection is empty.
 6. If a collection fails, add `debug=1` to the API URL, for example `/api/wix-content?type=articles&limit=1&debug=1`, and check the sanitized Wix error in the JSON response and Vercel logs.
 
-## 19. Cache and revalidation
+## 22. Cache and revalidation
 
 The Vercel API response uses `s-maxage=300, stale-while-revalidate=600`. Newly published Wix content can take a few minutes to appear without a new deployment.

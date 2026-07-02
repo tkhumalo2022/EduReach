@@ -11,7 +11,12 @@ export const WIX_ENV_KEYS = Object.freeze([
   "WIX_DOWNLOADS_COLLECTION_ID",
   "WIX_WORKSHOP_ALBUMS_COLLECTION_ID",
   "WIX_GALLERY_ALBUMS_COLLECTION_ID",
-  "WIX_CATEGORIES_COLLECTION_ID"
+  "WIX_CATEGORIES_COLLECTION_ID",
+  "WIX_TEAM_MEMBERS_COLLECTION_ID",
+  "WIX_PARTNERS_COLLECTION_ID",
+  "WIX_PARTNERS_SPONSORS_COLLECTION_ID",
+  "WIX_SPONSORS_COLLECTION_ID",
+  "WIX_TESTIMONIALS_COLLECTION_ID"
 ]);
 
 export const WIX_COLLECTION_ID_DEFAULTS = Object.freeze({
@@ -21,7 +26,10 @@ export const WIX_COLLECTION_ID_DEFAULTS = Object.freeze({
   workshops: "Import3",
   gallery: "Import4",
   ebooks: "Import5",
-  categories: "Import6"
+  categories: "Import6",
+  team: "TeamMembers",
+  partners: "PartnersSponsors",
+  testimonials: "Testimonials"
 });
 
 const WIX_COLLECTION_ID_ALIASES = Object.freeze({
@@ -40,7 +48,14 @@ const WIX_COLLECTION_ID_ALIASES = Object.freeze({
   },
   ebooks: { Ebooks: "Import5" },
   categories: { Categories: "Import6" },
-  blogs: { Blogs: "Import2" }
+  blogs: { Blogs: "Import2" },
+  team: {
+    "Team Members": "TeamMembers"
+  },
+  partners: {
+    "Partners / Sponsors": "PartnersSponsors",
+    "Partners and Sponsors": "PartnersSponsors"
+  }
 });
 
 export function readWixConfig(env = process.env) {
@@ -55,7 +70,15 @@ export function readWixConfig(env = process.env) {
       downloads: collectionId("downloads", env.WIX_DOWNLOADS_COLLECTION_ID),
       workshops: collectionId("workshops", env.WIX_WORKSHOP_ALBUMS_COLLECTION_ID),
       gallery: collectionId("gallery", env.WIX_GALLERY_ALBUMS_COLLECTION_ID),
-      categories: collectionId("categories", env.WIX_CATEGORIES_COLLECTION_ID)
+      categories: collectionId("categories", env.WIX_CATEGORIES_COLLECTION_ID),
+      team: collectionId("team", env.WIX_TEAM_MEMBERS_COLLECTION_ID),
+      partners: collectionId(
+        "partners",
+        env.WIX_PARTNERS_SPONSORS_COLLECTION_ID ||
+          env.WIX_PARTNERS_COLLECTION_ID ||
+          env.WIX_SPONSORS_COLLECTION_ID
+      ),
+      testimonials: collectionId("testimonials", env.WIX_TESTIMONIALS_COLLECTION_ID)
     }
   };
 }

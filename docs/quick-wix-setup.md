@@ -17,7 +17,7 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 
 1. Open the EduReach Wix site or Wix Headless project.
 2. Install Wix CMS / Content Manager.
-3. Create the six CMS collections listed below.
+3. Create the CMS collections listed below.
 4. Add the exact fields listed in `docs/wix-cms-templates/README.md`.
 5. Set CMS read permissions so the Headless API can read published items.
 6. Create or open the Wix OAuth app for the website.
@@ -38,6 +38,9 @@ Use this checklist with `docs/wix-cms-setup.md` and `docs/edureach-owner-guide.m
 | GalleryAlbums | `Import4` | `docs/wix-cms-templates/GalleryAlbums.sample.csv` |
 | Ebooks | `Import5` | `docs/wix-cms-templates/Ebooks.sample.csv` |
 | Category helper collection | `Import6` | `docs/wix-cms-templates/Categories.sample.csv` |
+| TeamMembers | `TeamMembers` | `docs/wix-cms-templates/TeamMembers.sample.csv` |
+| PartnersSponsors | `PartnersSponsors` | `docs/wix-cms-templates/PartnersSponsors.sample.csv` |
+| Testimonials | `Testimonials` | `docs/wix-cms-templates/Testimonials.sample.csv` |
 
 Set `WIX_BLOGS_COLLECTION_ID` to the real Blogs CMS collection ID, for example `Import2` if that is the ID Wix shows.
 
@@ -66,6 +69,9 @@ WIX_GALLERY_ALBUMS_COLLECTION_ID=Import4
 WIX_CATEGORIES_COLLECTION_ID=Import6
 # Set to Import2 if that is the real Blogs collection ID.
 WIX_BLOGS_COLLECTION_ID=
+WIX_TEAM_MEMBERS_COLLECTION_ID=TeamMembers
+WIX_PARTNERS_SPONSORS_COLLECTION_ID=PartnersSponsors
+WIX_TESTIMONIALS_COLLECTION_ID=Testimonials
 PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
 # Optional if the same passphrase is configured in PayFast.
@@ -109,6 +115,9 @@ After Vercel env vars are saved and a preview/production deployment is available
 | `/resources/gallery` | Page loads and only published albums with `consentConfirmed=true` appear |
 | `/blog` | Page loads and published Blogs appear, or the empty state appears |
 | `/api/wix-content?type=blogs` | JSON response with the Blogs CMS list or the normal empty state |
+| `/team` | Page loads and published TeamMembers appear, or the empty state appears |
+| `/partners` | Page loads and published PartnersSponsors appear, or the empty state appears |
+| `/testimonials` | Page loads and published Testimonials appear, or the empty state appears |
 
 Also check:
 

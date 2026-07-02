@@ -62,7 +62,7 @@ Read:
 - `docs/wix-cms-setup.md`
 - `docs/edureach-owner-guide.md`
 
-The expected Wix CMS collection IDs are `Articles`, `Ebooks`, `DownloadableResources`, `WorkshopAlbums`, `GalleryAlbums` and `Import6` for the category helper collection. Wix's built-in draft/publish controls manage visibility; do not add a separate manual status field.
+The expected Wix CMS collection IDs are `Articles`, `Blogs`, `Ebooks`, `DownloadableResources`, `WorkshopAlbums`, `GalleryAlbums`, `TeamMembers`, `PartnersSponsors`, `Testimonials` and `Import6` for the category helper collection. Wix's built-in draft/publish controls manage visibility; do not add a separate manual status field.
 
 ## Shopping cart and PayFast checkout
 

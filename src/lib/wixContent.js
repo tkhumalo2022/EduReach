@@ -68,6 +68,33 @@ export const CONTENT_TYPES = Object.freeze({
     detailPath: "/blog",
     ctaLabel: "Read More",
     emptyMessage: EMPTY_MESSAGE
+  },
+  team: {
+    label: "Team Members",
+    singular: "Team Member",
+    collectionKey: "team",
+    dateField: "_createdDate",
+    detailPath: "/team",
+    ctaLabel: "View Profile",
+    emptyMessage: EMPTY_MESSAGE
+  },
+  partners: {
+    label: "Partners / Sponsors",
+    singular: "Partner / Sponsor",
+    collectionKey: "partners",
+    dateField: "_createdDate",
+    detailPath: "/partners",
+    ctaLabel: "View Partner",
+    emptyMessage: EMPTY_MESSAGE
+  },
+  testimonials: {
+    label: "Testimonials",
+    singular: "Testimonial",
+    collectionKey: "testimonials",
+    dateField: "testimonialDate",
+    detailPath: "/testimonials",
+    ctaLabel: "Read Story",
+    emptyMessage: EMPTY_MESSAGE
   }
 });
 
@@ -78,11 +105,20 @@ const COLLECTION_ENV_KEYS = Object.freeze({
   downloads: "WIX_DOWNLOADS_COLLECTION_ID",
   workshops: "WIX_WORKSHOP_ALBUMS_COLLECTION_ID",
   gallery: "WIX_GALLERY_ALBUMS_COLLECTION_ID",
-  categories: "WIX_CATEGORIES_COLLECTION_ID"
+  categories: "WIX_CATEGORIES_COLLECTION_ID",
+  team: "WIX_TEAM_MEMBERS_COLLECTION_ID",
+  partners: "WIX_PARTNERS_SPONSORS_COLLECTION_ID",
+  testimonials: "WIX_TESTIMONIALS_COLLECTION_ID"
 });
 
 const CONTENT_TYPE_ALIASES = Object.freeze({
-  blog: "blogs"
+  blog: "blogs",
+  "team-members": "team",
+  teammembers: "team",
+  "partners-sponsors": "partners",
+  sponsors: "partners",
+  partner: "partners",
+  testimonial: "testimonials"
 });
 
 export function getContentType(type) {
@@ -216,6 +252,30 @@ export async function getBlogPostBySlug(slug) {
   return getCollectionItemBySlug("blogs", slug);
 }
 
+export async function getPublishedTeamMembers(options = {}) {
+  return getPublishedCollection("team", options);
+}
+
+export async function getTeamMemberBySlug(slug) {
+  return getCollectionItemBySlug("team", slug);
+}
+
+export async function getPublishedPartners(options = {}) {
+  return getPublishedCollection("partners", options);
+}
+
+export async function getPartnerBySlug(slug) {
+  return getCollectionItemBySlug("partners", slug);
+}
+
+export async function getPublishedTestimonials(options = {}) {
+  return getPublishedCollection("testimonials", options);
+}
+
+export async function getTestimonialBySlug(slug) {
+  return getCollectionItemBySlug("testimonials", slug);
+}
+
 export async function getContentList(type, options = {}) {
   switch (type) {
     case "articles":
@@ -230,6 +290,12 @@ export async function getContentList(type, options = {}) {
       return getPublishedGalleryAlbums(options);
     case "blogs":
       return getPublishedBlogPosts(options);
+    case "team":
+      return getPublishedTeamMembers(options);
+    case "partners":
+      return getPublishedPartners(options);
+    case "testimonials":
+      return getPublishedTestimonials(options);
     default:
       return { configured: true, items: [], error: "Unknown content type." };
   }
@@ -249,6 +315,12 @@ export async function getContentBySlug(type, slug, options = {}) {
       return getCollectionItemBySlug("gallery", slug, options);
     case "blogs":
       return getCollectionItemBySlug("blogs", slug, options);
+    case "team":
+      return getCollectionItemBySlug("team", slug, options);
+    case "partners":
+      return getCollectionItemBySlug("partners", slug, options);
+    case "testimonials":
+      return getCollectionItemBySlug("testimonials", slug, options);
     default:
       return { configured: true, item: null, error: "Unknown content type." };
   }
@@ -267,9 +339,10 @@ async function getPublishedCollection(type, options = {}) {
 
   try {
     const client = createWixClient();
+    const sortFields = querySortFields(definition);
     let query = client.items
       .query(collectionId)
-      .descending("featured", definition.dateField, "_createdDate")
+      .descending(...sortFields)
       .skip(wixSkip)
       .limit(wixLimit);
 
@@ -288,6 +361,7 @@ async function getPublishedCollection(type, options = {}) {
     });
 
     let items = (result.items || [])
+      .filter(isPublishedRawItem)
       .map((item) => normalizeCmsItem(type, item))
       .filter(Boolean);
 
@@ -354,15 +428,16 @@ async function getCollectionItemBySlug(type, slug, options = {}) {
 }
 
 function usesGeneratedSlugFallback(type) {
-  return ["articles", "ebooks", "blogs"].includes(type);
+  return ["articles", "ebooks", "blogs", "team", "partners", "testimonials"].includes(type);
 }
 
 async function findItemByGeneratedSlug(type, collectionId, slug, options = {}) {
   const definition = CONTENT_TYPES[type];
   const client = createWixClient();
+  const sortFields = querySortFields(definition);
   let query = client.items
     .query(collectionId)
-    .descending("featured", definition.dateField, "_createdDate")
+    .descending(...sortFields)
     .limit(MAX_FILTER_FETCH);
 
   if (definition.requiresConsent) {
@@ -375,6 +450,7 @@ async function findItemByGeneratedSlug(type, collectionId, slug, options = {}) {
   });
 
   return (result.items || [])
+    .filter(isPublishedRawItem)
     .map((item) => normalizeCmsItem(type, item, options))
     .find((item) => item.slug === slug) || null;
 }
@@ -408,17 +484,27 @@ async function findItems(query, options = {}) {
 export function normalizeCmsItem(type, rawItem, options = {}) {
   const definition = CONTENT_TYPES[type];
   const data = rawItem?.data || rawItem || {};
+  if (!definition || !isPublishedData(data)) return null;
+
+  const title = contentTitle(type, data);
+  const slug = normalizeSlug(data.slug || title);
+  if (!title || !slug) return null;
+
   const accessType = type === "ebooks"
     ? normalizeEbookAccessType(data)
     : type === "downloads"
       ? normalizeProductAccessType(data)
-    : normalizeAccessType(data.accessType);
+      : isDirectoryType(type)
+        ? ""
+        : normalizeAccessType(data.accessType);
   const image =
-    withFallbackAlt(resolveWixImage(data.featuredImage || data.coverImage || data.thumbnail || data.image), [
+    withFallbackAlt(resolveWixImage(primaryImageValue(type, data)), [
       data.imageAlt,
       data.coverAlt,
       data.thumbnailAlt,
-      data.title
+      data.logoAlt,
+      data.photoAlt,
+      title
     ]);
   const mediaGallery = normalizeMediaGallery(data.mediaGallery);
   const isPaid = accessType === "paid";
@@ -427,34 +513,46 @@ export function normalizeCmsItem(type, rawItem, options = {}) {
       ? resolveProductFile(type, data)
       : "";
   const previewAllowed = Boolean(data.previewAllowed);
-  const rawContent = data.content || data.description || data.fullDescription;
+  const rawContent = primaryContentValue(type, data);
   const contentBlocks = richContentToBlocks(rawContent);
   const contentText = blocksToPlainText(contentBlocks);
-  const excerpt = cleanSummaryText(data.excerpt || data.shortDescription) || cleanSummaryText(data.description) || contentText;
-  const slug = normalizeSlug(data.slug || data.title);
+  const excerpt =
+    cleanSummaryText(summaryValue(type, data)) ||
+    cleanSummaryText(data.description) ||
+    contentText;
   const paymentLink = resolveResourceLink(data.paymentLink || data.paymentUrl || data.purchaseLink || data.checkoutLink);
   const downloadLink = resolveResourceLink(data.downloadLink || data.downloadUrl || data.resourceLink || data.fileLink || data.fileUrl || data.resourceFile);
   const accessButtonLabel = text(data.accessButtonLabel || data.buttonLabel || data.ctaLabel);
   const previewText = text(data.previewText || data.previewDescription || data.whatYouGet || data.whatYoullGet || data.benefits || data.previewCopy);
+  const websiteUrl = resolveResourceLink(
+    data.websiteUrl || data.website || data.partnerUrl || data.sponsorUrl || data.profileUrl || data.externalUrl
+  );
+  const linkedinUrl = resolveResourceLink(data.linkedinUrl || data.linkedInUrl || data.linkedin || data.linkedIn);
+  const email = text(data.email || data.emailAddress);
+  const phone = text(data.phone || data.phoneNumber);
 
   return {
     id: rawItem?._id || data._id || "",
     type,
     label: definition.label,
-    title: text(data.title),
+    title,
     slug,
     excerpt,
     content: contentText,
     contentBlocks,
     image,
-    author: text(data.author),
+    author: text(data.author || data.authorName || data.clientName || data.personName),
     category: categoryLabel(data.category),
     tags: normalizeTags(data.tags),
     date: dateValue(
       data[definition.dateField] ||
         data.publishDate ||
         data.publishedDate ||
-        data.publicationDate
+        data.publicationDate ||
+        data.testimonialDate ||
+        data.createdDate ||
+        rawItem?._createdDate ||
+        rawItem?._updatedDate
     ),
     featured: Boolean(data.featured),
     isFree: accessType === "free",
@@ -477,8 +575,22 @@ export function normalizeCmsItem(type, rawItem, options = {}) {
     relatedProgramme: text(data.relatedProgramme),
     photographerCredit: text(data.photographerCredit || data.imageCredits),
     mediaGallery,
-    seoTitle: text(data.seoTitle || data.title),
-    seoDescription: cleanSummaryText(data.seoDescription || data.excerpt || data.shortDescription || data.description),
+    role: text(data.role || data.position || data.jobTitle || data.professionalTitle),
+    organization: text(data.organization || data.organisation || data.school || data.company),
+    qualifications: text(data.qualifications || data.credentials),
+    specialties: normalizeTags(data.specialties || data.specialisms || data.focusAreas),
+    email,
+    phone,
+    linkedinUrl,
+    websiteUrl,
+    partnerType: text(data.partnerType || data.sponsorType || data.type),
+    sponsorTier: text(data.sponsorTier || data.tier),
+    contribution: cleanSummaryText(data.contribution || data.supportDescription || data.partnershipDescription),
+    quote: cleanSummaryText(data.quote || data.testimonial || data.statement),
+    rating: data.rating || "",
+    sortOrder: numericValue(data.sortOrder || data.displayOrder || data.order),
+    seoTitle: text(data.seoTitle || title),
+    seoDescription: cleanSummaryText(data.seoDescription || summaryValue(type, data) || data.description),
     detailUrl: `${definition.detailPath}/${encodeURIComponent(slug)}`,
     ctaLabel: ctaLabel(type, accessType)
   };
@@ -501,6 +613,96 @@ function normalizeCategory(rawItem) {
   };
 }
 
+function contentTitle(type, data) {
+  if (type === "team") {
+    return text(data.name || data.fullName || data.memberName || data.title);
+  }
+
+  if (type === "partners") {
+    return text(data.name || data.partnerName || data.sponsorName || data.organizationName || data.organisationName || data.companyName || data.title);
+  }
+
+  if (type === "testimonials") {
+    const title = text(data.title || data.headline);
+    if (title) return title;
+
+    const author = text(data.author || data.authorName || data.clientName || data.personName);
+    return author ? `${author} testimonial` : "EduReach testimonial";
+  }
+
+  return text(data.title);
+}
+
+function primaryImageValue(type, data) {
+  if (type === "team") {
+    return data.profileImage || data.photo || data.headshot || data.featuredImage || data.image;
+  }
+
+  if (type === "partners") {
+    return data.logo || data.partnerLogo || data.sponsorLogo || data.featuredImage || data.image;
+  }
+
+  if (type === "testimonials") {
+    return data.photo || data.profileImage || data.featuredImage || data.image;
+  }
+
+  return data.featuredImage || data.coverImage || data.thumbnail || data.image;
+}
+
+function primaryContentValue(type, data) {
+  if (type === "team") {
+    return data.biography || data.bio || data.profile || data.description || data.content;
+  }
+
+  if (type === "partners") {
+    return data.description || data.about || data.partnershipDescription || data.contribution || data.content;
+  }
+
+  if (type === "testimonials") {
+    return data.quote || data.testimonial || data.statement || data.content || data.description;
+  }
+
+  return data.content || data.description || data.fullDescription;
+}
+
+function summaryValue(type, data) {
+  if (type === "team") {
+    return data.shortBio || data.summary || data.excerpt || data.bio || data.biography;
+  }
+
+  if (type === "partners") {
+    return data.summary || data.excerpt || data.description || data.contribution || data.partnershipDescription;
+  }
+
+  if (type === "testimonials") {
+    return data.quote || data.testimonial || data.statement || data.excerpt;
+  }
+
+  return data.excerpt || data.shortDescription;
+}
+
+function isDirectoryType(type) {
+  return ["team", "partners", "testimonials"].includes(type);
+}
+
+function isPublishedRawItem(rawItem) {
+  return isPublishedData(rawItem?.data || rawItem || {});
+}
+
+function isPublishedData(data) {
+  if (hasOwn(data, "published")) return normalizeBoolean(data.published);
+  if (hasOwn(data, "isPublished")) return normalizeBoolean(data.isPublished);
+  if (hasOwn(data, "visible")) return normalizeBoolean(data.visible);
+  if (hasOwn(data, "isVisible")) return normalizeBoolean(data.isVisible);
+  if (hasOwn(data, "draft")) return !normalizeBoolean(data.draft);
+  if (hasOwn(data, "status")) {
+    const status = text(data.status).toLowerCase();
+    return !status || ["published", "active", "live", "visible"].includes(status);
+  }
+
+  return true;
+}
+
 function normalizePaging(options = {}) {
   const limit = safeLimit(options.limit);
   const page = safePage(options.page);
@@ -511,6 +713,10 @@ function normalizePaging(options = {}) {
     search: text(options.search),
     category: normalizeSlug(options.category || "")
   };
+}
+
+function querySortFields(definition) {
+  return [...new Set(["featured", definition.dateField, "_createdDate"].filter(Boolean))];
 }
 
 function listResult(items, paging, total, hasNext = false) {
@@ -630,7 +836,16 @@ function normalizedPriceNumber(value) {
 function normalizeBoolean(value) {
   if (typeof value === "boolean") return value;
   const normalized = String(value || "").trim().toLowerCase();
-  return ["yes", "true", "1", "free"].includes(normalized);
+  return ["yes", "true", "1", "free", "published", "active", "live", "visible"].includes(normalized);
+}
+
+function hasOwn(value, key) {
+  return Boolean(value && Object.prototype.hasOwnProperty.call(value, key));
+}
+
+function numericValue(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : "";
 }
 
 function text(value) {
@@ -662,6 +877,9 @@ function dateValue(value) {
 
 function sortFeaturedNewest(a, b) {
   if (a.featured !== b.featured) return a.featured ? -1 : 1;
+  if (Number.isFinite(Number(a.sortOrder)) || Number.isFinite(Number(b.sortOrder))) {
+    return Number(a.sortOrder || 9999) - Number(b.sortOrder || 9999);
+  }
   return new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime();
 }
 
@@ -672,6 +890,9 @@ function ctaLabel(type, accessType) {
   }
 
   if (type === "downloads" && accessType === "paid") return "Add to Cart";
+  if (type === "team") return "View Profile";
+  if (type === "partners") return "View Partner";
+  if (type === "testimonials") return "Read Story";
   if (accessType === "paid") return "Buy";
   return CONTENT_TYPES[type].ctaLabel;
 }
