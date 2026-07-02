@@ -2,13 +2,7 @@
   "outputDirectory": ".",
   "functions": {
     "api/cms-page.js": {
-      "includeFiles": [
-        "resources/**/detail.html",
-        "blog/detail.html",
-        "team/detail.html",
-        "partners/detail.html",
-        "testimonials/detail.html"
-      ]
+      "includeFiles": "**/detail.html"
     }
   },
   "rewrites": [
