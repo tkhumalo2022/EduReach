@@ -1,6 +1,7 @@
 (() => {
   const CART_KEY = "edureach.cart.v1";
   const ORDERS_KEY = "edureach.orders.v1";
+  const ORDER_ACCESS_KEY = "edureach.orderAccess.v1";
   const CUSTOMER_KEY = "edureach.checkoutCustomer.v1";
   const PRODUCT_TYPES = new Set(["ebooks", "downloads"]);
   const MAX_QUANTITY = 99;
@@ -251,6 +252,7 @@
         throw new Error(result?.message || "Checkout could not be started.");
       }
 
+      saveOrderAccess(result.order?.id, result.orderAccessToken);
       saveOrderSnapshot(result.order);
       status.textContent = "Redirecting to PayFast...";
       launchPayFast(result.paymentUrl, result.fields);
@@ -264,6 +266,9 @@
   function renderSuccessPage() {
     const container = document.querySelector("[data-payment-success]");
     if (!container) return;
+
+    captureOrderAccessFromUrl();
+    removeSensitivePaymentParamsFromUrl();
 
     const orderId = new URLSearchParams(window.location.search).get("order") || readLatestOrderId();
     container.innerHTML = "";
@@ -297,6 +302,9 @@
     const container = document.querySelector("[data-payment-cancelled]");
     if (!container) return;
 
+    captureOrderAccessFromUrl();
+    removeSensitivePaymentParamsFromUrl();
+
     const orderId = new URLSearchParams(window.location.search).get("order") || readLatestOrderId();
     container.innerHTML = "";
 
@@ -314,8 +322,13 @@
 
   async function fetchOrder(orderId) {
     try {
+      const accessToken = readOrderAccess(orderId);
+      const headers = { Accept: "application/json" };
+      if (accessToken) headers["X-Order-Access-Token"] = accessToken;
+
       const response = await fetch(`/api/orders?orderId=${encodeURIComponent(orderId)}`, {
-        headers: { Accept: "application/json" },
+        headers,
+        credentials: "same-origin",
         cache: "no-store"
       });
       const result = await response.json().catch(() => null);
@@ -437,8 +450,6 @@
     const meta = document.createElement("dl");
     meta.className = "order-meta";
     appendDefinition(meta, "Order ID", order.id);
-    appendDefinition(meta, "Customer", [order.customer?.name, order.customer?.surname].filter(Boolean).join(" "));
-    appendDefinition(meta, "Email", order.customer?.email);
     appendDefinition(meta, "Amount", formatCurrency(order.amountCents, order.currency));
     appendDefinition(meta, "Status", order.status);
     appendDefinition(meta, "Date", formatDate(order.date));
@@ -459,10 +470,13 @@
 
       if (item.downloadUrl) {
         const download = linkButton(item.downloadUrl, "Download", "button button-primary button-small");
-        download.setAttribute("download", "");
         if (isExternalUrl(item.downloadUrl)) {
           download.target = "_blank";
           download.rel = "noopener noreferrer";
+        } else {
+          download.addEventListener("click", (event) => {
+            void openProtectedDownload(event, item.downloadUrl, order.id, download);
+          });
         }
         row.append(download);
       } else {
@@ -698,6 +712,61 @@
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
   }
 
+  function saveOrderAccess(orderId, accessToken) {
+    if (!orderId || !accessToken) return;
+
+    try {
+      const access = readOrderAccessMap();
+      access[orderId] = accessToken;
+      access.__latest = orderId;
+      sessionStorage.setItem(ORDER_ACCESS_KEY, JSON.stringify(access));
+    } catch {
+      // Session storage can be unavailable in private or locked-down browsers.
+    }
+  }
+
+  function readOrderAccess(orderId) {
+    if (!orderId) return "";
+
+    try {
+      return clean(readOrderAccessMap()[orderId]);
+    } catch {
+      return "";
+    }
+  }
+
+  function readOrderAccessMap() {
+    try {
+      const access = JSON.parse(sessionStorage.getItem(ORDER_ACCESS_KEY) || "{}");
+      return access && typeof access === "object" ? access : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function captureOrderAccessFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("order") || params.get("orderId") || "";
+    const accessToken = params.get("accessToken") || params.get("orderAccessToken") || params.get("token") || "";
+    saveOrderAccess(orderId, accessToken);
+  }
+
+  function removeSensitivePaymentParamsFromUrl() {
+    const url = new URL(window.location.href);
+    let changed = false;
+
+    ["accessToken", "orderAccessToken", "token"].forEach((key) => {
+      if (url.searchParams.has(key)) {
+        url.searchParams.delete(key);
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+    }
+  }
+
   function readLatestOrderId() {
     return readOrders().__latest || "";
   }
@@ -719,6 +788,38 @@
       button.textContent = original;
       button.disabled = false;
     }, 1300);
+  }
+
+  async function openProtectedDownload(event, href, orderId, button) {
+    const accessToken = readOrderAccess(orderId);
+    if (!accessToken) return;
+
+    event.preventDefault();
+    const originalText = button.textContent;
+    button.textContent = "Preparing...";
+
+    try {
+      const response = await fetch(href, {
+        headers: {
+          Accept: "application/json",
+          "X-Order-Access-Token": accessToken
+        },
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.downloadUrl) {
+        throw new Error(result?.message || "Download could not be prepared.");
+      }
+
+      window.location.href = result.downloadUrl;
+    } catch {
+      button.textContent = "Try Again";
+      window.setTimeout(() => {
+        button.textContent = originalText;
+      }, 1800);
+    }
   }
 
   function stateMessage(message) {

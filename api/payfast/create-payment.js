@@ -6,46 +6,50 @@ import {
   readPayFastConfig
 } from "../../src/lib/payfast.js";
 import {
+  createOrderAccessToken,
   createOrder,
+  hashOrderAccessToken,
   parsePriceToCents,
   saveOrder,
+  serializeOrderAccessCookie,
   toPublicOrder
 } from "../../src/lib/orders.js";
 import { getContentBySlug } from "../../src/lib/wixContent.js";
+import {
+  ApiRequestError,
+  enforceRateLimit,
+  methodNotAllowed,
+  readJsonBody,
+  sendJson
+} from "../../src/lib/security.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PRODUCT_TYPES = new Set(["ebooks", "downloads"]);
 const MAX_CART_ITEMS = 50;
 const MAX_QUANTITY = 99;
+const CHECKOUT_BODY_LIMIT_BYTES = 32 * 1024;
 
 export default async function handler(request, response) {
   if (request.method !== "POST") {
-    response.setHeader("Allow", "POST");
-    return sendJson(response, 405, {
-      ok: false,
-      message: "Method not allowed."
-    });
+    return methodNotAllowed(response, ["POST"]);
   }
 
-  const config = readPayFastConfig();
-  const missing = getMissingPayFastConfig(config);
-
-  if (missing.length) {
-    console.error("PayFast environment variables are missing.", { missing });
-    return sendJson(response, 503, {
-      ok: false,
-      message: "PayFast checkout is not configured yet."
-    });
+  if (!(await enforceRateLimit(request, response, {
+    name: "checkout",
+    limit: 20,
+    windowSeconds: 60
+  }))) {
+    return undefined;
   }
 
   let body;
 
   try {
-    body = await readJsonBody(request);
-  } catch {
-    return sendJson(response, 400, {
+    body = await readJsonBody(request, { maxBytes: CHECKOUT_BODY_LIMIT_BYTES });
+  } catch (error) {
+    return sendJson(response, error instanceof ApiRequestError ? error.statusCode : 400, {
       ok: false,
-      message: "Invalid checkout payload."
+      message: error instanceof ApiRequestError ? error.message : "Invalid checkout payload."
     });
   }
 
@@ -73,6 +77,17 @@ export default async function handler(request, response) {
     });
   }
 
+  const config = readPayFastConfig();
+  const missing = getMissingPayFastConfig(config);
+
+  if (missing.length) {
+    console.error("PayFast environment variables are missing.", { missing });
+    return sendJson(response, 503, {
+      ok: false,
+      message: "PayFast checkout is not configured yet."
+    });
+  }
+
   let orderItems;
 
   try {
@@ -94,14 +109,17 @@ export default async function handler(request, response) {
     });
   }
 
+  const accessToken = createOrderAccessToken();
   const order = createOrder({
     customer,
     items: orderItems,
     amountCents,
     currency: "ZAR",
-    mode: config.mode
+    mode: config.mode,
+    accessTokenHash: hashOrderAccessToken(accessToken)
   });
   await saveOrder(order);
+  response.setHeader("Set-Cookie", serializeOrderAccessCookie(order.id, accessToken));
 
   const origin = getRequestOrigin(request);
   const fields = {
@@ -130,6 +148,7 @@ export default async function handler(request, response) {
     ok: true,
     paymentUrl: config.endpoint,
     fields,
+    orderAccessToken: accessToken,
     order: toPublicOrder(order)
   });
 }
@@ -225,20 +244,6 @@ function normalizeCustomer(customer = {}) {
     surname: clean(customer.surname).slice(0, 100),
     email: clean(customer.email).toLowerCase().slice(0, 254)
   };
-}
-
-async function readJsonBody(request) {
-  if (request.body && typeof request.body === "object") return request.body;
-  if (typeof request.body === "string") return JSON.parse(request.body || "{}");
-
-  const chunks = [];
-  for await (const chunk of request) chunks.push(Buffer.from(chunk));
-  return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
-}
-
-function sendJson(response, statusCode, payload) {
-  response.setHeader("Cache-Control", "no-store");
-  return response.status(statusCode).json(payload);
 }
 
 function clean(value) {

@@ -84,6 +84,10 @@ https://edureach.network/api/payfast/notify
 
 The checkout API validates cart items against Wix CMS before signing the PayFast payload. The ITN webhook at `/api/payfast/notify` validates the PayFast signature, posts the ITN data back to PayFast for server-side confirmation, checks the merchant ID, amount and `payment_status`, and only then marks the order paid. Pending, cancelled or failed orders never receive `downloadUrl` values from `/api/orders`. Confirmed order state is stored server-side through Vercel Runtime Cache as a lightweight bridge until a permanent database is added. Do not add manual payment links to CMS products.
 
+Order lookups require both the order ID and the browser's order access token. The access token is generated during checkout, stored as a hash with the order, and kept only in the purchasing browser session or the secure order cookie. `/api/orders` returns only safe public order fields; paid files are served through `/api/downloads` after the order, token, payment status, product and short-lived download signature are verified.
+
+API rate limits use Vercel Runtime Cache rather than an in-memory JavaScript map. Configure `EDUREACH_RATE_LIMIT_SECRET` in Vercel, then adjust the optional `EDUREACH_RATE_LIMIT_CONTACT_*`, `EDUREACH_RATE_LIMIT_CHECKOUT_*`, `EDUREACH_RATE_LIMIT_ORDERS_*` and `EDUREACH_RATE_LIMIT_DOWNLOADS_*` values if the defaults need to change.
+
 ## Images
 
 Current images are placeholder assets in `assets/images`. Replace them with final approved images when ready. Do not add personal founder images until the founder has approved the final file.

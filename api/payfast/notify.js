@@ -13,6 +13,13 @@ import {
   markStoredOrderFailed,
   markStoredOrderPaid
 } from "../../src/lib/orders.js";
+import {
+  ApiRequestError,
+  readRawBody,
+  sendText
+} from "../../src/lib/security.js";
+
+const PAYFAST_NOTIFY_BODY_LIMIT_BYTES = 16 * 1024;
 
 export default async function handler(request, response) {
   if (request.method !== "POST") {
@@ -21,7 +28,18 @@ export default async function handler(request, response) {
   }
 
   const config = readPayFastConfig();
-  const rawBody = await readRawBody(request);
+  let rawBody;
+
+  try {
+    rawBody = await readRawBody(request, { maxBytes: PAYFAST_NOTIFY_BODY_LIMIT_BYTES });
+  } catch (error) {
+    return sendText(
+      response,
+      error instanceof ApiRequestError ? error.statusCode : 400,
+      error instanceof ApiRequestError ? error.message : "Invalid PayFast confirmation"
+    );
+  }
+
   const entries = Array.isArray(request.body) ? request.body : parseFormEncoded(rawBody);
   const data = entriesToObject(entries);
   const submittedSignature = String(data.signature || "").trim();
@@ -89,22 +107,4 @@ export default async function handler(request, response) {
   }
 
   return sendText(response, 200, "OK");
-}
-
-async function readRawBody(request) {
-  if (typeof request.body === "string") return request.body;
-
-  if (request.body && typeof request.body === "object") {
-    return new URLSearchParams(request.body).toString();
-  }
-
-  const chunks = [];
-  for await (const chunk of request) chunks.push(Buffer.from(chunk));
-  return Buffer.concat(chunks).toString("utf8");
-}
-
-function sendText(response, statusCode, body) {
-  response.setHeader("Cache-Control", "no-store");
-  response.statusCode = statusCode;
-  response.end(body);
 }

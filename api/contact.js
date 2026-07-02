@@ -1,3 +1,11 @@
+import {
+  ApiRequestError,
+  enforceRateLimit,
+  methodNotAllowed,
+  readJsonBody,
+  sendJson
+} from "../src/lib/security.js";
+
 const LIMITS = Object.freeze({
   name: 120,
   email: 254,
@@ -8,14 +16,10 @@ const LIMITS = Object.freeze({
 });
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CONTACT_BODY_LIMIT_BYTES = 16 * 1024;
 
 function clean(value, maxLength = 4000) {
   return String(value ?? "").trim().slice(0, maxLength);
-}
-
-function sendJson(response, statusCode, data) {
-  response.setHeader("Cache-Control", "no-store");
-  return response.status(statusCode).json(data);
 }
 
 export default async function handler(request, response) {
@@ -27,11 +31,31 @@ export default async function handler(request, response) {
   }
 
   if (request.method !== "POST") {
-    response.setHeader("Allow", "GET, POST");
-    return sendJson(response, 405, {
+    return methodNotAllowed(response, ["GET", "POST"]);
+  }
+
+  if (!(await enforceRateLimit(request, response, {
+    name: "contact",
+    limit: 10,
+    windowSeconds: 60
+  }))) {
+    return undefined;
+  }
+
+  let body;
+
+  try {
+    body = await readJsonBody(request, { maxBytes: CONTACT_BODY_LIMIT_BYTES });
+  } catch (error) {
+    return sendJson(response, error instanceof ApiRequestError ? error.statusCode : 400, {
       ok: false,
-      message: "Method not allowed."
+      message: error instanceof ApiRequestError ? error.message : "Invalid contact payload."
     });
+  }
+
+  // Honeypot field. Humans will not fill this field, but spam bots often do.
+  if (clean(body.website, 200)) {
+    return sendJson(response, 200, { ok: true });
   }
 
   const appsScriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
@@ -43,13 +67,6 @@ export default async function handler(request, response) {
       ok: false,
       message: "The contact service is not configured yet."
     });
-  }
-
-  const body = request.body || {};
-
-  // Honeypot field. Humans will not fill this field, but spam bots often do.
-  if (clean(body.website, 200)) {
-    return sendJson(response, 200, { ok: true });
   }
 
   const enquiry = {

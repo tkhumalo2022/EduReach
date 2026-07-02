@@ -59,11 +59,23 @@ PAYFAST_MODE=sandbox
 PAYFAST_SANDBOX=true
 SITE_URL=https://edureach.network
 NEXT_PUBLIC_SITE_URL=https://edureach.network
+EDUREACH_RATE_LIMIT_SECRET=
+EDUREACH_RATE_LIMIT_CONTACT_MAX=10
+EDUREACH_RATE_LIMIT_CONTACT_WINDOW_SECONDS=60
+EDUREACH_RATE_LIMIT_CHECKOUT_MAX=20
+EDUREACH_RATE_LIMIT_CHECKOUT_WINDOW_SECONDS=60
+EDUREACH_RATE_LIMIT_ORDERS_MAX=60
+EDUREACH_RATE_LIMIT_ORDERS_WINDOW_SECONDS=60
+EDUREACH_RATE_LIMIT_DOWNLOADS_MAX=60
+EDUREACH_RATE_LIMIT_DOWNLOADS_WINDOW_SECONDS=60
+EDUREACH_ADMIN_DEBUG_SECRET=
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
 
 Use `.env.example` as a reference only. Do not commit `.env.local`.
+
+Use long random values for `EDUREACH_RATE_LIMIT_SECRET` and `EDUREACH_ADMIN_DEBUG_SECRET` in Vercel. Do not commit real secret values.
 
 ## 6. Collection permissions and publishing
 
@@ -289,7 +301,7 @@ Paid ebooks and downloadable resources use the site cart plus PayFast checkout. 
 5. Confirm PayFast environment variables are configured in Vercel.
 6. Set the PayFast ITN/notify URL to `https://edureach.network/api/payfast/notify`.
 
-The website displays the price and Add to Cart button for paid resources, but it never prints protected paid file URLs in public CMS responses. The `/payment-success` page and resource detail pages ask `/api/orders` for server-confirmed status; pending, cancelled and failed payments do not receive download URLs.
+The website displays the price and Add to Cart button for paid resources, but it never prints protected paid file URLs in public CMS or order responses. The `/payment-success` page and resource detail pages ask `/api/orders` for server-confirmed status with the purchasing browser's order access token. Paid files are delivered through `/api/downloads` only after the order, token, paid status, product and short-lived download signature are verified. Pending, cancelled and failed payments do not receive download URLs.
 
 ## 19. Create test content
 
@@ -314,10 +326,10 @@ The website displays the price and Add to Cart button for paid resources, but it
 
 1. Add the same environment variables in Vercel.
 2. Redeploy after adding variables.
-3. Check `/api/wix-content?status=1` on the preview deployment.
+3. Check `/api/wix-content?status=1` on the preview deployment. The public response should only show `healthy` or `unavailable`.
 4. Check `/`, `/resources/articles`, `/resources/ebooks`, `/resources/downloads`, `/resources/workshops`, `/resources/gallery`, `/blog`, `/team`, `/partners`, and `/testimonials`.
 5. Confirm pages work when a collection is empty.
-6. If a collection fails, add `debug=1` to the API URL, for example `/api/wix-content?type=articles&limit=1&debug=1`, and check the sanitized Wix error in the JSON response and Vercel logs.
+6. If a collection fails in production, check Vercel Function logs first. Debug JSON requires `debug=1` plus the `x-edureach-admin-secret` request header matching `EDUREACH_ADMIN_DEBUG_SECRET`; do not expose the secret in a public URL or support ticket.
 
 ## 22. Cache and revalidation
 

@@ -1,4 +1,5 @@
 import { getCache } from "@vercel/functions";
+import crypto from "node:crypto";
 
 const PENDING_ORDER_STORE = globalThis.__EDUREACH_PENDING_ORDER_STORE__ || new Map();
 const CONFIRMED_ORDER_STORE = globalThis.__EDUREACH_CONFIRMED_ORDER_STORE__ || new Map();
@@ -7,6 +8,8 @@ globalThis.__EDUREACH_CONFIRMED_ORDER_STORE__ = CONFIRMED_ORDER_STORE;
 
 const ORDER_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
 const ORDER_CACHE_NAMESPACE = "edureach-orders";
+const ORDER_ACCESS_COOKIE_NAME = "edureach_order_access";
+const DOWNLOAD_LINK_TTL_SECONDS = 10 * 60;
 
 const ORDER_STATUSES = Object.freeze({
   pending: "pending",
@@ -15,7 +18,7 @@ const ORDER_STATUSES = Object.freeze({
   failed: "failed"
 });
 
-export function createOrder({ customer, items, amountCents, currency = "ZAR", mode = "sandbox" }) {
+export function createOrder({ customer, items, amountCents, currency = "ZAR", mode = "sandbox", accessTokenHash = "" }) {
   const now = new Date().toISOString();
   const order = {
     id: createOrderId(),
@@ -43,6 +46,8 @@ export function createOrder({ customer, items, amountCents, currency = "ZAR", mo
     status: ORDER_STATUSES.pending,
     createdAt: now,
     updatedAt: now,
+    accessTokenHash: text(accessTokenHash),
+    accessTokenCreatedAt: now,
     payment: null
   };
 
@@ -190,7 +195,6 @@ export function toPublicOrder(order, options = {}) {
 
   return {
     id: order.id,
-    customer: order.customer,
     items: order.items.map((item) => ({
       id: item.id,
       type: item.type,
@@ -202,14 +206,13 @@ export function toPublicOrder(order, options = {}) {
       currency: item.currency,
       image: item.image,
       fileType: item.fileType,
-      downloadUrl: includeDownloads ? item.fileUrl : ""
+      downloadUrl: includeDownloads ? createProtectedDownloadUrl(order, item) : ""
     })),
     amountCents: order.amountCents,
     currency: order.currency,
     status: order.status,
     date: order.createdAt,
-    updatedAt: order.updatedAt,
-    payment: order.payment
+    updatedAt: order.updatedAt
   };
 }
 
@@ -232,8 +235,90 @@ export function getResourceAccessState(resource, orders = []) {
   return {
     accessGranted: true,
     order: matchingOrder,
-    downloadUrl: text(matchingItem?.fileUrl || matchingItem?.downloadUrl || "")
+    downloadUrl: text(matchingItem?.downloadUrl || "")
   };
+}
+
+export function createOrderAccessToken() {
+  return crypto.randomBytes(32).toString("base64url");
+}
+
+export function hashOrderAccessToken(accessToken) {
+  return crypto
+    .createHash("sha256")
+    .update(text(accessToken), "utf8")
+    .digest("hex");
+}
+
+export function verifyOrderAccessToken(order, accessToken) {
+  const expectedHash = text(order?.accessTokenHash);
+  const submittedToken = text(accessToken);
+  if (!expectedHash || !submittedToken) return false;
+
+  const expected = Buffer.from(expectedHash, "hex");
+  const submitted = Buffer.from(hashOrderAccessToken(submittedToken), "hex");
+
+  return expected.length === submitted.length && crypto.timingSafeEqual(expected, submitted);
+}
+
+export function serializeOrderAccessCookie(orderId, accessToken) {
+  const value = encodeURIComponent(`${text(orderId)}.${text(accessToken)}`);
+  return [
+    `${ORDER_ACCESS_COOKIE_NAME}=${value}`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax"
+  ].join("; ");
+}
+
+export function readOrderAccessTokenFromCookies(cookies, orderId) {
+  const cookieValue = text(cookies?.[ORDER_ACCESS_COOKIE_NAME]);
+  const id = text(orderId);
+  if (!cookieValue || !id) return "";
+
+  const separator = cookieValue.indexOf(".");
+  if (separator < 0) return "";
+
+  const cookieOrderId = cookieValue.slice(0, separator);
+  const accessToken = cookieValue.slice(separator + 1);
+  return cookieOrderId === id ? accessToken : "";
+}
+
+export function createProtectedDownloadUrl(order, item, options = {}) {
+  if (!order?.id || !item?.type || !item?.slug || !order.accessTokenHash) return "";
+
+  const expiresAt = Math.floor(Date.now() / 1000) + positiveInteger(options.expiresInSeconds || DOWNLOAD_LINK_TTL_SECONDS);
+  const params = new URLSearchParams({
+    orderId: order.id,
+    type: item.type,
+    slug: item.slug,
+    expires: String(expiresAt)
+  });
+  if (item.id) params.set("itemId", item.id);
+
+  params.set("signature", signDownloadRequest(order, item, expiresAt));
+  return `/api/downloads?${params.toString()}`;
+}
+
+export function findOrderItem(order, query = {}) {
+  const type = text(query.type).toLowerCase();
+  const slug = text(query.slug);
+  const itemId = text(query.itemId);
+
+  return (order?.items || []).find((item) => {
+    if (itemId && item.id !== itemId) return false;
+    return item.type === type && item.slug === slug;
+  }) || null;
+}
+
+export function verifyProtectedDownloadSignature(order, item, expires, signature) {
+  const expiresAt = Number(expires);
+  if (!Number.isFinite(expiresAt) || expiresAt < Math.floor(Date.now() / 1000)) return false;
+
+  const expected = Buffer.from(signDownloadRequest(order, item, Math.trunc(expiresAt)), "hex");
+  const submitted = Buffer.from(text(signature), "hex");
+  return expected.length === submitted.length && crypto.timingSafeEqual(expected, submitted);
 }
 
 export function parsePriceToCents(price) {
@@ -262,12 +347,7 @@ function normalizedPriceNumber(value) {
 }
 
 function createOrderId() {
-  const stamp = new Date()
-    .toISOString()
-    .replace(/\D/g, "")
-    .slice(0, 14);
-  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `ER-${stamp}-${random}`;
+  return `ER-${crypto.randomUUID()}`;
 }
 
 function positiveInteger(value) {
@@ -278,6 +358,22 @@ function positiveInteger(value) {
 
 function text(value) {
   return String(value || "").trim();
+}
+
+function signDownloadRequest(order, item, expiresAt) {
+  const key = Buffer.from(text(order?.accessTokenHash), "hex");
+  if (!key.length) return "";
+
+  return crypto
+    .createHmac("sha256", key)
+    .update([
+      text(order.id),
+      text(item.id),
+      text(item.type),
+      text(item.slug),
+      String(expiresAt)
+    ].join("|"))
+    .digest("hex");
 }
 
 function normalizeResource(resource) {

@@ -78,6 +78,16 @@ PAYFAST_MODE=sandbox
 PAYFAST_SANDBOX=true
 SITE_URL=https://edureach.network
 NEXT_PUBLIC_SITE_URL=https://edureach.network
+EDUREACH_RATE_LIMIT_SECRET=
+EDUREACH_RATE_LIMIT_CONTACT_MAX=10
+EDUREACH_RATE_LIMIT_CONTACT_WINDOW_SECONDS=60
+EDUREACH_RATE_LIMIT_CHECKOUT_MAX=20
+EDUREACH_RATE_LIMIT_CHECKOUT_WINDOW_SECONDS=60
+EDUREACH_RATE_LIMIT_ORDERS_MAX=60
+EDUREACH_RATE_LIMIT_ORDERS_WINDOW_SECONDS=60
+EDUREACH_RATE_LIMIT_DOWNLOADS_MAX=60
+EDUREACH_RATE_LIMIT_DOWNLOADS_WINDOW_SECONDS=60
+EDUREACH_ADMIN_DEBUG_SECRET=
 # Optional/reference only:
 WIX_ACCOUNT_ID=
 ```
@@ -89,7 +99,9 @@ Check each value:
 - `WIX_ACCOUNT_ID`: optional/reference only; CMS loading does not require it.
 - Collection env vars: match the exact collection IDs above.
 - PayFast ITN/notify URL: `https://edureach.network/api/payfast/notify`.
-- Paid downloads unlock only after PayFast sends a validated `COMPLETE` ITN.
+- Paid downloads unlock only after PayFast sends a validated `COMPLETE` ITN and the purchasing browser presents the matching order access token.
+- `EDUREACH_RATE_LIMIT_SECRET`: long random server-side value for API rate-limit keys.
+- `EDUREACH_ADMIN_DEBUG_SECRET`: optional production-only secret for CMS debug requests sent in the `x-edureach-admin-secret` header.
 - Do not add real values to `.env.example`.
 - Do not commit `.env.local`.
 
@@ -105,7 +117,7 @@ After Vercel env vars are saved and a preview/production deployment is available
 
 | URL | Expected result |
 |---|---|
-| `/api/wix-content?status=1` | JSON response with `ok: true`; missing env vars list should be empty after setup |
+| `/api/wix-content?status=1` | JSON response with `ok: true` and a public `healthy` or `unavailable` status |
 | `/resources/articles` | Page loads and published Articles appear, or the empty state appears |
 | `/resources/ebooks` | Page loads and published Ebooks appear, or the empty state appears |
 | `/resources/downloads` | Page loads and published Downloadable Resources appear, or the empty state appears |
@@ -123,7 +135,7 @@ Also check:
 - Paid ebooks show Add to Cart when `isFree` is false and a paid price is set.
 - Paid resources show Add to Cart when `accessType` is paid and a paid price is set.
 - `/cart` and `/checkout` load with the cart badge and PayFast checkout button.
-- Paid resources do not expose protected file URLs.
+- Paid resources do not expose protected file URLs in public CMS or order responses.
 - Free resources show a download button only when the public file is uploaded.
 - Search, category filter and Load More work on listing pages when enough content exists.
 - Mobile pages still load without layout overlap.

@@ -3,6 +3,7 @@
   const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/assets/images/hero-inclusive-classroom.png`;
   const EMPTY_MESSAGE = "New EduReach resources will be available soon.";
   const CHECKOUT_PATH = "/checkout";
+  const ORDER_ACCESS_KEY = "edureach.orderAccess.v1";
   const DEFAULT_PAGE_SIZE = 9;
   const SOCIAL_LINKS = {
     facebook: "https://www.facebook.com/share/1EuwmMShrs/",
@@ -851,8 +852,13 @@
     }
 
     try {
+      const accessToken = readOrderAccess(orderId);
+      const headers = { Accept: "application/json" };
+      if (accessToken) headers["X-Order-Access-Token"] = accessToken;
+
       const response = await fetch(`/api/orders?orderId=${encodeURIComponent(orderId)}`, {
-        headers: { Accept: "application/json" },
+        headers,
+        credentials: "same-origin",
         cache: "no-store"
       });
       const result = await response.json().catch(() => null);
@@ -881,6 +887,7 @@
     action.textContent = resolveAccessActionLabel(item, accessState);
     action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
     bindPaidCheckoutAction(action, item, null, accessState);
+    bindProtectedDownloadAction(action, accessState);
 
     if (item.accessType === "paid" && !accessState.accessGranted) {
       if (isExternalUrl(href)) {
@@ -891,7 +898,11 @@
         action.removeAttribute("rel");
       }
     } else if (shouldDownload(item, accessState)) {
-      action.setAttribute("download", "");
+      if (isProtectedDownloadUrl(href)) {
+        action.removeAttribute("download");
+      } else {
+        action.setAttribute("download", "");
+      }
       action.removeAttribute("target");
       action.removeAttribute("rel");
     } else {
@@ -908,6 +919,7 @@
     action.textContent = resolveAccessActionLabel(item, accessState);
     action.setAttribute("aria-label", `${action.textContent} ${item.title || TYPE_LABELS[item.type] || "resource"}`);
     bindPaidCheckoutAction(action, item, note, accessState);
+    bindProtectedDownloadAction(action, accessState, note);
 
     if (item.accessType === "paid" && !accessState.accessGranted) {
       if (isExternalUrl(href)) {
@@ -919,7 +931,11 @@
       }
       if (note) note.textContent = "Payment confirmation is still required to unlock this resource.";
     } else if (shouldDownload(item, accessState)) {
-      action.setAttribute("download", "");
+      if (isProtectedDownloadUrl(href)) {
+        action.removeAttribute("download");
+      } else {
+        action.setAttribute("download", "");
+      }
       action.removeAttribute("target");
       action.removeAttribute("rel");
       if (note) note.remove();
@@ -939,6 +955,59 @@
       event.preventDefault();
       startPaidResourceCheckout(item, action, note);
     });
+  }
+
+  function bindProtectedDownloadAction(action, accessState, note = null) {
+    if (!accessState?.accessGranted || !isProtectedDownloadUrl(accessState.downloadUrl) || action.dataset.protectedDownloadBound) return;
+
+    action.dataset.protectedDownloadBound = "true";
+    action.addEventListener("click", (event) => {
+      void openProtectedDownload(event, accessState.downloadUrl, accessState.order?.id, action, note);
+    });
+  }
+
+  async function openProtectedDownload(event, href, orderId, action, note = null) {
+    const accessToken = readOrderAccess(orderId);
+    if (!accessToken) return;
+
+    event.preventDefault();
+    const originalText = action.textContent;
+    action.textContent = "Preparing...";
+    action.setAttribute("aria-busy", "true");
+    if (note) {
+      note.hidden = false;
+      note.classList.remove("is-error");
+      note.textContent = "Preparing secure download...";
+    }
+
+    try {
+      const response = await fetch(href, {
+        headers: {
+          Accept: "application/json",
+          "X-Order-Access-Token": accessToken
+        },
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.downloadUrl) {
+        throw new Error(result?.message || "Download could not be prepared.");
+      }
+
+      window.location.href = result.downloadUrl;
+    } catch {
+      action.textContent = "Try Again";
+      if (note) {
+        note.hidden = false;
+        note.classList.add("is-error");
+        note.textContent = "The secure download could not be prepared. Please try again.";
+      }
+      window.setTimeout(() => {
+        action.textContent = originalText;
+        action.removeAttribute("aria-busy");
+      }, 1800);
+    }
   }
 
   function startPaidResourceCheckout(item, action, note) {
@@ -1017,8 +1086,23 @@
     }
   }
 
+  function readOrderAccess(orderId) {
+    if (!orderId) return "";
+
+    try {
+      const access = JSON.parse(sessionStorage.getItem(ORDER_ACCESS_KEY) || "{}");
+      return String(access?.[orderId] || "").trim();
+    } catch {
+      return "";
+    }
+  }
+
   function isExternalUrl(href) {
     return /^https?:\/\//i.test(href) || String(href).startsWith("wix:");
+  }
+
+  function isProtectedDownloadUrl(href) {
+    return String(href || "").startsWith("/api/downloads?");
   }
 
   function cardMeta(item) {

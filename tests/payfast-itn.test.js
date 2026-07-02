@@ -109,6 +109,94 @@ test("ITN does not unlock downloads when PayFast server validation fails", async
   }
 });
 
+test("ITN rejects invalid PayFast signatures before server validation", async () => {
+  const restore = withPayFastEnv();
+  const originalFetch = globalThis.fetch;
+  const originalError = console.error;
+
+  try {
+    const order = createDigitalOrder(9900);
+    const request = createItnRequest(order, "COMPLETE", { signature: "invalid-signature" });
+    const response = createMockResponse();
+
+    globalThis.fetch = async () => {
+      throw new Error("PayFast validation should not run for invalid signatures.");
+    };
+    console.error = () => {};
+
+    await notifyHandler(request, response);
+
+    assert.equal(response.statusCode, 400);
+    assert.equal(response.body, "Invalid signature");
+    assert.equal(getConfirmedOrder(order.id), null);
+  } finally {
+    globalThis.fetch = originalFetch;
+    console.error = originalError;
+    restore();
+  }
+});
+
+test("ITN rejects merchant ID mismatches", async () => {
+  const restore = withPayFastEnv();
+  const originalFetch = globalThis.fetch;
+  const originalError = console.error;
+
+  try {
+    const order = createDigitalOrder(9900);
+    const request = createItnRequest(order, "COMPLETE", { merchantId: "99999999" });
+    const response = createMockResponse();
+
+    globalThis.fetch = async () => ({
+      ok: true,
+      status: 200,
+      text: async () => "VALID"
+    });
+    console.error = () => {};
+
+    await notifyHandler(request, response);
+
+    assert.equal(response.statusCode, 400);
+    assert.equal(response.body, "Invalid merchant");
+    assert.equal(getConfirmedOrder(order.id), null);
+  } finally {
+    globalThis.fetch = originalFetch;
+    console.error = originalError;
+    restore();
+  }
+});
+
+test("ITN rejects amount mismatches", async () => {
+  const restore = withPayFastEnv();
+  const originalFetch = globalThis.fetch;
+  const originalError = console.error;
+
+  try {
+    const order = createDigitalOrder(9900);
+    const request = createItnRequest(order, "COMPLETE", {
+      amountGross: "100.00",
+      amountNet: "100.00"
+    });
+    const response = createMockResponse();
+
+    globalThis.fetch = async () => ({
+      ok: true,
+      status: 200,
+      text: async () => "VALID"
+    });
+    console.error = () => {};
+
+    await notifyHandler(request, response);
+
+    assert.equal(response.statusCode, 400);
+    assert.equal(response.body, "Invalid amount");
+    assert.equal(getConfirmedOrder(order.id), null);
+  } finally {
+    globalThis.fetch = originalFetch;
+    console.error = originalError;
+    restore();
+  }
+});
+
 test("ITN records non-complete PayFast statuses without granting access", async () => {
   const restore = withPayFastEnv();
   const originalFetch = globalThis.fetch;
@@ -152,19 +240,21 @@ function createDigitalOrder(amountCents) {
   });
 }
 
-function createItnRequest(order, paymentStatus) {
+function createItnRequest(order, paymentStatus, options = {}) {
+  const amountGross = options.amountGross || formatPayFastAmount(order.amountCents);
+  const amountNet = options.amountNet || formatPayFastAmount(order.amountCents);
   const entries = [
     ["m_payment_id", order.id],
     ["pf_payment_id", `PF-${order.id}`],
     ["payment_status", paymentStatus],
     ["item_name", `EduReach digital resources ${order.id}`],
-    ["amount_gross", formatPayFastAmount(order.amountCents)],
+    ["amount_gross", amountGross],
     ["amount_fee", "0.00"],
-    ["amount_net", formatPayFastAmount(order.amountCents)],
+    ["amount_net", amountNet],
     ["custom_str1", order.id],
-    ["merchant_id", "10000100"]
+    ["merchant_id", options.merchantId || "10000100"]
   ];
-  entries.push(["signature", createNotificationSignature(entries, "secret")]);
+  entries.push(["signature", options.signature || createNotificationSignature(entries, "secret")]);
 
   return {
     method: "POST",

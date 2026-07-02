@@ -37,7 +37,7 @@ The EduReach website still lives on GitHub and Vercel. Wix is the content dashbo
 2. Add title, slug, short description, full description, thumbnail, thumbnail alt text, category and tags.
 3. For a free resource, upload the public file to `resourceFile`.
 4. Add `fileType`, such as PDF, DOCX or ZIP.
-5. For a paid resource, upload the file to `resourceFile`, set `accessType` to paid and add the paid price. The website shows Add to Cart and only unlocks the download after PayFast confirms the order.
+5. For a paid resource, upload the file to `resourceFile`, set `accessType` to paid and add the paid price. The website shows Add to Cart and only unlocks the download after PayFast confirms the order and the purchasing browser presents the matching order access token.
 
 ## Create a workshop photo album
 
