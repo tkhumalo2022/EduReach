@@ -133,7 +133,7 @@ export default async function handler(request, response) {
     email_address: customer.email,
     m_payment_id: order.id,
     amount: formatPayFastAmount(amountCents),
-    item_name: `EduReach digital resources ${order.id}`.slice(0, 100),
+    item_name: "EduReach Digital Resources",
     item_description: orderItems
       .map((item) => `${item.quantity} x ${item.title}`)
       .join("; ")
