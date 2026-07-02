@@ -79,7 +79,7 @@ PayFast credentials must be stored in Vercel environment variables:
 Set the PayFast ITN/notify URL to:
 
 ```text
-https://edureach-website.vercel.app/api/payfast/notify
+https://edureach.network/api/payfast/notify
 ```
 
 The checkout API validates cart items against Wix CMS before signing the PayFast payload. The ITN webhook at `/api/payfast/notify` validates the PayFast signature, posts the ITN data back to PayFast for server-side confirmation, checks the merchant ID, amount and `payment_status`, and only then marks the order paid. Pending, cancelled or failed orders never receive `downloadUrl` values from `/api/orders`. Confirmed order state is stored server-side through Vercel Runtime Cache as a lightweight bridge until a permanent database is added. Do not add manual payment links to CMS products.
