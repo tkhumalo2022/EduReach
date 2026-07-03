@@ -76,6 +76,14 @@ PayFast credentials must be stored in Vercel environment variables:
 - `PAYFAST_MODE` as `sandbox` or `production`, or `PAYFAST_SANDBOX=true/false`
 - `SITE_URL` or `NEXT_PUBLIC_SITE_URL` for the public site origin
 
+Paid-order email delivery uses Resend and requires:
+
+- `RESEND_API_KEY`
+- `EDUREACH_EMAIL_FROM`, using a sender address on a domain verified in Resend
+- `EDUREACH_EMAIL_REPLY_TO` if replies should go to a different address
+- `EDUREACH_DOWNLOAD_LINK_SECRET`, set to a long random secret
+- `EDUREACH_EMAIL_DOWNLOAD_TTL_SECONDS` if the default seven-day link lifetime should be changed
+
 Set the PayFast ITN/notify URL to:
 
 ```text
@@ -84,7 +92,9 @@ https://edureach.network/api/payfast/notify
 
 The checkout API validates cart items against Wix CMS before signing the PayFast payload. The ITN webhook at `/api/payfast/notify` validates the PayFast signature, posts the ITN data back to PayFast for server-side confirmation, checks the merchant ID, amount and `payment_status`, and only then marks the order paid. Pending, cancelled or failed orders never receive `downloadUrl` values from `/api/orders`. Confirmed order state is stored server-side through Vercel Runtime Cache as a lightweight bridge until a permanent database is added. Do not add manual payment links to CMS products.
 
-Order lookups require both the order ID and the browser's order access token. The access token is generated during checkout, stored as a hash with the order, and kept only in the purchasing browser session or the secure order cookie. `/api/orders` returns only safe public order fields; paid files are served through `/api/downloads` after the order, token, payment status, product and short-lived download signature are verified.
+After a verified `COMPLETE` ITN, the backend sends the customer a transactional email containing signed, expiring links for the purchased files. The order records the email delivery result, and the Resend request uses an order-specific idempotency key so duplicate PayFast notifications do not send duplicate emails.
+
+Order lookups require both the order ID and the browser's order access token. The access token is generated during checkout, stored as a hash with the order, and kept only in the purchasing browser session or the secure order cookie. `/api/orders` returns only safe public order fields. Browser downloads continue to require that token, while emailed links use a separate server-signed bearer link that verifies the paid order, purchased item, signature and expiry before redirecting to the Wix file.
 
 API rate limits use Vercel Runtime Cache rather than an in-memory JavaScript map. Configure `EDUREACH_RATE_LIMIT_SECRET` in Vercel, then adjust the optional `EDUREACH_RATE_LIMIT_CONTACT_*`, `EDUREACH_RATE_LIMIT_CHECKOUT_*`, `EDUREACH_RATE_LIMIT_ORDERS_*` and `EDUREACH_RATE_LIMIT_DOWNLOADS_*` values if the defaults need to change.
 
