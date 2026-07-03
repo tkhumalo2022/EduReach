@@ -2,6 +2,7 @@ import {
   createNotificationSignature,
   entriesToObject,
   formatPayFastAmount,
+  getRequestOrigin,
   parseFormEncoded,
   parsePayFastAmountToCents,
   readPayFastConfig,
@@ -11,8 +12,10 @@ import {
 import {
   getStoredOrder,
   markStoredOrderFailed,
-  markStoredOrderPaid
+  markStoredOrderPaid,
+  saveOrder
 } from "../../src/lib/orders.js";
+import { sendPaidOrderEmail } from "../../src/lib/orderEmail.js";
 import {
   ApiRequestError,
   readRawBody,
@@ -93,13 +96,68 @@ export default async function handler(request, response) {
   const isConfirmed = paymentStatus === "COMPLETE";
 
   if (isConfirmed) {
-    await markStoredOrderPaid(orderId, {
-      pfPaymentId: data.pf_payment_id,
-      status: paymentStatus,
-      amountGross: data.amount_gross,
-      amountFee: data.amount_fee,
-      amountNet: data.amount_net
+    const paidOrder = order.status === "paid"
+      ? order
+      : await markStoredOrderPaid(orderId, {
+        pfPaymentId: data.pf_payment_id,
+        status: paymentStatus,
+        amountGross: data.amount_gross,
+        amountFee: data.amount_fee,
+        amountNet: data.amount_net
+      });
+
+    if (!paidOrder) {
+      return sendText(response, 500, "Could not confirm order");
+    }
+
+    if (paidOrder.delivery?.email?.sentAt) {
+      return sendText(response, 200, "OK");
+    }
+
+    const attemptedAt = new Date().toISOString();
+    const emailResult = await sendPaidOrderEmail(paidOrder, {
+      origin: getRequestOrigin(request)
     });
+
+    paidOrder.delivery = {
+      ...(paidOrder.delivery || {}),
+      email: {
+        ...(paidOrder.delivery?.email || {}),
+        provider: "Resend",
+        attempts: Number(paidOrder.delivery?.email?.attempts || 0) + 1,
+        lastAttemptAt: attemptedAt
+      }
+    };
+
+    if (emailResult.skipped) {
+      paidOrder.delivery.email.status = "not_configured";
+      paidOrder.delivery.email.lastError = emailResult.message;
+      await saveOrder(paidOrder);
+      console.warn("Paid order email was not sent because email delivery is not configured.", {
+        orderId,
+        missing: emailResult.missing
+      });
+      return sendText(response, 200, "OK");
+    }
+
+    if (!emailResult.ok) {
+      paidOrder.delivery.email.status = "failed";
+      paidOrder.delivery.email.lastError = emailResult.message;
+      await saveOrder(paidOrder);
+      console.error("Paid order email delivery failed.", {
+        orderId,
+        statusCode: emailResult.statusCode,
+        message: emailResult.message
+      });
+      return sendText(response, 500, "Payment confirmed; delivery email failed");
+    }
+
+    paidOrder.delivery.email.status = "sent";
+    paidOrder.delivery.email.sentAt = new Date().toISOString();
+    paidOrder.delivery.email.emailId = emailResult.emailId;
+    paidOrder.delivery.email.linkExpiresAt = emailResult.linkExpiresAt;
+    delete paidOrder.delivery.email.lastError;
+    await saveOrder(paidOrder);
   } else {
     await markStoredOrderFailed(orderId, {
       status: paymentStatus
