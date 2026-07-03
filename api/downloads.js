@@ -5,6 +5,7 @@ import {
   verifyOrderAccessToken,
   verifyProtectedDownloadSignature
 } from "../src/lib/orders.js";
+import { verifyEmailDownloadSignature } from "../src/lib/orderEmail.js";
 import {
   enforceRateLimit,
   getRequestHeader,
@@ -34,6 +35,7 @@ export default async function handler(request, response) {
   const itemId = url.searchParams.get("itemId") || "";
   const expires = url.searchParams.get("expires") || "";
   const signature = url.searchParams.get("signature") || "";
+  const delivery = url.searchParams.get("delivery") || "";
 
   if (!orderId || !type || !slug || !expires || !signature) {
     return sendJson(response, 400, {
@@ -47,24 +49,6 @@ export default async function handler(request, response) {
     return sendJson(response, 404, {
       ok: false,
       message: "Order not found."
-    });
-  }
-
-  const accessToken =
-    getRequestHeader(request, "x-order-access-token") ||
-    readOrderAccessTokenFromCookies(parseCookies(request), orderId);
-
-  if (!accessToken) {
-    return sendJson(response, 401, {
-      ok: false,
-      message: "Order access token is required."
-    });
-  }
-
-  if (!verifyOrderAccessToken(order, accessToken)) {
-    return sendJson(response, 403, {
-      ok: false,
-      message: "Order access token is invalid."
     });
   }
 
@@ -83,11 +67,38 @@ export default async function handler(request, response) {
     });
   }
 
-  if (!verifyProtectedDownloadSignature(order, item, expires, signature)) {
-    return sendJson(response, 403, {
-      ok: false,
-      message: "Download link has expired or is invalid."
-    });
+  if (delivery === "email") {
+    if (!verifyEmailDownloadSignature(order, item, expires, signature)) {
+      return sendJson(response, 403, {
+        ok: false,
+        message: "Email download link has expired or is invalid."
+      });
+    }
+  } else {
+    const accessToken =
+      getRequestHeader(request, "x-order-access-token") ||
+      readOrderAccessTokenFromCookies(parseCookies(request), orderId);
+
+    if (!accessToken) {
+      return sendJson(response, 401, {
+        ok: false,
+        message: "Order access token is required."
+      });
+    }
+
+    if (!verifyOrderAccessToken(order, accessToken)) {
+      return sendJson(response, 403, {
+        ok: false,
+        message: "Order access token is invalid."
+      });
+    }
+
+    if (!verifyProtectedDownloadSignature(order, item, expires, signature)) {
+      return sendJson(response, 403, {
+        ok: false,
+        message: "Download link has expired or is invalid."
+      });
+    }
   }
 
   response.setHeader("Cache-Control", "no-store");
