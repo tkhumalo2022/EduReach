@@ -1,11 +1,50 @@
 (() => {
   const SELECTOR = '[data-cms-list][data-cms-type="ebooks"]';
   const FALLBACK_DELAY_MS = 1200;
+  const STYLE_ID = 'edureach-ebook-cover-fix';
 
   function start() {
+    injectEbookCoverStyles();
+
     document.querySelectorAll(SELECTOR).forEach((container) => {
+      container.classList.add('ebooks-grid');
       window.setTimeout(() => restoreEbooks(container), FALLBACK_DELAY_MS);
     });
+  }
+
+  function injectEbookCoverStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      ${SELECTOR} .cms-card {
+        overflow: hidden;
+      }
+
+      ${SELECTOR} .cms-card-image {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        height: auto;
+        padding: 0.75rem;
+        object-fit: contain;
+        object-position: center;
+        border: 1px solid rgba(6, 59, 130, 0.1);
+        border-radius: var(--radius);
+        background:
+          linear-gradient(135deg, rgba(234, 243, 255, 0.96), rgba(255, 245, 217, 0.92)),
+          var(--blue-soft);
+      }
+
+      ${SELECTOR} .cms-card h3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    `;
+
+    document.head.append(style);
   }
 
   async function restoreEbooks(container) {
@@ -39,7 +78,7 @@
 
   function createCard(item) {
     const article = document.createElement('article');
-    article.className = 'resource-card cms-card reveal is-visible';
+    article.className = 'resource-card cms-card cms-card-ebooks reveal is-visible';
 
     if (item.image?.url) {
       const image = document.createElement('img');
