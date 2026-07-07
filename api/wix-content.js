@@ -6,7 +6,7 @@ import {
   getWixConnectionStatus
 } from "../src/lib/wixContent.js";
 import crypto from "node:crypto";
-import { getRequestHeader } from "../src/lib/security.js";
+import { enforceRateLimit, getRequestHeader } from "../src/lib/security.js";
 
 const CACHE_HEADER = "s-maxage=300, stale-while-revalidate=600";
 
@@ -21,6 +21,14 @@ export default async function handler(req, res) {
   if (req.method && req.method !== "GET") {
     res.setHeader("Allow", "GET");
     sendJson(res, { ok: false, message: "Method not allowed." }, 405);
+    return;
+  }
+
+  if (!(await enforceRateLimit(req, res, {
+    name: "wix-content",
+    limit: 120,
+    windowSeconds: 60
+  }))) {
     return;
   }
 
@@ -89,18 +97,37 @@ function sanitizeCmsResult(result, options = {}) {
   if (options.itemMode) {
     return {
       configured: true,
-      item: result?.item || null,
+      item: sanitizePublicCmsItem(result?.item || null),
       ...(result?.error ? { message: "Content is unavailable right now." } : {})
     };
   }
 
   return {
     configured: true,
-    items: Array.isArray(result?.items) ? result.items : [],
+    items: Array.isArray(result?.items) ? result.items.map(sanitizePublicCmsItem) : [],
     filters: result?.filters || { categories: [] },
     pagination: result?.pagination,
     ...(result?.error ? { message: "Content is unavailable right now." } : {})
   };
+}
+
+function sanitizePublicCmsItem(item) {
+  if (!item || typeof item !== "object") return item || null;
+
+  const safeItem = { ...item };
+
+  if (isPaidProtectedResource(safeItem)) {
+    safeItem.fileUrl = "";
+    safeItem.downloadLink = "";
+  }
+
+  return safeItem;
+}
+
+function isPaidProtectedResource(item) {
+  const type = String(item.type || "").toLowerCase();
+  const accessType = String(item.accessType || "").toLowerCase();
+  return ["ebooks", "downloads"].includes(type) && accessType === "paid";
 }
 
 function canReturnDebug(req) {
