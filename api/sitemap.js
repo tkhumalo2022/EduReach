@@ -1,7 +1,7 @@
 import { getContentList } from "../src/lib/wixContent.js";
 import { buildSitemapXml } from "../src/lib/seo.js";
 
-const CACHE_HEADER = "s-maxage=300, stale-while-revalidate=600";
+const CACHE_HEADER = "s-maxage=3600, stale-while-revalidate=86400";
 const CMS_SITEMAP_TYPES = ["articles", "blogs", "downloads", "ebooks", "gallery", "workshops"];
 const STATIC_SITEMAP_PATHS = [
   "/",
@@ -19,6 +19,9 @@ const STATIC_SITEMAP_PATHS = [
   "/partners",
   "/testimonials"
 ];
+const CMS_PAGE_LIMIT = 50;
+const CMS_MAX_PAGES = 50;
+const CMS_RETRY_DELAYS_MS = [150, 450];
 
 export default async function handler(req, res) {
   if (req.method && req.method !== "GET" && req.method !== "HEAD") {
@@ -32,7 +35,7 @@ export default async function handler(req, res) {
     ...STATIC_SITEMAP_PATHS.map((path) => ({ loc: path })),
     ...(await getCmsSitemapEntries())
   ];
-  const xml = buildSitemapXml(entries);
+  const xml = buildSitemapXml(dedupeEntries(entries));
 
   res.statusCode = 200;
   res.setHeader("Cache-Control", CACHE_HEADER);
@@ -46,15 +49,14 @@ export default async function handler(req, res) {
 }
 
 async function getCmsSitemapEntries() {
-  const entries = [];
-
-  await Promise.all(
+  const groups = await Promise.all(
     CMS_SITEMAP_TYPES.map(async (type) => {
+      const entries = [];
       let page = 1;
       let hasMore = true;
 
-      while (hasMore && page <= 50) {
-        const result = await getContentList(type, { limit: 50, page });
+      while (hasMore && page <= CMS_MAX_PAGES) {
+        const result = await getContentListWithRetry(type, page);
         if (!result?.configured || result.error) break;
 
         (result.items || []).forEach((item) => {
@@ -68,8 +70,40 @@ async function getCmsSitemapEntries() {
         hasMore = Boolean(result.pagination?.hasMore);
         page += 1;
       }
+
+      return entries;
     })
   );
 
-  return entries;
+  return groups.flat();
+}
+
+async function getContentListWithRetry(type, page) {
+  let result = await getContentList(type, { limit: CMS_PAGE_LIMIT, page });
+
+  for (const delayMs of CMS_RETRY_DELAYS_MS) {
+    if (!result?.error) return result;
+    await delay(delayMs);
+    result = await getContentList(type, { limit: CMS_PAGE_LIMIT, page });
+  }
+
+  return result;
+}
+
+function dedupeEntries(entries) {
+  const unique = new Map();
+
+  for (const entry of entries) {
+    if (!entry?.loc) continue;
+    const existing = unique.get(entry.loc);
+    if (!existing || (!existing.lastmod && entry.lastmod)) {
+      unique.set(entry.loc, entry);
+    }
+  }
+
+  return [...unique.values()];
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
