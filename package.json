@@ -8,7 +8,7 @@
     "test": "node --test",
     "typecheck": "tsc --noEmit",
     "optimize": "node scripts/optimize-static-site.mjs",
-    "build": "node scripts/validate-js.mjs && node scripts/optimize-static-site.mjs"
+    "build": "node scripts/validate-js.mjs && tsc --noEmit && node --test && node scripts/optimize-static-site.mjs"
   },
   "dependencies": {
     "@vercel/functions": "^3.7.5",
