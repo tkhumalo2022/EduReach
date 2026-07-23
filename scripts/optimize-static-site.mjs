@@ -24,7 +24,7 @@ async function optimizeIndex() {
     rel="preload"
     as="image"
     href="assets/images/hero-inclusive-classroom-1200.webp"
-    imagesrcset="assets/images/hero-inclusive-classroom-800.webp 800w, assets/images/hero-inclusive-classroom-1200.webp 1200w, assets/images/hero-inclusive-classroom-1600.webp 1586w"
+    imagesrcset="assets/images/hero-inclusive-classroom-800.webp 800w, assets/images/hero-inclusive-classroom-1200.webp 1200w"
     imagesizes="100vw"
     type="image/webp"
     fetchpriority="high"
@@ -44,11 +44,11 @@ async function optimizeIndex() {
     `      <img
         class="hero-image"
         src="assets/images/hero-inclusive-classroom-1200.webp"
-        srcset="assets/images/hero-inclusive-classroom-800.webp 800w, assets/images/hero-inclusive-classroom-1200.webp 1200w, assets/images/hero-inclusive-classroom-1600.webp 1586w"
+        srcset="assets/images/hero-inclusive-classroom-800.webp 800w, assets/images/hero-inclusive-classroom-1200.webp 1200w"
         sizes="100vw"
         alt="Teacher supporting diverse learners in a bright classroom"
-        width="1586"
-        height="992"
+        width="1200"
+        height="751"
         loading="eager"
         decoding="async"
         fetchpriority="high"
@@ -68,11 +68,11 @@ async function optimizeIndex() {
           />`,
     `          <img
             src="assets/images/about-learning-support-768.webp"
-            srcset="assets/images/about-learning-support-480.webp 480w, assets/images/about-learning-support-768.webp 768w, assets/images/about-learning-support-1024.webp 1024w"
+            srcset="assets/images/about-learning-support-480.webp 480w, assets/images/about-learning-support-768.webp 768w"
             sizes="(min-width: 900px) 42vw, 100vw"
             alt="Learner receiving individual support during a school activity"
-            width="1024"
-            height="1536"
+            width="768"
+            height="1152"
             loading="lazy"
             decoding="async"
           />`,
@@ -92,12 +92,12 @@ async function optimizeIndex() {
       />`,
     `      <img
         class="cta-image"
-        src="assets/images/about-learning-support-1024.webp"
-        srcset="assets/images/about-learning-support-480.webp 480w, assets/images/about-learning-support-768.webp 768w, assets/images/about-learning-support-1024.webp 1024w"
+        src="assets/images/about-learning-support-768.webp"
+        srcset="assets/images/about-learning-support-480.webp 480w, assets/images/about-learning-support-768.webp 768w"
         sizes="100vw"
         alt=""
-        width="1024"
-        height="1536"
+        width="768"
+        height="1152"
         loading="lazy"
         decoding="async"
       />`,
