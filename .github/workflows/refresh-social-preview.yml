@@ -1,0 +1,39 @@
+name: Refresh social preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/refresh-social-preview.yml"
+      - "scripts/refresh-social-preview.mjs"
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Refresh metadata and capture homepage
+        run: node scripts/refresh-social-preview.mjs
+      - name: Commit preview and metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/images/social-preview.png
+          if git diff --cached --quiet; then
+            echo "No preview change detected."
+          else
+            git commit -m "Use real EduReach homepage preview"
+            git push
+          fi
