@@ -51,6 +51,18 @@
   ],
   "rewrites": [
     {
+      "source": "/api/admin/login",
+      "destination": "/api/contact?adminAction=login"
+    },
+    {
+      "source": "/api/admin/session",
+      "destination": "/api/contact?adminAction=session"
+    },
+    {
+      "source": "/api/admin/logout",
+      "destination": "/api/contact?adminAction=logout"
+    },
+    {
       "source": "/admin",
       "destination": "/admin/index.html"
     },

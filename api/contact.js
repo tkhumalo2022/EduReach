@@ -5,6 +5,7 @@ import {
   readJsonBody,
   sendJson
 } from "../src/lib/security.js";
+import { handleAdminApi } from "../src/lib/adminApi.js";
 
 const LIMITS = Object.freeze({
   name: 120,
@@ -23,6 +24,13 @@ function clean(value, maxLength = 4000) {
 }
 
 export default async function handler(request, response) {
+  const requestUrl = new URL(request.url || "/api/contact", "https://edureach.network");
+  const adminAction = requestUrl.searchParams.get("adminAction");
+
+  if (adminAction) {
+    return handleAdminApi(request, response, adminAction);
+  }
+
   if (request.method === "GET") {
     return sendJson(response, 200, {
       ok: true,
