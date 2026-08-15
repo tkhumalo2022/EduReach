@@ -17,6 +17,7 @@ A modern, responsive one-page website for EduReach, an Inclusive Education Consu
 - WhatsApp buttons configured through `site-config.js`
 - Google Maps placeholder
 - SEO metadata and accessible semantic HTML
+- Secure `/admin` login and a Wix CMS publishing workspace
 
 ## Before publishing
 
@@ -63,6 +64,12 @@ Read:
 - `docs/edureach-owner-guide.md`
 
 The expected Wix CMS collection IDs are `articles`, `blogPosts`, `Import5`, `downloadableResources`, `workshopAlbums`, `galleryAlbums`, `teamMembers`, `partnersSponsors` and `testimonials`. Wix's built-in draft/publish controls manage visibility; do not add a separate manual status field.
+
+## Admin workspace
+
+The publishing hub is available at `/admin`. It uses a rate-limited server-side login and an HttpOnly, SameSite session cookie. Successful sessions are stored server-side through Vercel Runtime Cache and expire automatically.
+
+The first-login admin email is `edureach70@gmail.com`. Rotate the bundled first-login password after handover by setting `EDUREACH_ADMIN_EMAIL` and `EDUREACH_ADMIN_PASSWORD_HASH` in Vercel. The dashboard does not expose Wix credentials; publishing continues through the authorised Wix dashboard.
 
 ## Shopping cart and PayFast checkout
 

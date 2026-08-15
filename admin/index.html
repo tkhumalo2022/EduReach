@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="theme-color" content="#063b82" />
+  <title>Admin Workspace | EduReach</title>
+  <link rel="icon" href="/assets/logo-mark.png" type="image/png" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <script src="/admin/admin.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#admin-main">Skip to admin workspace</a>
+
+  <main class="admin-main" id="admin-main">
+    <section class="login-view" data-login-view aria-labelledby="login-title">
+      <aside class="brand-panel" aria-label="EduReach admin introduction">
+        <a class="brand-lockup" href="/" aria-label="Return to EduReach website">
+          <img src="/assets/logo.png" alt="EduReach" width="320" height="92" />
+        </a>
+
+        <div class="brand-copy">
+          <p class="eyebrow">Secure admin workspace</p>
+          <h1>Manage the stories and resources that move inclusion forward.</h1>
+          <p>
+            A focused workspace for publishing articles, uploading learning resources,
+            sharing workshop moments and keeping EduReach content current.
+          </p>
+        </div>
+
+        <ol class="workflow-list" aria-label="Publishing workflow">
+          <li><span>1</span><div><strong>Create</strong><small>Add approved content in Wix CMS.</small></div></li>
+          <li><span>2</span><div><strong>Review</strong><small>Check consent, accessibility and details.</small></div></li>
+          <li><span>3</span><div><strong>Publish</strong><small>Make it live on the EduReach website.</small></div></li>
+        </ol>
+
+        <p class="brand-footnote">EduReach Inclusive Education Consultancy</p>
+      </aside>
+
+      <div class="login-panel">
+        <div class="login-card">
+          <div class="mobile-logo" aria-hidden="true">
+            <img src="/assets/logo.png" alt="" width="260" height="75" />
+          </div>
+          <div class="lock-badge" aria-hidden="true">ER</div>
+          <p class="eyebrow">Authorised access only</p>
+          <h2 id="login-title">Welcome back</h2>
+          <p class="login-intro">Sign in to continue to the EduReach publishing workspace.</p>
+
+          <form class="login-form" data-login-form novalidate>
+            <label for="admin-email">Admin email</label>
+            <input
+              id="admin-email"
+              name="email"
+              type="email"
+              autocomplete="username"
+              inputmode="email"
+              placeholder="name@example.com"
+              required
+            />
+
+            <div class="password-label-row">
+              <label for="admin-password">Password</label>
+              <button class="text-button" type="button" data-password-toggle aria-controls="admin-password">
+                Show
+              </button>
+            </div>
+            <input
+              id="admin-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              minlength="12"
+              required
+            />
+
+            <p class="form-message" data-login-message role="status" aria-live="polite"></p>
+
+            <button class="primary-button login-button" type="submit" data-login-button>
+              <span>Sign in securely</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </form>
+
+          <div class="security-note">
+            <span aria-hidden="true">✓</span>
+            <p>Your session is protected and automatically expires.</p>
+          </div>
+
+          <a class="back-link" href="/">← Back to the public website</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-view" data-dashboard-view hidden aria-labelledby="dashboard-title">
+      <header class="dashboard-header">
+        <a class="dashboard-brand" href="/" aria-label="Open EduReach public website">
+          <img src="/assets/logo.png" alt="EduReach" width="320" height="92" />
+        </a>
+        <div class="header-actions">
+          <span class="secure-pill"><i aria-hidden="true"></i> Secure session</span>
+          <a class="secondary-button" href="/" target="_blank" rel="noopener">View website</a>
+          <button class="ghost-button" type="button" data-logout>Sign out</button>
+        </div>
+      </header>
+
+      <div class="dashboard-shell">
+        <aside class="dashboard-sidebar" aria-label="Admin navigation">
+          <p class="sidebar-label">Workspace</p>
+          <nav>
+            <a class="active" href="#overview">Overview</a>
+            <a href="#publish">Publish content</a>
+            <a href="#checklist">Publishing checklist</a>
+            <a href="#tools">Website tools</a>
+          </nav>
+          <div class="sidebar-help">
+            <span aria-hidden="true">?</span>
+            <strong>Need a reminder?</strong>
+            <p>Use the checklist before making any item public.</p>
+          </div>
+        </aside>
+
+        <div class="dashboard-content">
+          <section class="welcome-row" id="overview">
+            <div>
+              <p class="eyebrow">EduReach content centre</p>
+              <h1 id="dashboard-title" tabindex="-1">Good <span data-day-period>day</span>, <span data-admin-name>Admin</span>.</h1>
+              <p>Everything you need to keep the EduReach website useful, current and trustworthy.</p>
+            </div>
+            <a class="primary-button" href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">
+              Open Wix CMS <span aria-hidden="true">↗</span>
+            </a>
+          </section>
+
+          <section class="status-grid" aria-label="Website status">
+            <article class="status-card">
+              <span class="status-icon blue" aria-hidden="true">WEB</span>
+              <div><p>Public website</p><strong>Live</strong></div>
+              <i class="status-dot is-live" aria-hidden="true"></i>
+            </article>
+            <article class="status-card">
+              <span class="status-icon teal" aria-hidden="true">CMS</span>
+              <div><p>Wix content</p><strong data-cms-status>Checking…</strong></div>
+              <i class="status-dot" data-cms-dot aria-hidden="true"></i>
+            </article>
+            <article class="status-card">
+              <span class="status-icon gold" aria-hidden="true">LIB</span>
+              <div><p>Content library</p><strong data-content-count>Loading…</strong></div>
+              <i class="status-dot" data-library-dot aria-hidden="true"></i>
+            </article>
+          </section>
+
+          <section class="dashboard-section" id="publish" aria-labelledby="publish-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Quick actions</p>
+                <h2 id="publish-title">What would you like to publish?</h2>
+              </div>
+              <p>Content opens in Wix, where you can save a draft, review it and publish when ready.</p>
+            </div>
+
+            <div class="publish-grid">
+              <article class="publish-card">
+                <span class="publish-number">01</span>
+                <div class="publish-card-copy">
+                  <p class="card-kicker">Knowledge</p>
+                  <h3>Article or blog post</h3>
+                  <p>Share research-informed guidance, inclusion stories and practical advice.</p>
+                </div>
+                <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">Create in Wix <span aria-hidden="true">↗</span></a>
+              </article>
+
+              <article class="publish-card">
+                <span class="publish-number">02</span>
+                <div class="publish-card-copy">
+                  <p class="card-kicker">Learning library</p>
+                  <h3>Resource or ebook</h3>
+                  <p>Upload useful PDFs, guides and paid or free educational materials.</p>
+                </div>
+                <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">Upload in Wix <span aria-hidden="true">↗</span></a>
+              </article>
+
+              <article class="publish-card">
+                <span class="publish-number">03</span>
+                <div class="publish-card-copy">
+                  <p class="card-kicker">In the community</p>
+                  <h3>Workshop or gallery</h3>
+                  <p>Publish approved event photos only after learner consent has been confirmed.</p>
+                </div>
+                <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">Add an album <span aria-hidden="true">↗</span></a>
+              </article>
+
+              <article class="publish-card">
+                <span class="publish-number">04</span>
+                <div class="publish-card-copy">
+                  <p class="card-kicker">Trust and people</p>
+                  <h3>Team, partner or testimonial</h3>
+                  <p>Keep profiles, partnerships and approved impact stories accurate.</p>
+                </div>
+                <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">Manage in Wix <span aria-hidden="true">↗</span></a>
+              </article>
+            </div>
+          </section>
+
+          <section class="dashboard-section content-snapshot" aria-labelledby="snapshot-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Live snapshot</p>
+                <h2 id="snapshot-title">Recently published</h2>
+              </div>
+              <button class="secondary-button" type="button" data-refresh-content>Refresh</button>
+            </div>
+            <div class="recent-list" data-recent-list aria-live="polite">
+              <p class="loading-state">Loading published content…</p>
+            </div>
+          </section>
+
+          <section class="dashboard-section checklist-card" id="checklist" aria-labelledby="checklist-title">
+            <div class="checklist-intro">
+              <p class="eyebrow">Before you publish</p>
+              <h2 id="checklist-title">Protect trust at every step.</h2>
+              <p>Run through these checks for every new item. They keep EduReach accurate, accessible and respectful.</p>
+            </div>
+            <ul class="checklist">
+              <li><span>01</span><div><strong>Facts verified</strong><p>Names, dates, qualifications, prices and claims are correct.</p></div></li>
+              <li><span>02</span><div><strong>Consent confirmed</strong><p>Every learner or workshop image has the required permission.</p></div></li>
+              <li><span>03</span><div><strong>Accessible content</strong><p>Images have useful alt text and headings are clear.</p></div></li>
+              <li><span>04</span><div><strong>Draft reviewed</strong><p>Preview the item before selecting Publish in Wix.</p></div></li>
+            </ul>
+          </section>
+
+          <section class="dashboard-section" id="tools" aria-labelledby="tools-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Shortcuts</p>
+                <h2 id="tools-title">Website tools</h2>
+              </div>
+            </div>
+            <div class="tool-grid">
+              <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener"><strong>Wix CMS</strong><span>Draft, publish or unpublish content ↗</span></a>
+              <a href="https://vercel.com/tkhumalo2022s-projects/edureach-website" target="_blank" rel="noopener"><strong>Vercel</strong><span>Check website deployments ↗</span></a>
+              <a href="https://github.com/tkhumalo2022/EduReach" target="_blank" rel="noopener"><strong>GitHub</strong><span>View website source ↗</span></a>
+              <a href="/docs/edureach-owner-guide.md" target="_blank" rel="noopener"><strong>Owner guide</strong><span>Open the publishing instructions ↗</span></a>
+            </div>
+          </section>
+
+          <footer class="dashboard-footer">
+            <p>EduReach Admin Workspace</p>
+            <p>Only publish verified and approved content.</p>
+          </footer>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

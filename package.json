@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "vite",
     "lint": "node scripts/validate-js.mjs",
     "test": "node --test",
     "typecheck": "tsc --noEmit",
@@ -15,6 +16,7 @@
     "@wix/sdk": "^1.21.12"
   },
   "devDependencies": {
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vite": "^7.1.2"
   }
 }
