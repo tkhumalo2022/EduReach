@@ -39,6 +39,12 @@ test("admin password verification accepts the correct password only", async () =
   assert.equal(await verifyScryptPassword("wrong password", hash), false);
 });
 
+test("admin password verification safely handles invalid hash structures", async () => {
+  assert.equal(await verifyScryptPassword("password123", "invalid-hash-string"), false);
+  assert.equal(await verifyScryptPassword("password123", "scrypt$16384$8$1$bad$hash"), false);
+  assert.equal(await verifyScryptPassword("password123", "bcrypt$16384$8$1$salt$hash"), false);
+});
+
 test("admin credentials normalize email casing and whitespace", async () => {
   const config = {
     email: "admin@edureach.network",
