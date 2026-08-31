@@ -1,3 +1,5 @@
+import { getAdminSession } from '../src/lib/adminAuth.js';
+import { enforceRateLimit, sendJson } from '../src/lib/security.js';
 import { buildPurchaseEmail } from './email-template.js';
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
@@ -5,16 +7,29 @@ const RESEND_API_URL = 'https://api.resend.com/emails';
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Use POST' });
+    return sendJson(res, 405, { ok: false, error: 'Use POST' });
+  }
+
+  if (!(await enforceRateLimit(req, res, {
+    name: "send-test-purchase-email",
+    limit: 5,
+    windowSeconds: 60
+  }))) {
+    return undefined;
+  }
+
+  const session = await getAdminSession(req);
+  if (!session) {
+    return sendJson(res, 401, { ok: false, error: 'Unauthorized. Admin authentication required.' });
   }
 
   if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({ error: 'Missing RESEND_API_KEY in Vercel environment variables' });
+    return sendJson(res, 500, { ok: false, error: 'Missing RESEND_API_KEY in Vercel environment variables' });
   }
 
   const data = req.body || {};
   if (!data.customerEmail) {
-    return res.status(400).json({ error: 'customerEmail is required' });
+    return sendJson(res, 400, { ok: false, error: 'customerEmail is required' });
   }
 
   const email = {
@@ -36,8 +51,8 @@ export default async function handler(req, res) {
   const result = await resendResponse.json();
 
   if (!resendResponse.ok) {
-    return res.status(resendResponse.status).json({ error: 'Resend failed', details: result });
+    return sendJson(res, resendResponse.status, { ok: false, error: 'Resend failed', details: result });
   }
 
-  return res.status(200).json({ ok: true, id: result.id });
+  return sendJson(res, 200, { ok: true, id: result.id });
 }
