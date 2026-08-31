@@ -56,6 +56,28 @@ test("admin credentials normalize email casing and whitespace", async () => {
   );
 });
 
+test("admin config fails closed when credentials are absent", async () => {
+  const config = getAdminConfig({});
+
+  assert.equal(config.configured, false);
+  assert.equal(config.email, "");
+  assert.equal(config.passwordHash, "");
+  assert.equal(await verifyAdminCredentials("admin@example.com", "any password", config), false);
+});
+
+test("admin config reports configured only when both credential values exist", () => {
+  const complete = getAdminConfig({
+    EDUREACH_ADMIN_EMAIL: "admin@edureach.network",
+    EDUREACH_ADMIN_PASSWORD_HASH: passwordHash("configured password")
+  });
+  const missingHash = getAdminConfig({
+    EDUREACH_ADMIN_EMAIL: "admin@edureach.network"
+  });
+
+  assert.equal(complete.configured, true);
+  assert.equal(missingHash.configured, false);
+});
+
 test("admin config clamps the session lifetime", () => {
   assert.equal(getAdminConfig({ EDUREACH_ADMIN_SESSION_HOURS: "99" }).sessionHours, 24);
   assert.equal(getAdminConfig({ EDUREACH_ADMIN_SESSION_HOURS: "0" }).sessionHours, 1);
