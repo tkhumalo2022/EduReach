@@ -2,6 +2,8 @@
 
 A production education consultancy platform built for EduReach in South Africa. The project combines a responsive public website, CMS-managed resources, an owner publishing workspace and a secure digital-resource checkout flow.
 
+Live site: https://edureach.network
+
 ## What I built
 
 EduReach started as a public-facing consultancy website and grew into a practical content and commerce platform. The implementation focuses on keeping everyday content manageable for the organisation while sensitive operations remain server-side.
