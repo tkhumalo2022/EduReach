@@ -61,6 +61,13 @@ async function handleLogin(request, response) {
   }
 
   const config = getAdminConfig();
+  if (!config.configured) {
+    return sendJson(response, 503, {
+      ok: false,
+      message: "Admin sign-in is not configured."
+    });
+  }
+
   const authenticated = await verifyAdminCredentials(body.email, body.password, config);
 
   if (!authenticated) {
