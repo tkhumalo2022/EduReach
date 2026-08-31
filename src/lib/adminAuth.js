@@ -6,9 +6,6 @@ import { getRequestHeader, parseCookies } from "./security.js";
 export const ADMIN_COOKIE_NAME = "__Host-edureach_admin";
 
 const ADMIN_SESSION_NAMESPACE = "edureach-admin-sessions";
-const DEFAULT_ADMIN_EMAIL = "edureach70@gmail.com";
-const DEFAULT_ADMIN_PASSWORD_HASH =
-  "scrypt$16384$8$1$RNCi4IrumHASjP6aIzyzuw$c5dvfdVlVIMz_rEa0Oasee11yEA5ehsva0NS3ct3z9w";
 const DEFAULT_SESSION_HOURS = 8;
 const MIN_SESSION_HOURS = 1;
 const MAX_SESSION_HOURS = 24;
@@ -31,17 +28,27 @@ export function getAdminConfig(env = process.env) {
     MIN_SESSION_HOURS,
     MAX_SESSION_HOURS
   );
+  const email = String(env.EDUREACH_ADMIN_EMAIL || "").trim().toLowerCase();
+  const passwordHash = String(env.EDUREACH_ADMIN_PASSWORD_HASH || "").trim();
 
   return {
-    email: String(env.EDUREACH_ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL).trim().toLowerCase(),
-    passwordHash: String(env.EDUREACH_ADMIN_PASSWORD_HASH || DEFAULT_ADMIN_PASSWORD_HASH).trim(),
-    sessionHours
+    email,
+    passwordHash,
+    sessionHours,
+    configured: Boolean(email && passwordHash)
   };
 }
 
 export async function verifyAdminCredentials(email, password, config = getAdminConfig()) {
   const suppliedEmail = String(email || "").trim().toLowerCase();
   const suppliedPassword = String(password || "");
+  const configured = config?.configured ?? Boolean(config?.email && config?.passwordHash);
+
+  if (!configured) {
+    await runFakePasswordCheck(suppliedPassword);
+    return false;
+  }
+
   const emailMatches = safeEqual(suppliedEmail, config.email);
   const passwordMatches = await verifyScryptPassword(suppliedPassword, config.passwordHash);
   return emailMatches && passwordMatches;
