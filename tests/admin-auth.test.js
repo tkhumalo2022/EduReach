@@ -83,6 +83,30 @@ test("admin config clamps the session lifetime", () => {
   assert.equal(getAdminConfig({ EDUREACH_ADMIN_SESSION_HOURS: "0" }).sessionHours, 1);
 });
 
+test("admin email matching safeEqual handles different length strings safely", async () => {
+  const config = {
+    email: "admin@edureach.network",
+    passwordHash: passwordHash("a strong test password"),
+    sessionHours: 8
+  };
+
+  // Matching email
+  assert.equal(
+    await verifyAdminCredentials("admin@edureach.network", "a strong test password", config),
+    true
+  );
+  // Shorter email
+  assert.equal(
+    await verifyAdminCredentials("a@b.co", "a strong test password", config),
+    false
+  );
+  // Longer email
+  assert.equal(
+    await verifyAdminCredentials("verylongemailaddress@edureach.network", "a strong test password", config),
+    false
+  );
+});
+
 test("admin session cookies are httpOnly, strict and secure in production", () => {
   const cookie = createAdminCookie("token-value", 3600, { secure: true });
   assert.match(cookie, new RegExp(`^${ADMIN_COOKIE_NAME}=`));
