@@ -1,43 +1,93 @@
-import { buildPurchaseEmail } from './email-template.js';
+import { buildPurchaseEmail } from "./email-template.js";
+import { AdminAuthError, getAdminSession, requireValidCsrf } from "../src/lib/adminAuth.js";
+import {
+  ApiRequestError,
+  enforceRateLimit,
+  methodNotAllowed,
+  readJsonBody,
+  sendJson
+} from "../src/lib/security.js";
 
-const RESEND_API_URL = 'https://api.resend.com/emails';
+const RESEND_API_URL = "https://api.resend.com/emails";
+const TEST_EMAIL_BODY_LIMIT_BYTES = 16 * 1024;
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Use POST' });
+export default async function handler(request, response) {
+  if (request.method !== "POST") {
+    return methodNotAllowed(response, ["POST"]);
+  }
+
+  if (!(await enforceRateLimit(request, response, {
+    name: "admin-test-email",
+    limit: 5,
+    windowSeconds: 60
+  }))) {
+    return undefined;
+  }
+
+  try {
+    const session = await getAdminSession(request);
+    if (!session) {
+      return sendJson(response, 401, { ok: false, message: "Authentication required." });
+    }
+    requireValidCsrf(request, session);
+  } catch (error) {
+    return sendJson(response, error instanceof AdminAuthError ? error.statusCode : 403, {
+      ok: false,
+      message: error instanceof AdminAuthError ? error.message : "Access denied."
+    });
   }
 
   if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({ error: 'Missing RESEND_API_KEY in Vercel environment variables' });
+    return sendJson(response, 500, {
+      ok: false,
+      message: "The email service is not configured yet."
+    });
   }
 
-  const data = req.body || {};
-  if (!data.customerEmail) {
-    return res.status(400).json({ error: 'customerEmail is required' });
+  let body;
+  try {
+    body = await readJsonBody(request, { maxBytes: TEST_EMAIL_BODY_LIMIT_BYTES });
+  } catch (error) {
+    return sendJson(response, error instanceof ApiRequestError ? error.statusCode : 400, {
+      ok: false,
+      message: error instanceof ApiRequestError ? error.message : "Invalid email request payload."
+    });
+  }
+
+  if (!body?.customerEmail) {
+    return sendJson(response, 400, { ok: false, message: "customerEmail is required." });
   }
 
   const email = {
-    from: process.env.EDUREACH_FROM_EMAIL || 'EduReach <onboarding@resend.dev>',
-    to: data.customerEmail,
-    subject: `${data.customerName || 'Your'} EduReach resource is ready to download`,
-    html: buildPurchaseEmail(data),
+    from: process.env.EDUREACH_FROM_EMAIL || "EduReach <onboarding@resend.dev>",
+    to: body.customerEmail,
+    subject: `${body.customerName || "Your"} EduReach resource is ready to download`,
+    html: buildPurchaseEmail(body)
   };
 
-  const resendResponse = await fetch(RESEND_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: ['Bearer', process.env.RESEND_API_KEY].join(' '),
-    },
-    body: JSON.stringify(email),
-  });
+  try {
+    const resendResponse = await fetch(RESEND_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`
+      },
+      body: JSON.stringify(email)
+    });
 
-  const result = await resendResponse.json();
+    const result = await resendResponse.json().catch(() => null);
 
-  if (!resendResponse.ok) {
-    return res.status(resendResponse.status).json({ error: 'Resend failed', details: result });
+    if (!resendResponse.ok) {
+      console.error("Resend test email failed.", {
+        status: resendResponse.status,
+        error: result?.message || result?.error
+      });
+      return sendJson(response, 502, { ok: false, message: "Failed to send test email." });
+    }
+
+    return sendJson(response, 200, { ok: true, id: result?.id });
+  } catch (error) {
+    console.error("Test email handler error.", error);
+    return sendJson(response, 502, { ok: false, message: "Test email service is unavailable." });
   }
-
-  return res.status(200).json({ ok: true, id: result.id });
 }
