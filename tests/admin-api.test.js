@@ -38,3 +38,17 @@ test("admin API rejects unknown actions", async () => {
 
   assert.equal(response.statusCode, 404);
 });
+
+test("send-test-purchase-email endpoint rejects unauthenticated requests", async () => {
+  const handler = (await import("../api/send-test-purchase-email.js")).default;
+  const request = { method: "POST", headers: {} };
+  const response = createResponse();
+
+  await handler(request, response);
+
+  assert.equal(response.statusCode, 401);
+  assert.deepEqual(JSON.parse(response.body), {
+    ok: false,
+    message: "Admin authentication required."
+  });
+});
