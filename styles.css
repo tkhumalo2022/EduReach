@@ -2713,3 +2713,109 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =====================================================
+   HEADER DESKTOP LAYOUT FIX
+   Keep injected cart + social actions on one deliberate row.
+   ===================================================== */
+
+@media (min-width: 1040px) {
+  .site-header .header-inner {
+    width: min(1500px, calc(100% - 3rem));
+    gap: clamp(0.75rem, 1.4vw, 1.5rem);
+  }
+
+  .site-header .brand {
+    width: clamp(184px, 14vw, 224px);
+  }
+
+  .site-header .brand img {
+    max-height: 62px;
+  }
+
+  .site-header .primary-nav {
+    min-width: 0;
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: clamp(0.08rem, 0.22vw, 0.26rem);
+  }
+
+  .site-header .primary-nav > a:not(.button) {
+    min-height: 40px;
+    flex: 0 0 auto;
+    padding: 0.5rem clamp(0.38rem, 0.48vw, 0.62rem);
+    font-size: clamp(0.78rem, 0.78vw, 0.9rem);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .site-header .primary-nav .button {
+    width: auto;
+    min-height: 40px;
+    flex: 0 0 auto;
+    margin-left: 0.32rem;
+    padding: 0.58rem 0.78rem;
+    font-size: clamp(0.78rem, 0.76vw, 0.88rem);
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+
+  .site-header .cart-nav-link {
+    gap: 0.34rem;
+  }
+
+  .site-header .cart-badge {
+    min-width: 1.2rem;
+    height: 1.2rem;
+    padding-inline: 0.3rem;
+    font-size: 0.68rem;
+  }
+
+  .site-header .header-social-links {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    margin: 0 0 0 0.2rem;
+    padding: 0;
+  }
+
+  .site-header .header-social-link {
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 2rem;
+    box-shadow: none;
+  }
+
+  .site-header .header-social-link .social-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+}
+
+@media (min-width: 1040px) and (max-width: 1199px) {
+  .site-header .header-inner {
+    width: calc(100% - 2rem);
+    gap: 0.65rem;
+  }
+
+  .site-header .brand {
+    width: 164px;
+  }
+
+  .site-header .primary-nav > a:not(.button) {
+    padding-inline: 0.32rem;
+    font-size: 0.74rem;
+  }
+
+  .site-header .primary-nav .button {
+    margin-left: 0.15rem;
+    padding-inline: 0.58rem;
+    font-size: 0.74rem;
+  }
+
+  .site-header .header-social-links {
+    display: none;
+  }
+}
