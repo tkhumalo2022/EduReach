@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { handleAdminApi } from "../src/lib/adminApi.js";
+import sendTestEmailHandler from "../api/send-test-purchase-email.js";
 
 function createResponse() {
   return {
@@ -37,4 +38,30 @@ test("admin API rejects unknown actions", async () => {
   await handleAdminApi(request, response, "unknown");
 
   assert.equal(response.statusCode, 404);
+});
+
+test("test purchase email handler rejects GET requests", async () => {
+  const request = { method: "GET", headers: {} };
+  const response = createResponse();
+
+  await sendTestEmailHandler(request, response);
+
+  assert.equal(response.statusCode, 405);
+});
+
+test("test purchase email handler rejects unauthenticated requests", async () => {
+  const request = {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ customerEmail: "test@example.com" })
+  };
+  const response = createResponse();
+
+  await sendTestEmailHandler(request, response);
+
+  assert.equal(response.statusCode, 401);
+  assert.deepEqual(JSON.parse(response.body), {
+    ok: false,
+    message: "Admin authentication is required to send test emails."
+  });
 });
