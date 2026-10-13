@@ -207,10 +207,11 @@ function getRateLimitCache() {
 }
 
 function rateLimitIdentity(request, name) {
-  const forwardedFor = getRequestHeader(request, "x-forwarded-for").split(",")[0].trim();
+  // Prioritize trusted edge proxy IP (x-real-ip) over x-forwarded-for to prevent spoofed XFF rate limit bypasses
   const realIp = getRequestHeader(request, "x-real-ip").trim();
+  const forwardedFor = getRequestHeader(request, "x-forwarded-for").split(",")[0].trim();
   const userAgent = getRequestHeader(request, "user-agent").slice(0, 160);
-  const identity = [forwardedFor || realIp || "unknown", userAgent].join("|");
+  const identity = [realIp || forwardedFor || "unknown", userAgent].join("|");
   const secret =
     process.env.EDUREACH_RATE_LIMIT_SECRET ||
     process.env.EDUREACH_BACKEND_SECRET ||
