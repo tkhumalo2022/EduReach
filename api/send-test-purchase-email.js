@@ -1,43 +1,64 @@
-import { buildPurchaseEmail } from './email-template.js';
+import { buildPurchaseEmail } from "./email-template.js";
+import { getAdminSession } from "../src/lib/adminAuth.js";
+import {
+  ApiRequestError,
+  enforceRateLimit,
+  methodNotAllowed,
+  readJsonBody,
+  sendJson
+} from "../src/lib/security.js";
 
-const RESEND_API_URL = 'https://api.resend.com/emails';
+const RESEND_API_URL = "https://api.resend.com/emails";
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Use POST' });
+  if (req.method !== "POST") return methodNotAllowed(res, ["POST"]);
+
+  if (!(await enforceRateLimit(req, res, { name: "send-test-email", limit: 5, windowSeconds: 60 }))) {
+    return undefined;
+  }
+
+  // Security: Require an active admin session to prevent unauthorized email sending / abuse
+  const session = await getAdminSession(req);
+  if (!session) {
+    return sendJson(res, 401, { error: "Unauthorized: Admin authentication required." });
   }
 
   if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({ error: 'Missing RESEND_API_KEY in Vercel environment variables' });
+    return sendJson(res, 500, { error: "Missing RESEND_API_KEY in environment variables." });
   }
 
-  const data = req.body || {};
-  if (!data.customerEmail) {
-    return res.status(400).json({ error: 'customerEmail is required' });
+  let data;
+  try {
+    data = await readJsonBody(req, { maxBytes: 16384 });
+  } catch (error) {
+    return sendJson(res, error instanceof ApiRequestError ? error.statusCode : 400, {
+      error: error instanceof ApiRequestError ? error.message : "Invalid JSON payload."
+    });
   }
+
+  if (!data.customerEmail) return sendJson(res, 400, { error: "customerEmail is required." });
 
   const email = {
-    from: process.env.EDUREACH_FROM_EMAIL || 'EduReach <onboarding@resend.dev>',
+    from: process.env.EDUREACH_FROM_EMAIL || "EduReach <onboarding@resend.dev>",
     to: data.customerEmail,
-    subject: `${data.customerName || 'Your'} EduReach resource is ready to download`,
-    html: buildPurchaseEmail(data),
+    subject: `${data.customerName || "Your"} EduReach resource is ready to download`,
+    html: buildPurchaseEmail(data)
   };
 
   const resendResponse = await fetch(RESEND_API_URL, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: ['Bearer', process.env.RESEND_API_KEY].join(' '),
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`
     },
-    body: JSON.stringify(email),
+    body: JSON.stringify(email)
   });
 
-  const result = await resendResponse.json();
+  const result = await resendResponse.json().catch(() => ({}));
 
   if (!resendResponse.ok) {
-    return res.status(resendResponse.status).json({ error: 'Resend failed', details: result });
+    return sendJson(res, resendResponse.status, { error: "Resend failed", details: result });
   }
 
-  return res.status(200).json({ ok: true, id: result.id });
+  return sendJson(res, 200, { ok: true, id: result.id });
 }
