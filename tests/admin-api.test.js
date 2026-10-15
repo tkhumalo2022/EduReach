@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { handleAdminApi } from "../src/lib/adminApi.js";
+import sendTestPurchaseEmailHandler from "../api/send-test-purchase-email.js";
 
 function createResponse() {
   return {
@@ -37,4 +38,31 @@ test("admin API rejects unknown actions", async () => {
   await handleAdminApi(request, response, "unknown");
 
   assert.equal(response.statusCode, 404);
+});
+
+test("send test purchase email handler rejects non-POST requests with 405", async () => {
+  const request = { method: "GET", headers: {} };
+  const response = createResponse();
+
+  await sendTestPurchaseEmailHandler(request, response);
+
+  assert.equal(response.statusCode, 405);
+  assert.equal(response.headers["allow"], "POST");
+  assert.deepEqual(JSON.parse(response.body), {
+    ok: false,
+    message: "Method not allowed."
+  });
+});
+
+test("send test purchase email handler rejects unauthenticated requests with 401", async () => {
+  const request = { method: "POST", headers: {} };
+  const response = createResponse();
+
+  await sendTestPurchaseEmailHandler(request, response);
+
+  assert.equal(response.statusCode, 401);
+  assert.deepEqual(JSON.parse(response.body), {
+    ok: false,
+    message: "Authentication required."
+  });
 });
