@@ -1,4 +1,5 @@
 import { buildPurchaseEmail } from './email-template.js';
+import { getAdminSession } from '../src/lib/adminAuth.js';
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
@@ -6,6 +7,11 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Use POST' });
+  }
+
+  const session = await getAdminSession(req);
+  if (!session) {
+    return res.status(401).json({ error: 'Unauthorized: Admin session required' });
   }
 
   if (!process.env.RESEND_API_KEY) {
