@@ -38,3 +38,45 @@ test("admin API rejects unknown actions", async () => {
 
   assert.equal(response.statusCode, 404);
 });
+
+test("send-test-purchase-email API rejects unauthenticated requests", async () => {
+  const handler = (await import("../api/send-test-purchase-email.js")).default;
+  const request = { method: "POST", headers: {} };
+  const response = createResponse();
+
+  await handler(request, response);
+
+  assert.equal(response.statusCode, 401);
+  assert.deepEqual(JSON.parse(response.body), {
+    ok: false,
+    error: "Admin authentication required"
+  });
+});
+
+test("send-test-purchase-email API rejects invalid CSRF tokens for active admin sessions", async () => {
+  const handler = (await import("../api/send-test-purchase-email.js")).default;
+  const { createAdminSession, createAdminCookie } = await import("../src/lib/adminAuth.js");
+
+  const sessionData = await createAdminSession(
+    { email: "admin@edureach.co.za", name: "EduReach Admin" },
+    { config: { email: "admin@edureach.co.za", sessionHours: 1 }, allowLocal: true }
+  );
+
+  const cookie = createAdminCookie(sessionData.token, sessionData.maxAgeSeconds);
+  const request = {
+    method: "POST",
+    headers: {
+      cookie,
+      "x-edureach-csrf": "invalid-csrf-token"
+    }
+  };
+  const response = createResponse();
+
+  await handler(request, response);
+
+  assert.equal(response.statusCode, 403);
+  assert.deepEqual(JSON.parse(response.body), {
+    ok: false,
+    error: "This admin request could not be verified."
+  });
+});
