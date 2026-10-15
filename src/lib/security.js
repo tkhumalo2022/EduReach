@@ -164,11 +164,13 @@ export async function enforceRateLimit(request, response, options = {}) {
 }
 
 export function parseCookies(request) {
+  const MAX_COOKIES = 50;
   return String(getRequestHeader(request, "cookie") || "")
     .split(";")
     .map((part) => part.trim())
     .filter(Boolean)
     .reduce((cookies, part) => {
+      if (Object.keys(cookies).length >= MAX_COOKIES) return cookies;
       const separator = part.indexOf("=");
       if (separator < 0) return cookies;
       const key = part.slice(0, separator).trim();

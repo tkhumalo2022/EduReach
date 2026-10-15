@@ -13,6 +13,7 @@ import {
   verifyAdminCredentials,
   verifyScryptPassword
 } from "../src/lib/adminAuth.js";
+import { parseCookies } from "../src/lib/security.js";
 
 function passwordHash(password) {
   const salt = Buffer.from("0123456789abcdef", "utf8");
@@ -124,4 +125,15 @@ test("admin sessions are stored server-side and can be revoked", async () => {
 
   await revokeAdminSession(request, { cache });
   assert.equal(await getAdminSession(request, { cache }), null);
+});
+
+test("parseCookies limits the parsed output object to 50 key-value pairs", () => {
+  const cookieHeader = Array.from({ length: 60 }, (_, i) => `cookie_${i}=val_${i}`).join("; ");
+  const request = { headers: { cookie: cookieHeader } };
+  const parsed = parseCookies(request);
+
+  assert.equal(Object.keys(parsed).length, 50);
+  assert.equal(parsed.cookie_0, "val_0");
+  assert.equal(parsed.cookie_49, "val_49");
+  assert.equal(parsed.cookie_50, undefined);
 });
