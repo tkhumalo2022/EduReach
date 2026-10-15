@@ -226,10 +226,9 @@ function sessionKey(token) {
 }
 
 function safeEqual(left, right) {
-  const leftBuffer = Buffer.from(String(left || ""), "utf8");
-  const rightBuffer = Buffer.from(String(right || ""), "utf8");
-  if (leftBuffer.length !== rightBuffer.length) return false;
-  return crypto.timingSafeEqual(leftBuffer, rightBuffer);
+  const leftHash = crypto.createHash("sha256").update(String(left || "")).digest();
+  const rightHash = crypto.createHash("sha256").update(String(right || "")).digest();
+  return crypto.timingSafeEqual(leftHash, rightHash);
 }
 
 function decodeBase64Url(value) {
