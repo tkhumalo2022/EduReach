@@ -15,6 +15,7 @@ export class ApiRequestError extends Error {
 export function sendJson(response, statusCode, payload) {
   response.setHeader?.("Cache-Control", "no-store");
   response.setHeader?.("Content-Type", "application/json; charset=utf-8");
+  response.setHeader?.("X-Content-Type-Options", "nosniff");
 
   if (typeof response.status === "function" && typeof response.json === "function") {
     return response.status(statusCode).json(payload);
@@ -28,6 +29,7 @@ export function sendJson(response, statusCode, payload) {
 export function sendText(response, statusCode, body) {
   response.setHeader?.("Cache-Control", "no-store");
   response.setHeader?.("Content-Type", "text/plain; charset=utf-8");
+  response.setHeader?.("X-Content-Type-Options", "nosniff");
   response.statusCode = statusCode;
   response.end?.(body);
   return undefined;
