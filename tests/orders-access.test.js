@@ -6,6 +6,7 @@ import contactHandler from "../api/contact.js";
 import ordersHandler from "../api/orders.js";
 import checkoutHandler from "../api/payfast/create-payment.js";
 import wixContentHandler from "../api/wix-content.js";
+import { sendJson, sendText } from "../src/lib/security.js";
 import {
   createOrder,
   createOrderAccessToken,
@@ -356,6 +357,16 @@ test("parses formatted paid resource prices into cents", () => {
   assert.equal(parsePriceToCents("R1,250.00"), 125000);
   assert.equal(parsePriceToCents("R 75"), 7500);
   assert.equal(parsePriceToCents("75.50"), 7550);
+});
+
+test("API response helpers include X-Content-Type-Options nosniff security header", () => {
+  const jsonResponse = createMockResponse();
+  sendJson(jsonResponse, 200, { ok: true });
+  assert.equal(jsonResponse.headers["x-content-type-options"], "nosniff");
+
+  const textResponse = createMockResponse();
+  sendText(textResponse, 200, "OK");
+  assert.equal(textResponse.headers["x-content-type-options"], "nosniff");
 });
 
 function createPaidOrder(options = {}) {
