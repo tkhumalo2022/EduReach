@@ -1,4 +1,6 @@
 import { buildPurchaseEmail } from './email-template.js';
+import { getAdminSession } from '../src/lib/adminAuth.js';
+import { enforceRateLimit } from '../src/lib/security.js';
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
@@ -6,6 +8,17 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Use POST' });
+  }
+
+  // Rate limit endpoint to prevent abuse or resource exhaustion
+  if (!(await enforceRateLimit(req, res, { name: 'test-email', limit: 5, windowSeconds: 60 }))) {
+    return;
+  }
+
+  // Security: Require active admin session to prevent unauthenticated email relay
+  const session = await getAdminSession(req);
+  if (!session) {
+    return res.status(401).json({ error: 'Unauthorized: Admin authentication required' });
   }
 
   if (!process.env.RESEND_API_KEY) {
