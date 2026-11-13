@@ -1,50 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="EduReach ebooks and digital publications." />
-  <title>Ebooks | EduReach</title>
-  <link rel="canonical" href="https://edureach.network/resources/ebooks" />
-  <meta property="og:title" content="Ebooks | EduReach" />
-  <meta property="og:description" content="EduReach ebooks and digital publications." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://edureach.network/resources/ebooks" />
-  <meta property="og:image" content="https://edureach.network/assets/images/hero-inclusive-classroom.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Ebooks | EduReach" />
-  <meta name="twitter:description" content="EduReach ebooks and digital publications." />
-  <meta name="twitter:image" content="https://edureach.network/assets/images/hero-inclusive-classroom.png" />
-  <link rel="icon" href="/assets/logo-mark.png" type="image/png" />
-  <link rel="stylesheet" href="/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Discover EduReach books and practical inclusive education guides for parents, teachers and learning support teams.">
+  <title>Books & Inclusive Learning Guides | EduReach</title>
+  <link rel="canonical" href="https://edureach.network/resources/ebooks">
+  <meta property="og:title" content="Books & Inclusive Learning Guides | EduReach">
+  <meta property="og:description" content="Practical inclusive education books and guides from EduReach.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://edureach.network/resources/ebooks">
+  <meta property="og:image" content="https://edureach.network/assets/images/hero-inclusive-classroom.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#073a72">
+  <link rel="icon" href="/assets/logo-mark.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/resources/ebooks/bookshop.css">
 </head>
-<body class="cms-page">
+<body class="cms-page bookshop-page">
+  <a class="skip-link" href="#main-content">Skip to books</a>
   <header class="site-header" data-header>
     <div class="container header-inner">
-      <a class="brand" href="/#home" aria-label="EduReach home"><img src="/assets/logo.png" alt="EduReach" width="320" height="92" /></a>
+      <a class="brand" href="/#home" aria-label="EduReach home"><img src="/assets/logo.png" alt="EduReach" width="320" height="92"></a>
       <nav class="primary-nav" aria-label="Primary navigation">
         <a href="/#home">Home</a>
-        <a href="/#resources" aria-current="page">Resources</a>
+        <a href="/resources/ebooks" aria-current="page">Books</a>
+        <a href="/#resources">Resources</a>
+        <a href="/cart">Cart</a>
         <a href="/#contact">Contact</a>
       </nav>
     </div>
   </header>
-  <main>
-    <section class="resources section cms-listing-page">
-      <div class="container">
-        <div class="section-heading section-heading-left">
-          <p class="eyebrow">Resources</p>
-          <h1>Ebooks</h1>
-          <p>Digital publications and guides from EduReach.</p>
+
+  <main id="main-content">
+    <section class="bookshop-hero" aria-labelledby="bookshop-title">
+      <div class="container bookshop-hero-grid">
+        <div class="bookshop-intro">
+          <span class="bookshop-kicker"><span aria-hidden="true">✦</span> THE EDUREACH READING ROOM</span>
+          <h1 id="bookshop-title">Better learning<br>begins with <em>understanding.</em></h1>
+          <p>Explore practical books and digital guides created to support inclusive classrooms, families and every learner's potential.</p>
+          <div class="bookshop-hero-actions"><a class="bookshop-primary" href="#all-books">Explore the library <span aria-hidden="true">↘</span></a><a class="bookshop-secondary" href="/#contact">Ask about a resource</a></div>
+          <div class="bookshop-meta"><span>Made for families & educators</span><span aria-hidden="true">·</span><span>Digital resources</span></div>
         </div>
-        <div class="resource-grid cms-grid" data-cms-list data-cms-type="ebooks" data-empty-message="New EduReach resources will be available soon."></div>
+        <div class="bookshop-hero-art" aria-hidden="true">
+          <div class="art-orbit art-orbit-one"></div><div class="art-orbit art-orbit-two"></div>
+          <div class="art-book art-book-back"><div class="art-line"></div><strong>EVERY<br>LEARNER<br>MATTERS</strong><span>EDUREACH</span></div>
+          <div class="art-book art-book-front"><small>INCLUSIVE EDUCATION</small><strong>LEARN.<br>GROW.<br>BELONG.</strong><i>✳</i><span>EDUREACH</span></div>
+          <div class="art-caption">Resources with purpose.</div>
+        </div>
       </div>
     </section>
+
+    <section class="bookshop-topics" aria-label="Subjects we cover">
+      <div class="container topics-inner"><span>EXPLORE BY FOCUS</span><p>Autism <b>·</b> ADHD <b>·</b> Down syndrome <b>·</b> Inclusive education <b>·</b> Parent & teacher support</p></div>
+    </section>
+
+    <section class="bookshop-featured" id="featured-books" hidden aria-labelledby="featured-title">
+      <div class="container"><div class="bookshop-section-heading"><div><span class="bookshop-kicker">FROM THE READING ROOM</span><h2 id="featured-title">Featured publication</h2></div><a href="#all-books">View all books ↘</a></div><div id="featured-book-spotlight"></div></div>
+    </section>
+
+    <section class="bookshop-library resources section cms-listing-page" id="all-books" aria-labelledby="books-heading">
+      <div class="container">
+        <div class="bookshop-section-heading"><div><span class="bookshop-kicker">THE LIBRARY</span><h2 id="books-heading">Find your next resource.</h2><p>Real titles published by EduReach. Browse the latest additions below.</p></div><span class="bookshop-library-count" id="book-count" aria-live="polite">Loading titles…</span></div>
+        <div class="resource-grid cms-grid" data-cms-list data-cms-type="ebooks" data-empty-message="We're preparing our first published guides. Explore our other resources or get in touch for recommendations."></div>
+      </div>
+    </section>
+
+    <section class="bookshop-bottom"><div class="container bookshop-bottom-content"><div><span class="bookshop-kicker">MORE THAN A BOOK</span><h2>Learning is better when we do it together.</h2><p>Pair the right resources with EduReach workshops and professional learning support.</p></div><a class="bookshop-primary" href="/#services">Explore EduReach services <span aria-hidden="true">↗</span></a></div></section>
   </main>
   <script src="/site-config.js"></script>
   <script src="/cart.js"></script>
   <script src="/script.js"></script>
   <script src="/cms.js"></script>
   <script src="/ebooks-fallback.js?v=1"></script>
+  <script src="/resources/ebooks/bookshop.js" defer></script>
 </body>
 </html>
