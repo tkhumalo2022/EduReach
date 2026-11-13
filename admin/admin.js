@@ -84,20 +84,6 @@
   initialise();
 
   async function initialise() {
-    const localDashboardPreview =
-      ["terminal.local", "localhost", "127.0.0.1"].includes(window.location.hostname) &&
-      new URLSearchParams(window.location.search).get("preview") === "dashboard";
-
-    if (localDashboardPreview) {
-      session = {
-        name: "EduReach Admin",
-        email: "edureach70@gmail.com",
-        csrfToken: "local-preview"
-      };
-      showDashboard(session);
-      return;
-    }
-
     loginView.setAttribute("aria-busy", "true");
 
     try {
@@ -122,6 +108,13 @@
   }
 
   function showDashboard(activeSession) {
+    // Return the owner to Book Studio after a successful, verified sign-in.
+    // Exact-match allowlist prevents an external or arbitrary redirect.
+    if (new URLSearchParams(window.location.search).get("next") === "/admin/books") {
+      window.location.replace("/admin/books");
+      return;
+    }
+
     loginView.hidden = true;
     dashboardView.hidden = false;
     document.body.classList.add("dashboard-active");
