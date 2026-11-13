@@ -36,6 +36,10 @@
       setLoginMessage("Enter your admin email and password.", true);
       return;
     }
+    if (password.length < 6 || !/[^A-Za-z0-9\s]/u.test(password)) {
+      setLoginMessage("Use at least 6 characters and one special character (such as ! or @).", true);
+      return;
+    }
 
     setLoginBusy(true);
     setLoginMessage("Checking your details…");
