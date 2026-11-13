@@ -18,7 +18,10 @@
     window.gtag("event", name, params);
   }
 
+  window.__EDUREACH_ANALYTICS_EVENT__ = event;
+
   function startAnalytics() {
+    window["ga-disable-" + measurementId] = false;
     if (window.__EDUREACH_GTAG_STARTED__) return;
     window.__EDUREACH_GTAG_STARTED__ = true;
     window.dataLayer = window.dataLayer || [];
@@ -50,6 +53,7 @@
     try { localStorage.setItem(consentKey, value); } catch {}
     banner.remove();
     if (value === "accepted") startAnalytics();
+    if (value === "declined") window["ga-disable-" + measurementId] = true;
     if (value === "declined" && window.gtag) {
       window.gtag("consent", "update", { analytics_storage: "denied" });
     }
