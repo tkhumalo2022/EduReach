@@ -280,7 +280,7 @@
       updatePreview();
       await refresh();
     } catch {
-      window.location.replace("/admin");
+      window.location.replace("/admin?next=%2Fadmin%2Fbooks");
     }
   }
 
