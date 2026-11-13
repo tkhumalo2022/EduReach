@@ -65,7 +65,7 @@ export function validateEntry(input) {
     return { type, data: { title, description, author, category: topic, coverImage, pdfFile, file: pdfFile, price: 0, isFree: true, accessType: "free" } };
   }
   const price = Number(input.price);
-  if (!Number.isFinite(price) || price < 0 || price > 100000 || !Number.isInteger(price * 100)) throw new Error("Enter a valid price in rand.");
+  if (!Number.isFinite(price) || price < 0 || price > 100000 || Math.abs(price * 100 - Math.round(price * 100)) > 0.000001) throw new Error("Enter a valid price in rand.");
   if (price > 0 && pdfFile) throw new Error("Paid PDFs cannot use public upload links. Save book details without attaching a PDF.");
   return { type, data: { title, description, author, category: topic, coverImage, pdfFile: price === 0 ? pdfFile : "", price, isFree: price === 0 } };
 }
