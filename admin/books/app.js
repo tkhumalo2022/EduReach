@@ -198,10 +198,12 @@
 
   async function upload(file, kind) {
     if (!file) return;
-    const target = byId(kind === "cover" ? "coverImage" : "pdfFile");
-    const paid = Number(byId("price").value || 0) > 0;
+    if (kind === "pdf") {
+      notify("PDF uploads are disabled in Book Studio. Use Wix CMS for free documents; paid PDFs need private storage.");
+      return;
+    }
+    const target = byId("coverImage");
     if (file.size > 10 * 1024 * 1024) { notify("Choose a file smaller than 10 MB."); return; }
-    if (kind === "pdf" && paid) { notify("Paid PDFs need private delivery configured first. You can save the book details as a draft."); return; }
 
     const original = target.placeholder;
     target.placeholder = "Uploading " + file.name + "…";
@@ -210,7 +212,7 @@
     try {
       const data = await adminPost({
         action: "uploadUrl", kind, filename: file.name, mimeType: file.type,
-        size: file.size, paid
+        size: file.size
       });
       const url = new URL(data.uploadUrl);
       url.searchParams.set("filename", file.name);
