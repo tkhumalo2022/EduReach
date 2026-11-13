@@ -98,7 +98,7 @@ export function safeGa4Report(summary, pages, events) {
   const total = summary?.rows?.[0];
   const safePages = (pages?.rows || [])
     .map(row => ({ path: String(row.dimensionValues?.[0]?.value || "").slice(0, 160), views: metric(row, 0) }))
-    .filter(row => row.path.startsWith("/") && !/^\/(?:admin|api|checkout|payment-)/.test(row.path));
+    .filter(row => row.path.startsWith("/") && !row.path.startsWith("//") && !/^\/(?:admin|api|checkout|payment-)/.test(row.path));
   const acceptedEvents = new Set(["generate_lead", "select_content", "add_to_cart", "begin_checkout", "purchase"]);
   const safeEvents = (events?.rows || [])
     .map(row => ({ name: String(row.dimensionValues?.[0]?.value || ""), count: metric(row, 0) }))
