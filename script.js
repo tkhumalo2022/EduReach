@@ -203,6 +203,7 @@
 
         form.reset();
         setFormStatus("Thank you. Your message has been sent.", "success");
+        window.__EDUREACH_ANALYTICS_EVENT__?.("generate_lead", { contact_method: "form" });
       } catch (error) {
         setFormStatus("We could not send your message right now. Please try again later.", "error");
       }
