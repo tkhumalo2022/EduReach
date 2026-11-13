@@ -1,6 +1,6 @@
 import { getAdminSession, requireValidCsrf } from "./adminAuth.js";
 import { readWixConfig } from "./wixClient.js";
-import { enforceRateLimit, readJsonBody, sendJson } from "./security.js";
+import { enforceRateLimit, getRequestHeader, readJsonBody, sendJson } from "./security.js";
 
 const WIX_ORIGIN = "https://www.wixapis.com";
 const BODY_LIMIT = 24 * 1024;
@@ -24,6 +24,7 @@ export function validateBook(input) {
   if (!Number.isFinite(price) || price < 0 || price > 100000 || Math.abs(price * 100 - Math.round(price * 100)) > 0.000001) {
     throw new Error("Enter a valid price in rand, or 0 for a free book.");
   }
+  if (price > 0 && pdfFile) throw new Error("Paid PDF files must use private storage; do not attach public Wix PDF links.");
   for (const url of [coverImage, pdfFile]) {
     if (url && !isTrustedMediaUrl(url)) throw new Error("Only media links hosted by Wix are allowed.");
   }
@@ -36,8 +37,33 @@ export function validateBook(input) {
 export function isTrustedMediaUrl(value) {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" &&
+    return url.protocol === "https:" && !url.username && !url.password && !url.port &&
       (url.hostname === "static.wixstatic.com" || url.hostname.endsWith(".wixstatic.com"));
+  } catch {
+    return false;
+  }
+}
+
+export function isTrustedWixUploadUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    const trusted = ["wixmp.com", "wixapis.com", "wix.com", "wixstatic.com"]
+      .some(domain => host === domain || host.endsWith("." + domain));
+    return url.protocol === "https:" && !url.username && !url.password && !url.port && trusted;
+  } catch {
+    return false;
+  }
+}
+
+export function isValidBrowserOrigin(req) {
+  try {
+    const origin = new URL(String(getRequestHeader(req, "origin") || ""));
+    const host = String(getRequestHeader(req, "host") || "").trim().toLowerCase();
+    const secure = origin.protocol === "https:" ||
+      (process.env.NODE_ENV !== "production" && origin.protocol === "http:");
+    return Boolean(host && secure && origin.host.toLowerCase() === host &&
+      origin.pathname === "/" && !origin.search && !origin.hash && !origin.username && !origin.password);
   } catch {
     return false;
   }
@@ -78,12 +104,16 @@ function publicDraft(value) {
     id: value.id || data._id || "", title: String(data.title || ""),
     author: String(data.author || ""), description: String(data.description || ""), category: String(data.category || ""),
     price: Number(data.price || 0), featured: Boolean(data.featured),
-    coverImage: String(data.coverImage || ""), pdfFile: String(data.pdfFile || "")
+    coverImage: String(data.coverImage || ""),
+    pdfFile: Number(data.price || 0) === 0 && data.isFree === true ? String(data.pdfFile || "") : "",
+    hasPdf: Boolean(data.pdfFile)
   };
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
   if (!["GET", "POST"].includes(req.method)) return sendJson(res, 405, { ok: false, message: "Method not allowed." });
 
   let session;
@@ -102,11 +132,14 @@ export default async function handler(req, res) {
       const items = Array.isArray(data.dataItems) ? data.dataItems : [];
       return sendJson(res, 200, { ok: true, connected: true, drafts: items.map(publicDraft) });
     } catch {
-      return sendJson(res, 200, { ok: true, connected: true, drafts: [], message: "Drafts could not be listed. Confirm the Wix draft collection is enabled." });
+      return sendJson(res, 200, { ok: true, connected: false, drafts: [], message: "Wix draft access needs verification. Check the collection and API key permissions." });
     }
   }
 
   if (!(await enforceRateLimit(req, res, { name: "admin-books", limit: 20, windowSeconds: 60 }))) return;
+  if (!isValidBrowserOrigin(req)) {
+    return sendJson(res, 403, { ok: false, message: "This request must come from the EduReach admin dashboard." });
+  }
   try { requireValidCsrf(req, session); }
   catch { return sendJson(res, 403, { ok: false, message: "Your session needs refreshing. Sign in again." }); }
   if (!config.configured) return sendJson(res, 503, { ok: false, message: "Publishing is not configured. Ask the site owner to add the Wix admin API key in Vercel." });
@@ -114,6 +147,10 @@ export default async function handler(req, res) {
   let input;
   try { input = await readJsonBody(req, { maxBytes: BODY_LIMIT }); }
   catch { return sendJson(res, 400, { ok: false, message: "Invalid request." }); }
+
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return sendJson(res, 400, { ok: false, message: "Invalid publishing request." });
+  }
 
   try {
     if (input.action === "createDraft") {
@@ -129,6 +166,13 @@ export default async function handler(req, res) {
         return sendJson(res, 400, { ok: false, message: "Choose a saved draft to update." });
       }
       const book = validateBook(input.book);
+      const previous = await wixFetch(config, "/wix-data/v2/items/" + encodeURIComponent(id) +
+        "?dataCollectionId=" + encodeURIComponent(config.collectionId + "__drafts"));
+      // Keep an already-attached PDF in a paid draft without exposing its URL to the browser.
+      // Paid drafts cannot be published until private storage is available.
+      if (book.price > 0 && !book.pdfFile && previous?.dataItem?.data?.pdfFile) {
+        book.pdfFile = previous.dataItem.data.pdfFile;
+      }
       const updated = await wixFetch(config, "/wix-data/v2/items/" + encodeURIComponent(id), "PUT", {
         dataCollectionId: config.collectionId + "__drafts", dataItem: { id, data: book }
       });
@@ -142,7 +186,8 @@ export default async function handler(req, res) {
       const saved = await wixFetch(config,
         "/wix-data/v2/items/" + encodeURIComponent(id) + "?dataCollectionId=" + encodeURIComponent(config.collectionId + "__drafts"));
       const book = saved.dataItem?.data || {};
-      if (Number(book.price || 0) > 0) {
+      const price = Number(book.price);
+      if (!Number.isFinite(price) || price !== 0 || book.isFree !== true) {
         return sendJson(res, 409, { ok: false, message: "Paid-book publishing is paused until private download fulfilment is verified. Keep this title as a draft." });
       }
       if (!isTrustedMediaUrl(String(book.pdfFile || ""))) {
@@ -162,19 +207,27 @@ export default async function handler(req, res) {
       if (!kind || !allowed.includes(mimeType) || !/^[a-z0-9._ -]{3,100}$/i.test(filename) || bytes <= 0 || bytes > 10 * 1024 * 1024) {
         return sendJson(res, 400, { ok: false, message: "Choose a JPG, PNG, WEBP or PDF under 10 MB." });
       }
-      if (kind === "pdf" && input.paid === true) {
-        return sendJson(res, 409, { ok: false, message: "Paid PDFs need private-storage integration before upload. Save the book details as a draft for now." });
+      // Never mint a public upload capability for PDFs. A manipulated "paid" flag
+      // could previously bypass the client-side price check.
+      if (kind === "pdf") {
+        return sendJson(res, 409, { ok: false, message: "PDF uploads are disabled here until protected delivery is ready. Upload free files through Wix CMS." });
       }
       const result = await wixFetch(config, "/site-media/v1/files/generate-upload-url", "POST", {
         mimeType, fileName: filename, private: false
       });
-      if (!result.uploadUrl || !String(result.uploadUrl).startsWith("https://")) {
+      if (!isTrustedWixUploadUrl(result.uploadUrl)) {
         throw new Error("Wix did not return a valid upload link.");
       }
       return sendJson(res, 200, { ok: true, uploadUrl: result.uploadUrl });
     }
     return sendJson(res, 400, { ok: false, message: "Unknown publishing action." });
   } catch (error) {
-    return sendJson(res, 400, { ok: false, message: error?.message || "The publishing request failed." });
+    const expected = error instanceof Error && [
+      "Enter", "Add", "Choose", "Only", "Paid PDF", "Unknown"
+    ].some(prefix => error.message.startsWith(prefix));
+    return sendJson(res, expected ? 400 : 502, {
+      ok: false,
+      message: expected ? error.message : "The Wix publishing service is temporarily unavailable."
+    });
   }
 }
