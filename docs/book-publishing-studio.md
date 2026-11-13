@@ -54,3 +54,18 @@ Media upload documentation: https://dev.wix.com/docs/api-reference/assets/media/
 ## Current limitations
 
 This is an implemented review-stage feature. It cannot publish through Wix before the owner configures the separate Wix API key, admin login and CMS draft lifecycle. Paid books must stay as drafts until protected download delivery is verified.
+
+## Verified live Wix audit — 13 November 2026
+
+Inspected the signed-in Edu Reach owner CMS on the authorized laptop, without modifying any records. Site dashboard points to Wix CMS Ebooks collection ID `Import5`.
+
+The collection currently has 3 published, paid ebooks at R75 each:
+- Teaching Strategies That Make a Difference
+- Autism and the Challenges
+- Understanding Autism in Inclusive Classrooms
+
+The live public EduReach CMS endpoint returns all three with valid cover images and accessType=paid. Protected PDF URLs are absent from public item responses; **this alone does not prove the underlying Wix Media Manager files are private**. No paid delivery was attempted.
+
+The Wix table visibly uses these columns: Title, Cover Image, description, PDF File, price, and is Free. Public API responses currently have empty author, category, and featured values. Before using the new Book Studio in production, verify or add those optional fields in Wix with the exact IDs `author` (text), `category` (text), `featured` (boolean), and optionally `publishedDate` (date). Do not change current pricing or existing publication states as part of this setup.
+
+The public bookshop preview renders all three real books. Browser QA confirmed Add to Cart increases to 1, cart totals R75 and checkout shows R75. The test cart was cleared, and no payment was made. Owner login and new authenticated Wix write operations remain unverified until restricted credentials and the Wix draft plugin are configured.
