@@ -90,3 +90,44 @@ The public bookshop preview renders all three real books. Browser QA confirmed A
 - To activate **review** access, the owner must set `EDUREACH_ADMIN_EMAIL` and `EDUREACH_ADMIN_PASSWORD_HASH` as **sensitive Preview variables scoped to this review branch**, then redeploy this branch to pick them up. Do not expose the password or verifier in chat, source control, logs or screenshots.
 - Do not add these variables to Production until the owner explicitly authorises launch. Do not attach a broad Wix administrative API key while testing login.
 - After preview variables are set, verify login, session renewal, protection of `/api/admin/books`, redirect back to the Book Studio, logout and cookie invalidation without publishing any books.
+
+## Owner traffic insights, security and SEO — 13 November 2026 (review branch)
+
+The existing public site already uses Google Analytics 4 measurement ID `G-FXDS1M5CFN` in `script.js`. The ID is public metadata, not a credential. New changes keep **the same** GA4 property rather than create an empty replacement, and require affirmative visitor consent before loading the Google tag. Visitors can decline or revisit Analytics choices. Custom click events include contact methods (WhatsApp/email/phone), ebook-detail clicks, add-to-cart clicks, and checkout starts, **without names, email addresses, book-file URLs or order details**. Page URLs and referrers are stripped of query strings to avoid collecting checkout/order tokens.
+
+### Connect real GA4 metrics to Dad's private dashboard
+
+The new Admin → **Visitor insights** area reads the Google Analytics Data API only from the server-side endpoint `GET /api/admin/insights` (existing Vercel `api/contact.js` function with protected session). It displays real **28-day** active users, sessions, page views and tracked useful actions, plus top pages and action categories. If not connected or upstream data is inaccessible, it displays **Not connected / unavailable**, never invented numbers. There are direct links to Google Analytics and Search Console if the owner already has access. No Analytics account credentials or customer-level records are returned to the browser.
+
+1. In the **existing** Google Analytics property receiving `G-FXDS1M5CFN`, find its **numeric Property ID** in Admin → Property details.
+2. In a Google Cloud project with Google Analytics Data API enabled, create a **dedicated** service account for server-side read-only reporting. Add the service account **email as Viewer only** under this GA4 property's access management. Do **not** grant Editor or Admin.
+3. Create a private JSON key and configure just these values in Vercel **Preview only**, for `feature/owner-book-publishing-studio`: `EDUREACH_GA4_PROPERTY_ID` (numeric), `EDUREACH_GA4_CLIENT_EMAIL` (service account email), `EDUREACH_GA4_PRIVATE_KEY` (private key PEM; escaped newlines are supported). Use encrypted/sensitive project environment variables, **never** GitHub or public JavaScript.
+4. Redeploy the preview to pick up variables. Sign in at `/admin`, open Visitor insights, and compare numbers with the original GA4 property for the same 28-day window. Historical numbers can show if they were recorded previously; new custom event labels show only after deploying consent-gated tracking and people opting in.
+5. The connected Search Console account currently accessible through the TK Web Studio integration did **not** include `edureach.network`. The owner should verify/access EduReach under its correct Google account, open Search Console via the new dashboard link, check indexing and submit `https://edureach.network/sitemap.xml` after release. No Search Console account, integration, or access permissions were changed.
+
+### Sign-in protections
+
+- **Preview password rule remains at least six characters and a special character.** This is weak for a sensitive admin panel; use a longer unique password in production.
+- Login throttle is 5 requests per 10 minutes **per network address**, independent of user-agent. In production the admin login **fails closed** if persistent rate-limiting storage becomes unavailable, rather than permitting unlimited guesses. Existing secure HTTP-only, SameSite=Strict cookies and short-lived server sessions remain.
+- Optional authenticator-app verification is supported using `EDUREACH_ADMIN_TOTP_SECRET` (Base32 authenticator seed, secret). If set, the server requires a valid six-digit authenticator code in addition to password. Do not enable this until the owner has successfully enrolled the seed into an authenticator application and verified a live test sign-in. Do not store QR code seed in code or chat.
+- Keep `EDUREACH_ADMIN_EMAIL`, `EDUREACH_ADMIN_PASSWORD_HASH`, `EDUREACH_ADMIN_TOTP_SECRET` and GA4 service-account credentials **Preview branch-scoped** until owner approval. No production deployment or permissions change is authorized by these review changes.
+
+### SEO fixes in review
+
+- Homepage metadata now accurately describes inclusive education workshops, teacher training, school inclusion audits, autism awareness and learner support in Richards Bay.
+- Ebook shop metadata names its actual South African audience (teachers, families and school support teams), with truthful `CollectionPage` JSON-LD.
+- Published ebook pages have server-rendered schema.org `Book` metadata and a real `Offer` in ZAR only when the Wix record contains a valid price/access status; no invented ratings, ISBNs, authors or reviews.
+- Checkout, cart and payment pages are removed from the XML sitemap and served with an `X-Robots-Tag: noindex` rule. These pages are **not** blocked by robots.txt because crawlers must be able to see the noindex directive. Admin routes remain excluded.
+- Existing real CMS slugs and canonical URLs remain unchanged. No claims of higher rankings or indexed status before checking Search Console.
+
+### QA and release gates
+
+- [ ] Automated lint, TypeScript checks, tests and build pass on the review branch.
+- [ ] Anonymous `/api/admin/insights` GET is denied with HTTP 401.
+- [ ] Analytics reports cannot expose service-account credentials or raw private user-level records.
+- [ ] Check consent decline, accept, re-open settings, and that new GA4 events omit URL query tokens.
+- [ ] Test owner login after preview credentials are set; optional TOTP only after enrollment.
+- [ ] Confirm Google sees `noindex` on cart and checkout and not in sitemap.
+- [ ] Check Book JSON-LD in rendered book page and in Schema.org Validator.
+- [ ] Compare GA4 aggregate metrics to Analytics UI after permissions are configured.
+- [ ] Owner explicitly approves any production merge/deployment.
