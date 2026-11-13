@@ -44,7 +44,8 @@ async function handleLogin(request, response) {
   if (!(await enforceRateLimit(request, response, {
     name: "admin-login",
     limit: 5,
-    windowSeconds: 10 * 60
+    windowSeconds: 10 * 60,
+    failClosed: true
   }))) {
     return undefined;
   }
