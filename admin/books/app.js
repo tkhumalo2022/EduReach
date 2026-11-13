@@ -11,6 +11,7 @@
   const libraryStatus = byId("books-status");
   let csrf = "";
   let connected = false;
+  let editingId = "";
   let coverObjectUrl = "";
 
   const escapeText = (value) => String(value == null ? "" : value);
@@ -78,6 +79,23 @@
     return el;
   }
 
+  function editDraft(book) {
+    editingId = book.id;
+    for (const key of ["title", "author", "description", "category", "price", "coverImage", "pdfFile"]) {
+      if (byId(key)) byId(key).value = book[key] ?? "";
+    }
+    byId("featured").checked = Boolean(book.featured);
+    if (coverObjectUrl) URL.revokeObjectURL(coverObjectUrl);
+    coverObjectUrl = "";
+    byId("cover-file").value = "";
+    byId("pdf-file").value = "";
+    updatePreview();
+    saveButton.textContent = "Update saved draft →";
+    notify("Editing \"" + book.title + "\". Save the changes when you are ready.");
+    byId("create").scrollIntoView({ behavior: "smooth", block: "start" });
+    byId("title").focus();
+  }
+
   function renderBookCard(book, draft) {
     const card = make("article", "library-item");
     const url = draft ? book.coverImage : book.image?.url;
@@ -99,6 +117,10 @@
     content.append(make("small", "", book.category || "Inclusive education"));
 
     if (draft) {
+      const editButton = make("button", "small-action", "Edit details");
+      editButton.type = "button";
+      editButton.addEventListener("click", () => editDraft(book));
+      content.append(editButton);
       const button = make("button", "small-action", "Publish free book");
       button.type = "button";
       button.disabled = !book.id || Number(book.price || 0) > 0 || !book.pdfFile;
@@ -224,9 +246,10 @@
     saveButton.disabled = true;
     saveButton.textContent = "Saving…";
     try {
-      const response = await adminPost({ action: "createDraft", book: readBook() });
+      const response = await adminPost({ action: editingId ? "updateDraft" : "createDraft", ...(editingId ? { id: editingId } : {}), book: readBook() });
       notify(response.message || "Saved as a draft.", true);
       form.reset();
+      editingId = "";
       byId("price").value = "0";
       if (coverObjectUrl) URL.revokeObjectURL(coverObjectUrl);
       coverObjectUrl = "";
