@@ -72,9 +72,11 @@
               type="password"
               autocomplete="current-password"
               placeholder="Enter your password"
-              minlength="12"
+              minlength="6"
+              aria-describedby="admin-password-hint"
               required
             />
+            <p class="password-hint" id="admin-password-hint">6+ characters with at least one special character (such as ! or @).</p>
 
             <p class="form-message" data-login-message role="status" aria-live="polite"></p>
 
