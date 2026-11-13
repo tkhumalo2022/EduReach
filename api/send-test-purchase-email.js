@@ -1,5 +1,5 @@
 import { buildPurchaseEmail } from './email-template.js';
-import { getAdminSession } from '../src/lib/adminAuth.js';
+import { AdminAuthError, getAdminSession, requireValidCsrf } from '../src/lib/adminAuth.js';
 import { ApiRequestError, enforceRateLimit, methodNotAllowed, readJsonBody, sendJson } from '../src/lib/security.js';
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
@@ -18,6 +18,15 @@ export default async function handler(req, res) {
     return sendJson(res, 401, { ok: false, message: 'Unauthorized admin access required.' });
   }
 
+  try {
+    requireValidCsrf(req, session);
+  } catch (error) {
+    return sendJson(res, error instanceof AdminAuthError ? error.statusCode : 403, {
+      ok: false,
+      message: 'This admin request could not be verified.'
+    });
+  }
+
   if (!process.env.RESEND_API_KEY) {
     return sendJson(res, 500, { ok: false, message: 'Missing RESEND_API_KEY in Vercel environment variables.' });
   }
@@ -32,14 +41,16 @@ export default async function handler(req, res) {
     });
   }
 
-  if (!data.customerEmail) {
-    return sendJson(res, 400, { ok: false, message: 'customerEmail is required.' });
+  const customerEmail = typeof data?.customerEmail === 'string' ? data.customerEmail.trim() : '';
+  if (!customerEmail || customerEmail.length > 254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(customerEmail)) {
+    return sendJson(res, 400, { ok: false, message: 'A valid customerEmail is required.' });
   }
 
+  const customerName = String(data?.customerName || 'Your').replace(/[\r\n]+/g, ' ').trim().slice(0, 120) || 'Your';
   const email = {
     from: process.env.EDUREACH_FROM_EMAIL || 'EduReach <onboarding@resend.dev>',
-    to: data.customerEmail,
-    subject: `${data.customerName || 'Your'} EduReach resource is ready to download`,
+    to: customerEmail,
+    subject: `${customerName} EduReach resource is ready to download`,
     html: buildPurchaseEmail(data),
   };
 
