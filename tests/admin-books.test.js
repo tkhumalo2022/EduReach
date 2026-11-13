@@ -22,7 +22,7 @@ test("validates the essential details of a free ebook", () => {
 });
 
 test("supports paid ebook metadata as an unpublished draft", () => {
-  const result = validateBook({ ...basic, price: 149.99 });
+  const result = validateBook({ ...basic, price: 149.99, pdfFile: "" });
   assert.equal(result.isFree, false);
   assert.equal(result.price, 149.99);
 });
