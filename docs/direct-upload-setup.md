@@ -53,3 +53,14 @@ Official docs:
 - [ ] Owner approval before production merge or settings changes.
 
 If Wix auth or draft plugin is not ready, the editor explicitly reports **Wix connection needed** and disables uploads/save. This is intentional; it does not pretend an upload completed.
+
+## Wix connection verification — 13 November 2026
+
+- Created the Wix API key **EduReach Owner Publishing - Preview** in the authorized Edu Reach account, restricted to **My Site** with **Wix Data** and **Manage Site Media** permissions. No broad site, account, payment, or member permissions.
+- Saved the API key as a **Sensitive** Vercel Preview variable named `EDUREACH_WIX_ADMIN_API_KEY`, scoped exclusively to branch `feature/owner-dashboard-direct-uploads`. The key value is not committed to GitHub or displayed in this report.
+- Configured a distinct strong-password **Preview-only** admin login (`EDUREACH_ADMIN_EMAIL` and `EDUREACH_ADMIN_PASSWORD_HASH`, both Sensitive and branch-scoped). The preview password was generated locally and put on the owner's laptop clipboard; it is not in source or chat. Store it in a password manager or rotate it if the clipboard value is lost.
+- Redeployed the preview with these credentials and successfully authenticated through the browser. Production remained unchanged.
+- The signed-in preview called `GET /api/admin/publishing?type=ebooks`; Vercel logged **404** from Wix's `POST /wix-data/v2/items/query` for `Import5__drafts`. Admin properly displays **Wix connection needed** and blocks draft writes. End-to-end publishing remains unverified.
+- Inspected Wix Ebooks → More Actions → Collection settings and confirmed **Enable drafts is OFF**. No collection settings or published records were changed. This is a prerequisite for the current draft-shadow API design.
+- Before enabling drafts on the existing collection, verify owner approval; export or back up the three existing paid books, confirm published status and media links, then check behavior after activation. Repeat for Free Resources and Articles only after reviewing their field mappings.
+- After enabling, test draft listing, a harmless non-public draft, and approved small cover-image upload; verify that the published paid books and public storefront are unaffected before any production merge.
