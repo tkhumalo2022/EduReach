@@ -24,10 +24,20 @@
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function gtag() { window.dataLayer.push(arguments); };
     window.gtag("js", new Date());
+    let safeReferrer = "";
+    try {
+      const ref = new URL(document.referrer);
+      if (ref.protocol === "https:" || ref.protocol === "http:") {
+        safeReferrer = ref.origin + ref.pathname;
+      }
+    } catch {}
     window.gtag("config", measurementId, {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
-      anonymize_ip: true
+      anonymize_ip: true,
+      // Prevent checkout/session/order tokens in query strings entering GA4.
+      page_location: window.location.origin + window.location.pathname,
+      page_referrer: safeReferrer
     });
     const script = document.createElement("script");
     script.async = true;
