@@ -33,6 +33,7 @@
     const formData = new FormData(loginForm);
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
+    const totpCode = String(formData.get("totpCode") || "").trim();
 
     if (!email || !password) {
       setLoginMessage("Enter your admin email and password.", true);
@@ -51,7 +52,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, ...(totpCode ? { totpCode } : {}) })
       });
       const data = await response.json();
 
