@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import handlePublishing, {
-  validateEntry, validUploadRequest, safeDraft,
+  validateEntry, validUploadRequest, safeDraft, draftFieldModifications,
   trustedPublicFileUrl, trustedUploadDestination, exactSameOrigin
 } from "../src/lib/adminPublishingApi.js";
 
@@ -101,4 +101,29 @@ test("publishing API rejects unsupported methods", async () => {
   const response = res();
   await handlePublishing({ method: "DELETE", headers: {} }, response);
   assert.equal(response.statusCode, 405);
+});
+
+test("editing a saved draft preserves unrelated fields and existing file references", () => {
+  const updates = draftFieldModifications({
+    title: "Revised title",
+    description: "Updated description",
+    coverImage: "",
+    pdfFile: "",
+    price: 75
+  }, {
+    title: "Old title",
+    slug: "existing-wix-slug",
+    coverImage: "https://static.wixstatic.com/media/old-cover.jpg",
+    pdfFile: "https://static.wixstatic.com/ugd/existing-attachment.pdf"
+  });
+  assert.equal(updates.some(x => x.fieldPath === "title"), true);
+  assert.equal(updates.some(x => x.fieldPath === "slug"), false);
+  assert.equal(updates.some(x => x.fieldPath === "coverImage"), false);
+  assert.equal(updates.some(x => x.fieldPath === "pdfFile"), false);
+  assert.equal(updates.find(x => x.fieldPath === "price").setFieldOptions.value, 75);
+});
+
+test("rand values with cents are accepted for ebook drafts", () => {
+  assert.equal(validateEntry({ ...base, price: 19.99 }).data.price, 19.99);
+  assert.throws(() => validateEntry({ ...base, price: 19.999 }));
 });
