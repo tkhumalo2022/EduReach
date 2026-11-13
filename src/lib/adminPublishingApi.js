@@ -109,6 +109,20 @@ async function wixRequest(cfg, path, method = "GET", data) {
   } finally { clearTimeout(timeout); }
 }
 
+export function draftFieldModifications(data, previous = {}) {
+  // Patch only the fields shown in the editor. Updating a Wix item via PUT
+  // replaces *all* its fields and could remove existing attachments or slugs.
+  const edits = [];
+  for (const [fieldPath, value] of Object.entries(data)) {
+    const existing = previous[fieldPath];
+    if ((fieldPath === "pdfFile" || fieldPath === "file" ||
+         fieldPath === "coverImage" || fieldPath === "image") &&
+        !value && existing) continue;
+    edits.push({ fieldPath, action: "SET_FIELD", setFieldOptions: { value } });
+  }
+  return edits;
+}
+
 export function safeDraft(item, type) {
   const d = item?.data || {};
   const price = Number(d.price || 0);
@@ -189,13 +203,12 @@ export default async function handlePublishing(req, res) {
       if (id) {
         const existing = await wixRequest(cfg, "/wix-data/v2/items/" + encodeURIComponent(id) +
           "?dataCollectionId=" + encodeURIComponent(draftsCollection));
-        const previous = existing.dataItem?.data || {};
-        // For paid books preserve the previously attached asset in Wix, never return the file reference to the client.
-        if (entry.type === "ebooks" && Number(entry.data.price) > 0 && previous.pdfFile) {
-          entry.data.pdfFile = previous.pdfFile;
-        }
-        const result = await wixRequest(cfg, "/wix-data/v2/items/" + encodeURIComponent(id), "PUT", {
-          dataCollectionId: draftsCollection, dataItem: { id, data: entry.data }
+        if (!existing.dataItem) throw new Error("Saved draft could not be found.");
+        const previous = existing.dataItem.data || {};
+        const fields = draftFieldModifications(entry.data, previous);
+        const result = await wixRequest(cfg, "/wix-data/v2/items/" + encodeURIComponent(id), "PATCH", {
+          dataCollectionId: draftsCollection,
+          patch: { dataItemId: id, fieldModifications: fields }
         });
         return sendJson(res, 200, { ok: true, message: "Draft updated in Wix. Not published.", draft: safeDraft(result.dataItem || { id, data: entry.data }, entry.type) });
       }
