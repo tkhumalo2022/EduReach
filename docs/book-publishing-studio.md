@@ -5,7 +5,7 @@ This branch keeps edureach.network on Vercel and Wix as the content store. It ad
 ## What this branch provides
 
 - Private book editor: title, author, description, topic, price, featured status, live preview.
-- Short-lived Wix upload URLs for public covers and free PDFs under 10 MB. Browser CORS and readiness must still be tested.
+- Short-lived Wix upload URLs for **cover images only**. PDF uploads inside Book Studio are disabled until private-file delivery is available. Cover upload browser CORS and readiness must still be tested.
 - Save new drafts in Wix, reopen and update drafts, publish approved complete free PDFs.
 - Public bookshop showcases real published Wix books, not fictitious bestsellers.
 - Paid books can be drafted. Paid-book publishing is blocked until secure PDF delivery is audited.
@@ -45,7 +45,7 @@ Media upload documentation: https://dev.wix.com/docs/api-reference/assets/media/
 - [ ] Invalid CSRF and missing admin sessions deny writes.
 - [ ] Restricted Wix API key stays only in Vercel server-side environment variables.
 - [ ] Create, edit, list, publish and unpublish a real free test book through the entire flow.
-- [ ] Confirm CORS for media uploads and mobile browser support. Do not upload paid PDFs as public files.
+- [ ] Confirm CORS for **cover** media uploads and mobile browser support. Book Studio issues no public PDF upload URLs.
 - [ ] Public bookshop contains no sample products and only displays real published Wix records.
 - [ ] Screen-reader labels, responsiveness, contrast and keyboard navigation verified.
 - [ ] Private paid-file storage and download delivery tested with PayFast ITN and durable order records in a separate phase.
@@ -69,3 +69,14 @@ The live public EduReach CMS endpoint returns all three with valid cover images 
 The Wix table visibly uses these columns: Title, Cover Image, description, PDF File, price, and is Free. Public API responses currently have empty author, category, and featured values. Before using the new Book Studio in production, verify or add those optional fields in Wix with the exact IDs `author` (text), `category` (text), `featured` (boolean), and optionally `publishedDate` (date). Do not change current pricing or existing publication states as part of this setup.
 
 The public bookshop preview renders all three real books. Browser QA confirmed Add to Cart increases to 1, cart totals R75 and checkout shows R75. The test cart was cleared, and no payment was made. Owner login and new authenticated Wix write operations remain unverified until restricted credentials and the Wix draft plugin are configured.
+
+## API leak and publishing security review — 13 November 2026
+
+- The Wix admin API key is read only in the server-side Book Studio library; no credential is placed in HTML, JavaScript bundles, or public API responses.
+- A previously available `uploadUrl` branch allowed a client to request a public PDF upload by falsifying a `paid` flag. **Closed:** the server now rejects all PDF upload URL requests, even when a client sends `paid:false`. Cover-only upload URLs are validated against HTTPS Wix domains.
+- Paid draft PDF URLs are masked in admin list responses; a boolean `hasPdf` is returned instead. Saved paid-draft PDF references can be preserved during metadata edits without sending those URLs to the browser.
+- The publish handler requires an exact free price **and** `isFree === true`, rather than assuming any nonpositive or invalid price is free.
+- Admin mutations require a same-origin browser `Origin` header, existing signed-in session and matching CSRF token. Responses are marked private/no-store, noindex and no-referrer.
+- The Book Studio now reports disconnected if Wix draft queries fail, instead of reporting a healthy connection.
+- Important **unresolved preexisting commerce risk**: current paid download fulfillment redirects customers to Wix media URLs after purchase. A buyer may share that media URL outside checkout. This feature branch does **not** modify the live checkout or its paid download handler; a protected file storage and delivery redesign is required before treating paid PDFs as non-shareable.
+- A redacted source audit found no committed environment-secret file beyond template `.env.example`; this is not proof that previously shared credentials or Wix media files have never leaked. Rotate any credential known to be exposed and move paid PDFs out of public storage after choosing a protected delivery system.
