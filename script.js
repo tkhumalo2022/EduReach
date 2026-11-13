@@ -1,20 +1,11 @@
 (() => {
-  const googleAnalyticsId = "G-FXDS1M5CFN";
-
-  if (!window.__EDUREACH_GOOGLE_ANALYTICS_INITIALIZED__) {
-    window.__EDUREACH_GOOGLE_ANALYTICS_INITIALIZED__ = true;
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || function gtag() {
-      window.dataLayer.push(arguments);
-    };
-
-    const googleTagScript = document.createElement("script");
-    googleTagScript.async = true;
-    googleTagScript.src = `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`;
-    document.head.append(googleTagScript);
-
-    window.gtag("js", new Date());
-    window.gtag("config", googleAnalyticsId);
+  // Preserve the existing GA4 property, but load it only after visitors opt in.
+  if (!window.__EDUREACH_ANALYTICS_SCRIPT_LOADED__) {
+    window.__EDUREACH_ANALYTICS_SCRIPT_LOADED__ = true;
+    const analytics = document.createElement("script");
+    analytics.src = "/site-analytics.js";
+    analytics.defer = true;
+    document.head.append(analytics);
   }
 
   const config = window.SITE_CONFIG || window.EDUREACH_CONFIG || {};
@@ -212,6 +203,7 @@
 
         form.reset();
         setFormStatus("Thank you. Your message has been sent.", "success");
+        window.__EDUREACH_ANALYTICS_EVENT__?.("generate_lead", { contact_method: "form" });
       } catch (error) {
         setFormStatus("We could not send your message right now. Please try again later.", "error");
       }

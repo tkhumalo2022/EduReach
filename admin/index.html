@@ -72,9 +72,20 @@
               type="password"
               autocomplete="current-password"
               placeholder="Enter your password"
-              minlength="12"
+              minlength="6"
+              aria-describedby="admin-password-hint"
               required
             />
+            <p class="password-hint" id="admin-password-hint">6+ characters with at least one special character (such as ! or @).</p>
+
+            <details class="totp-details">
+              <summary>Use an authenticator code (if enabled)</summary>
+              <label for="admin-totp">6-digit authenticator code</label>
+              <input id="admin-totp" name="totpCode" type="text" inputmode="numeric"
+                     pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"
+                     placeholder="123456" aria-describedby="totp-help" />
+              <small id="totp-help">Only required if your account has two-step verification switched on.</small>
+            </details>
 
             <p class="form-message" data-login-message role="status" aria-live="polite"></p>
 
@@ -111,7 +122,9 @@
           <p class="sidebar-label">Workspace</p>
           <nav>
             <a class="active" href="#overview">Overview</a>
+            <a href="#insights">Visitor insights</a>
             <a href="#publish">Publish content</a>
+            <a href="/admin/books">Book publishing studio</a>
             <a href="#checklist">Publishing checklist</a>
             <a href="#tools">Website tools</a>
           </nav>
@@ -152,13 +165,39 @@
             </article>
           </section>
 
+          <section class="dashboard-section insights-section" id="insights" aria-labelledby="insights-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Visitor insights</p>
+                <h2 id="insights-title">How people use EduReach</h2>
+                <p class="insights-note" data-insights-note role="status" aria-live="polite">Checking verified traffic data…</p>
+              </div>
+              <button class="secondary-button" type="button" data-refresh-insights>Refresh figures</button>
+            </div>
+            <div class="insights-grid" aria-label="Website activity over the last 28 days">
+              <article class="insights-stat"><span>Active visitors</span><strong data-insight="visitors">—</strong><small>GA4 active users, not individual identities</small></article>
+              <article class="insights-stat"><span>Site visits</span><strong data-insight="sessions">—</strong><small>Sessions</small></article>
+              <article class="insights-stat"><span>Pages viewed</span><strong data-insight="pageViews">—</strong><small>Website page views</small></article>
+              <article class="insights-stat"><span>Useful actions</span><strong data-insight="interactions">—</strong><small>Tracked enquiries, book views and checkout actions</small></article>
+            </div>
+            <div class="insights-columns">
+              <div><h3>Most viewed pages</h3><div data-insights-pages class="insights-list"><p>Connect Google Analytics to see your pages.</p></div></div>
+              <div><h3>Visitor actions</h3><div data-insights-events class="insights-list"><p>Visitor actions will appear after tracking is configured.</p></div></div>
+            </div>
+            <p class="insights-footnote">Only aggregated reporting is shown. No customer emails, passwords or PDF links appear in these figures.</p>
+            <div class="insights-tools">
+              <a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener noreferrer">Open Google Analytics ↗</a>
+              <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer">Open Google Search Console ↗</a>
+            </div>
+          </section>
+
           <section class="dashboard-section" id="publish" aria-labelledby="publish-title">
             <div class="section-heading">
               <div>
                 <p class="eyebrow">Quick actions</p>
                 <h2 id="publish-title">What would you like to publish?</h2>
               </div>
-              <p>Content opens in Wix, where you can save a draft, review it and publish when ready.</p>
+              <p>Books use the EduReach Book Studio. Other resources open in Wix CMS for now.</p>
             </div>
 
             <div class="publish-grid">
@@ -179,7 +218,7 @@
                   <h3>Resource or ebook</h3>
                   <p>Upload useful PDFs, guides and paid or free educational materials.</p>
                 </div>
-                <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">Upload in Wix <span aria-hidden="true">↗</span></a>
+                <a href="/admin/books">Open Book Studio <span aria-hidden="true">→</span></a>
               </article>
 
               <article class="publish-card">

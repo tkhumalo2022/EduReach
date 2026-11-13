@@ -7,6 +7,19 @@
   },
   "headers": [
     {
+      "source": "/(cart|checkout|payment-success|payment-cancelled)(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store, max-age=0"
+        }
+      ]
+    },
+    {
       "source": "/admin(.*)",
       "headers": [
         {
@@ -24,7 +37,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.wixstatic.com https://static.wixstatic.com https://static.parastorage.com https://*.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src https://www.google.com https://maps.google.com; form-action 'self' https://payfast.co.za https://*.payfast.co.za https://payfast.io https://*.payfast.io; frame-ancestors https://tkwebstudio.company https://tk-web-studio-tkhumalo2022s-projects.vercel.app https://tk-web-studio-git-master-tkhumalo2022s-projects.vercel.app https://tk-web-studio-git-fix-interactive-e09d44-tkhumalo2022s-projects.vercel.app; media-src 'self' https://*.wixstatic.com; worker-src 'self'"
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.wixstatic.com https://static.wixstatic.com https://static.parastorage.com https://*.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.wixstatic.com https://*.wixapis.com https://*.wix.com https://*.wixmp.com https://*.parastorage.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src https://www.google.com https://maps.google.com; form-action 'self' https://payfast.co.za https://*.payfast.co.za https://payfast.io https://*.payfast.io; frame-ancestors https://tkwebstudio.company https://tk-web-studio-tkhumalo2022s-projects.vercel.app https://tk-web-studio-git-master-tkhumalo2022s-projects.vercel.app https://tk-web-studio-git-fix-interactive-e09d44-tkhumalo2022s-projects.vercel.app; media-src 'self' https://*.wixstatic.com; worker-src 'self'"
         },
         {
           "key": "X-Content-Type-Options",
@@ -46,6 +59,18 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/admin/books",
+      "destination": "/admin/books/index.html"
+    },
+    {
+      "source": "/api/admin/books",
+      "destination": "/api/contact?adminAction=books"
+    },
+    {
+      "source": "/api/admin/insights",
+      "destination": "/api/contact?adminAction=insights"
+    },
     {
       "source": "/api/admin/login",
       "destination": "/api/contact?adminAction=login"

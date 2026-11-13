@@ -15,6 +15,8 @@
   const cmsStatus = document.querySelector("[data-cms-status]");
   const cmsDot = document.querySelector("[data-cms-dot]");
   const libraryDot = document.querySelector("[data-library-dot]");
+  const insightRefresh = document.querySelector("[data-refresh-insights]");
+  const insightNote = document.querySelector("[data-insights-note]");
 
   let session = null;
 
@@ -31,9 +33,14 @@
     const formData = new FormData(loginForm);
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
+    const totpCode = String(formData.get("totpCode") || "").trim();
 
     if (!email || !password) {
       setLoginMessage("Enter your admin email and password.", true);
+      return;
+    }
+    if (password.length < 6 || !/[^A-Za-z0-9\s]/u.test(password)) {
+      setLoginMessage("Use at least 6 characters and one special character (such as ! or @).", true);
       return;
     }
 
@@ -45,7 +52,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, ...(totpCode ? { totpCode } : {}) })
       });
       const data = await response.json();
 
@@ -80,24 +87,11 @@
   });
 
   refreshButton?.addEventListener("click", () => loadContentSnapshot(true));
+  insightRefresh?.addEventListener("click", () => loadInsights());
 
   initialise();
 
   async function initialise() {
-    const localDashboardPreview =
-      ["terminal.local", "localhost", "127.0.0.1"].includes(window.location.hostname) &&
-      new URLSearchParams(window.location.search).get("preview") === "dashboard";
-
-    if (localDashboardPreview) {
-      session = {
-        name: "EduReach Admin",
-        email: "edureach70@gmail.com",
-        csrfToken: "local-preview"
-      };
-      showDashboard(session);
-      return;
-    }
-
     loginView.setAttribute("aria-busy", "true");
 
     try {
@@ -122,6 +116,13 @@
   }
 
   function showDashboard(activeSession) {
+    // Return the owner to Book Studio after a successful, verified sign-in.
+    // Exact-match allowlist prevents an external or arbitrary redirect.
+    if (new URLSearchParams(window.location.search).get("next") === "/admin/books") {
+      window.location.replace("/admin/books");
+      return;
+    }
+
     loginView.hidden = true;
     dashboardView.hidden = false;
     document.body.classList.add("dashboard-active");
@@ -134,6 +135,7 @@
     document.title = "Admin Workspace | EduReach";
     dashboardView.querySelector("h1")?.focus?.({ preventScroll: true });
     loadContentSnapshot();
+    loadInsights();
   }
 
   function showLogin() {
@@ -190,6 +192,70 @@
       recentList.innerHTML = '<p class="empty-state">Published content could not be loaded right now. The Wix dashboard is still available.</p>';
     } finally {
       if (refreshButton) refreshButton.disabled = false;
+    }
+  }
+
+  async function loadInsights() {
+    if (!insightNote) return;
+    insightRefresh.disabled = true;
+    insightNote.textContent = "Checking Google Analytics…";
+    const tiles = ["visitors", "sessions", "pageViews", "interactions"];
+    tiles.forEach(key => {
+      const node = document.querySelector('[data-insight="' + key + '"]');
+      if (node) node.textContent = "—";
+    });
+    try {
+      const response = await fetch("/api/admin/insights", {
+        credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" }
+      });
+      const data = await response.json();
+      if (response.status === 401) { showLogin(); return; }
+      if (!response.ok || !data.connected || !data.report) {
+        insightNote.textContent = data.message || "Google Analytics is not connected yet. No visitor totals are available.";
+        document.querySelector("[data-insights-pages]").textContent = "No verified page traffic yet.";
+        document.querySelector("[data-insights-events]").textContent = "No verified action data yet.";
+        return;
+      }
+      const report = data.report;
+      const number = new Intl.NumberFormat("en-ZA");
+      tiles.forEach(key => {
+        const node = document.querySelector('[data-insight="' + key + '"]');
+        if (node) node.textContent = number.format(Number(report[key]) || 0);
+      });
+      insightNote.textContent = report.dateLabel || "Last 28 days through yesterday";
+      renderInsightRows("[data-insights-pages]", report.pages || [], row => row.path, row => row.views);
+      const eventNames = {
+        generate_lead: "Contact clicks", select_content: "Book views",
+        add_to_cart: "Added to cart", begin_checkout: "Checkout starts", purchase: "Purchases"
+      };
+      renderInsightRows("[data-insights-events]", report.events || [],
+        row => eventNames[row.name] || row.name, row => row.count);
+    } catch {
+      insightNote.textContent = "Visitor reporting is temporarily unavailable.";
+    } finally {
+      insightRefresh.disabled = false;
+    }
+  }
+
+  function renderInsightRows(selector, rows, labelOf, valueOf) {
+    const host = document.querySelector(selector);
+    if (!host) return;
+    host.replaceChildren();
+    if (!rows.length) {
+      const empty = document.createElement("p");
+      empty.textContent = "No tracked activity for this period.";
+      host.append(empty);
+      return;
+    }
+    for (const row of rows) {
+      const item = document.createElement("div");
+      item.className = "insights-list-row";
+      const label = document.createElement("span");
+      label.textContent = String(labelOf(row) || "").slice(0, 130);
+      const count = document.createElement("strong");
+      count.textContent = new Intl.NumberFormat("en-ZA").format(Number(valueOf(row)) || 0);
+      item.append(label, count);
+      host.append(item);
     }
   }
 
