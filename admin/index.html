@@ -78,6 +78,15 @@
             />
             <p class="password-hint" id="admin-password-hint">6+ characters with at least one special character (such as ! or @).</p>
 
+            <details class="totp-details">
+              <summary>Use an authenticator code (if enabled)</summary>
+              <label for="admin-totp">6-digit authenticator code</label>
+              <input id="admin-totp" name="totpCode" type="text" inputmode="numeric"
+                     pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"
+                     placeholder="123456" aria-describedby="totp-help" />
+              <small id="totp-help">Only required if your account has two-step verification switched on.</small>
+            </details>
+
             <p class="form-message" data-login-message role="status" aria-live="polite"></p>
 
             <button class="primary-button login-button" type="submit" data-login-button>
