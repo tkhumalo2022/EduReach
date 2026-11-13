@@ -7,6 +7,7 @@ import {
 } from "../src/lib/security.js";
 import { handleAdminApi } from "../src/lib/adminApi.js";
 import handleBooksApi from "../src/lib/adminBooksApi.js";
+import handleInsightsApi from "../src/lib/adminInsightsApi.js";
 
 const LIMITS = Object.freeze({
   name: 120,
@@ -29,6 +30,7 @@ export default async function handler(request, response) {
   const adminAction = requestUrl.searchParams.get("adminAction");
 
   if (adminAction === "books") return handleBooksApi(request, response);
+  if (adminAction === "insights") return handleInsightsApi(request, response);
 
   if (adminAction) {
     return handleAdminApi(request, response, adminAction);
