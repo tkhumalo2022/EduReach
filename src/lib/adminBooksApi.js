@@ -98,7 +98,7 @@ async function wixFetch(config, path, method = "GET", body) {
   }
 }
 
-function publicDraft(value) {
+export function publicDraft(value) {
   const data = value.data || {};
   return {
     id: value.id || data._id || "", title: String(data.title || ""),
