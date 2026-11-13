@@ -9,6 +9,7 @@
   <link rel="icon" href="/assets/logo-mark.png" type="image/png" />
   <link rel="stylesheet" href="/admin/admin.css" />
   <script src="/admin/admin.js" defer></script>
+  <script src="/admin/publisher.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#admin-main">Skip to admin workspace</a>
@@ -123,7 +124,8 @@
           <nav>
             <a class="active" href="#overview">Overview</a>
             <a href="#insights">Visitor insights</a>
-            <a href="#publish">Publish content</a>
+            <a href="#publisher">Upload & drafts</a>
+            <a href="#publish">Publishing shortcuts</a>
             <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">Manage ebooks in Wix ↗</a>
             <a href="#checklist">Publishing checklist</a>
             <a href="#tools">Website tools</a>
@@ -191,13 +193,101 @@
             </div>
           </section>
 
+          <section class="dashboard-section publisher-pane" id="publisher" aria-labelledby="publisher-title">
+            <div class="publisher-heading">
+              <div>
+                <p class="eyebrow">EduReach Publishing Desk</p>
+                <h2 id="publisher-title">Upload it here. Keep it organised.</h2>
+                <p>Add a book, a free PDF or an article right inside your workspace. Save drafts for review before anything goes live.</p>
+              </div>
+              <span class="publisher-connection" id="publisher-connection" role="status">Checking publishing connection…</span>
+            </div>
+            <div class="publisher-tabs" role="group" aria-label="What would you like to add?">
+              <button type="button" class="active" data-publisher-type="ebooks" aria-pressed="true">Books</button>
+              <button type="button" data-publisher-type="downloads" aria-pressed="false">Free resources</button>
+              <button type="button" data-publisher-type="articles" aria-pressed="false">Articles</button>
+            </div>
+            <div class="publisher-layout">
+              <form id="publisher-form" class="publisher-form">
+                <input type="hidden" id="publisher-id" value="">
+                <div class="publisher-row">
+                  <label class="publisher-field">
+                    <span>Title <span aria-hidden="true">*</span></span>
+                    <input id="publisher-title-input" name="title" maxlength="140" minlength="3" required placeholder="e.g. Understanding Autism in the Classroom">
+                  </label>
+                  <label class="publisher-field">
+                    <span>Topic</span>
+                    <select id="publisher-topic" name="topic">
+                      <option>Autism</option><option>ADHD</option><option>Down syndrome</option>
+                      <option selected>Inclusive education</option><option>Teaching strategies</option>
+                      <option>Parent guides</option><option>Other</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="publisher-field" data-publisher-author>
+                  <span>Author or creator <span aria-hidden="true">*</span></span>
+                  <input id="publisher-author" name="author" minlength="2" maxlength="120" placeholder="Full name">
+                </label>
+                <label class="publisher-field">
+                  <span>Short description <span aria-hidden="true">*</span></span>
+                  <textarea id="publisher-description" name="description" maxlength="3000" minlength="20" rows="4" placeholder="Who is this resource for, and what will it help them do?" required></textarea>
+                </label>
+                <label class="publisher-field" id="publisher-article-body" hidden>
+                  <span>Full article <span aria-hidden="true">*</span></span>
+                  <textarea id="publisher-body" name="body" minlength="80" maxlength="20000" rows="9" placeholder="Write the full article here. Include clear headings and practical examples."></textarea>
+                </label>
+                <label class="publisher-field" id="publisher-price-field">
+                  <span>Book price (R)</span>
+                  <input id="publisher-price" type="number" name="price" min="0" max="100000" step=".01" value="0" inputmode="decimal">
+                  <small>R0 is a free resource. Paid books can be drafted, but paid PDF delivery needs separate private storage.</small>
+                </label>
+                <div class="publisher-file-grid">
+                  <div class="publisher-upload">
+                    <label for="publisher-cover"><strong>Cover image</strong><small>JPG, PNG or WEBP · maximum 5 MB</small></label>
+                    <input id="publisher-cover" type="file" accept="image/jpeg,image/png,image/webp">
+                    <button class="secondary-button" type="button" id="publisher-cover-upload">Upload cover</button>
+                    <span id="publisher-cover-status" role="status">No cover uploaded yet.</span>
+                  </div>
+                  <div class="publisher-upload" id="publisher-pdf-wrap">
+                    <label for="publisher-pdf"><strong>Free PDF attachment</strong><small>PDF · maximum 10 MB</small></label>
+                    <input id="publisher-pdf" type="file" accept="application/pdf,.pdf">
+                    <button class="secondary-button" type="button" id="publisher-pdf-upload">Upload free PDF</button>
+                    <span id="publisher-pdf-status" role="status">No PDF uploaded yet.</span>
+                  </div>
+                </div>
+                <p class="publisher-security" id="publisher-file-warning">Paid PDFs must never be uploaded as public downloads. This editor blocks them.</p>
+                <div class="publisher-form-actions">
+                  <button class="primary-button" type="submit" id="publisher-save">Save to Wix drafts</button>
+                  <button class="secondary-button" type="button" id="publisher-reset">New draft</button>
+                </div>
+                <p id="publisher-message" class="publisher-message" role="status" aria-live="polite">Drafts are private and do not change your public website.</p>
+              </form>
+              <aside class="publisher-preview" aria-label="Live content preview">
+                <p class="eyebrow">Draft preview</p>
+                <div class="publisher-preview-cover" id="publisher-preview-cover"><span>ER</span></div>
+                <p class="publisher-preview-topic" id="publisher-preview-topic">Inclusive education</p>
+                <h3 id="publisher-preview-title">Your new resource</h3>
+                <p id="publisher-preview-copy">Add a title and description to see how the content will read.</p>
+                <strong id="publisher-preview-price">Free</strong>
+                <p class="publisher-preview-note">Preview only · nothing is public until a reviewed draft is published.</p>
+              </aside>
+            </div>
+            <div class="publisher-drafts">
+              <div class="publisher-drafts-head"><div><h3>Saved drafts</h3><p>Reopen and edit without starting over.</p></div><button type="button" class="secondary-button" id="publisher-refresh">Refresh drafts</button></div>
+              <div class="publisher-draft-list" id="publisher-draft-list" aria-live="polite"><p>Connect Wix publishing to load drafts.</p></div>
+              <p class="publisher-setup" id="publisher-setup" hidden>
+                <strong>One-time setup required.</strong> This site needs a restricted Wix CMS/Media API key stored securely in Vercel before direct uploads and draft saving can work. Existing published books remain untouched.
+              </p>
+            </div>
+          </section>
+
           <section class="dashboard-section" id="publish" aria-labelledby="publish-title">
             <div class="section-heading">
               <div>
                 <p class="eyebrow">Quick actions</p>
                 <h2 id="publish-title">What would you like to publish?</h2>
               </div>
-              <p>Manage all learning resources securely in Wix CMS.</p>
+              <p>Use the Upload & drafts section above, or open Wix for advanced edits and publishing approval.</p>
             </div>
 
             <div class="publish-grid">
@@ -218,7 +308,7 @@
                   <h3>Resource or ebook</h3>
                   <p>Upload useful PDFs, guides and paid or free educational materials.</p>
                 </div>
-                <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener">Manage ebooks in Wix <span aria-hidden="true">→</span></a>
+                <a href="#publisher">Open upload form <span aria-hidden="true">↑</span></a>
               </article>
 
               <article class="publish-card">
