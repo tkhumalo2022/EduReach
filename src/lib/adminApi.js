@@ -10,6 +10,7 @@ import {
   revokeAdminSession,
   verifyAdminCredentials
 } from "./adminAuth.js";
+import { verifyAdminTotp } from "./adminTotp.js";
 import {
   ApiRequestError,
   enforceRateLimit,
@@ -71,10 +72,11 @@ async function handleLogin(request, response) {
 
   const authenticated = await verifyAdminCredentials(body.email, body.password, config);
 
-  if (!authenticated) {
+  const totpSecret = String(process.env.EDUREACH_ADMIN_TOTP_SECRET || "").trim();
+  if (!authenticated || (totpSecret && !verifyAdminTotp(body.totpCode, totpSecret))) {
     return sendJson(response, 401, {
       ok: false,
-      message: "The email or password is incorrect."
+      message: "The email, password or authenticator code is incorrect."
     });
   }
 
