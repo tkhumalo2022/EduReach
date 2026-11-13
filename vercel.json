@@ -55,6 +55,10 @@
       "destination": "/api/contact?adminAction=books"
     },
     {
+      "source": "/api/admin/insights",
+      "destination": "/api/contact?adminAction=insights"
+    },
+    {
       "source": "/api/admin/login",
       "destination": "/api/contact?adminAction=login"
     },
