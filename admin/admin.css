@@ -710,3 +710,11 @@ button:disabled { cursor: wait; opacity: 0.65; }
 .insights-footnote { margin: 1.1rem 0 0; color: var(--muted); font-size: 0.78rem; }
 @media (max-width: 940px) { .insights-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .insights-grid, .insights-columns { grid-template-columns: 1fr; } .insights-stat { padding: 0.95rem; } }
+
+.totp-details { margin: 0.25rem 0 0.8rem; color: var(--muted); font-size: 0.85rem; }
+.totp-details summary { cursor: pointer; color: var(--blue); font-weight: 650; padding: 0.4rem 0; }
+.totp-details label { display: block; margin: 0.4rem 0; color: var(--ink); }
+.totp-details input { width: 100%; }
+.totp-details small { display: block; margin-top: 0.25rem; font-size: 0.74rem; }
+.insights-tools { display: flex; flex-wrap: wrap; gap: 0.85rem; margin-top: 0.85rem; }
+.insights-tools a { color: var(--blue); font-weight: 700; font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
