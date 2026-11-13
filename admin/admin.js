@@ -129,9 +129,11 @@
     dashboardView.querySelector("h1")?.focus?.({ preventScroll: true });
     loadContentSnapshot();
     loadInsights();
+    window.dispatchEvent(new CustomEvent("edureach:admin-ready", { detail: { csrfToken: activeSession?.csrfToken || "" } }));
   }
 
   function showLogin() {
+    window.dispatchEvent(new Event("edureach:admin-closed"));
     dashboardView.hidden = true;
     loginView.hidden = false;
     document.body.classList.remove("dashboard-active");
