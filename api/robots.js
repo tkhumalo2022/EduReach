@@ -8,7 +8,8 @@ Disallow: /payment-success
 Disallow: /payment-cancelled
 Disallow: /api/orders
 Disallow: /api/payfast/
-Disallow: /admin/
+Disallow: /admin
+Disallow: /cart
 Disallow: /private/
 
 Sitemap: ${SITE_ORIGIN}/sitemap.xml
