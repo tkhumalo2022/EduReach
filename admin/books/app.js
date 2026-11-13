@@ -217,7 +217,7 @@
       const url = new URL(data.uploadUrl);
       url.searchParams.set("filename", file.name);
       const uploadResponse = await fetch(url.toString(), {
-        method: "PUT", headers: { "Content-Type": file.type }, body: file
+        method: "PUT", redirect: "error", headers: { "Content-Type": file.type }, body: file
       });
       if (!uploadResponse.ok) throw new Error("Wix upload failed. Retry or upload in the Wix Media Manager.");
       const uploadData = await uploadResponse.json();
