@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#063b82">
+  <title>Book Publishing Studio | EduReach</title>
+  <link rel="icon" href="/assets/logo-mark.png" type="image/png">
+  <link rel="stylesheet" href="/admin/books/styles.css">
+  <script src="/admin/books/app.js" defer></script>
+</head>
+<body>
+  <a href="#content" class="skip-link">Skip to content</a>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Admin navigation">
+      <a href="/admin" class="identity"><img src="/assets/logo.png" width="170" height="49" alt="EduReach"></a>
+      <p class="rail-label">OWNER WORKSPACE</p>
+      <nav>
+        <a href="/admin"><span aria-hidden="true">⌂</span> Overview</a>
+        <a class="selected" href="/admin/books" aria-current="page"><span aria-hidden="true">▤</span> Book studio</a>
+        <a href="/resources/ebooks" target="_blank" rel="noopener"><span aria-hidden="true">↗</span> View public shop</a>
+        <a href="https://manage.wix.com/dashboard" target="_blank" rel="noopener"><span aria-hidden="true">◈</span> Wix CMS backup</a>
+      </nav>
+      <div class="sidebar-help"><strong>One book at a time.</strong><p>Write the details, add files, review, and save as a private draft.</p></div>
+      <a href="/" class="back-home">← Back to EduReach</a>
+    </aside>
+
+    <main id="content">
+      <header class="topbar">
+        <div class="top-name"><span class="mobile-name">EduReach / </span>Publishing studio</div>
+        <div class="top-actions"><span class="status-pill" id="connection-pill">Checking connection…</span><button type="button" id="signout" class="ghost-button">Sign out</button></div>
+      </header>
+      <div class="workspace">
+        <div id="notice" role="status" aria-live="polite" hidden></div>
+        <section class="welcome">
+          <div><p class="eyebrow">YOUR CONTENT, YOUR CONTROL</p><h1>Good afternoon.<br><em>What are we publishing?</em></h1><p>Add an ebook without wrestling with the Wix editor. Review everything before it becomes public.</p></div>
+          <div class="welcome-mark" aria-hidden="true"><span>ER</span><small>PUBLISHING</small></div>
+        </section>
+
+        <section class="stat-grid" aria-label="Book overview">
+          <article class="stat"><small>Published books</small><strong id="published-count">—</strong><span>Showing on website</span></article>
+          <article class="stat"><small>Saved drafts</small><strong id="draft-count">—</strong><span>Not yet public</span></article>
+          <article class="stat"><small>Next step</small><strong class="stat-word">Add a book</strong><span>Start with the title</span></article>
+        </section>
+
+        <div class="section-header" id="create"><div><p class="eyebrow">NEW PUBLICATION</p><h2>Add a book</h2><p>Three simple steps. Nothing goes live automatically.</p></div><span class="phase-label">01 / Create</span></div>
+        <div class="editor-grid">
+          <form id="book-form" class="editor-card" novalidate>
+            <div class="editor-heading"><span class="step-dot">1</span><div><h3>Book details</h3><p>These details appear on the public book page.</p></div></div>
+            <div class="form-grid">
+              <label class="wide">Book title <span>*</span><input name="title" id="title" maxlength="140" required minlength="3" placeholder="e.g. A Practical Guide to Inclusive Learning"></label>
+              <label class="wide">Author <span>*</span><input name="author" id="author" maxlength="100" required placeholder="Author's full name"></label>
+              <label class="wide">Description <span>*</span><textarea name="description" id="description" maxlength="3200" rows="5" required minlength="20" placeholder="Who is this for, and how will it help them?"></textarea><small>Explain what readers will learn, in plain language.</small></label>
+              <label>Topic <select name="category" id="category"><option>Inclusive education</option><option>Autism</option><option>ADHD</option><option>Down syndrome</option><option>Parent guides</option><option>Teacher resources</option><option>Other</option></select></label>
+              <label>Price (ZAR) <input name="price" id="price" type="number" min="0" max="100000" step="0.01" value="0" inputmode="decimal"><small>R0 means free.</small></label>
+            </div>
+
+            <div class="editor-heading upload-heading"><span class="step-dot">2</span><div><h3>Add the cover & PDF</h3><p>Choose files from your computer or paste an existing Wix link.</p></div></div>
+            <div class="form-grid">
+              <label class="wide">Book cover <small>JPG, PNG, WEBP · maximum 10 MB</small>
+                <input id="cover-file" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                <input name="coverImage" id="coverImage" type="url" placeholder="Or paste a Wix cover image link">
+              </label>
+              <label class="wide">Book PDF <small>PDF · maximum 10 MB. Paid books can be drafted, but need protected delivery before launch.</small>
+                <input id="pdf-file" type="file" accept=".pdf,application/pdf">
+                <input name="pdfFile" id="pdfFile" type="url" placeholder="Or paste a Wix PDF link">
+              </label>
+            </div>
+            <label class="featured-checkbox"><input type="checkbox" name="featured" id="featured"><span><strong>Feature this book</strong><small>Place it in the Featured Books collection.</small></span></label>
+            <div class="editor-footer"><span class="safe-note">🔒 Changes stay in a draft until published.</span><button class="primary-button" type="submit" id="save-button">Save as draft <span aria-hidden="true">→</span></button></div>
+          </form>
+
+          <aside class="preview-column" aria-label="Book preview">
+            <div class="preview-head"><div><p class="eyebrow">LIVE PREVIEW</p><h3>How readers will see it</h3></div><span>Not published</span></div>
+            <div class="book-preview">
+              <div class="cover-frame"><img src="" alt="" id="preview-cover" hidden><div class="no-cover" id="no-cover"><span>ER</span><small>BOOK COVER</small></div></div>
+              <div class="preview-copy"><span class="topic" id="preview-category">Inclusive education</span><h3 id="preview-title">Your book title appears here</h3><p class="byline" id="preview-author">By your author</p><p class="preview-description" id="preview-description">Write a description to see the book as your readers will.</p><div class="preview-footer"><strong id="preview-price">Free</strong><span class="preview-button">View book ↗</span></div></div>
+            </div>
+            <div class="preview-tip"><strong>Tip</strong> Use a clear cover, a short title and a description that explains who the book helps.</div>
+          </aside>
+        </div>
+
+        <section class="library-section" id="library">
+          <div class="section-header"><div><p class="eyebrow">YOUR LIBRARY</p><h2>Books & drafts</h2><p>Published books are public. Drafts stay private until reviewed.</p></div><button class="ghost-button" type="button" id="refresh">Refresh</button></div>
+          <div id="books-status" class="library-state">Loading your book library…</div>
+          <div id="draft-library" class="library-grid" aria-label="Draft books"></div>
+          <div id="published-library" class="library-grid" aria-label="Published books"></div>
+        </section>
+        <footer class="footer">EduReach Publishing Studio · Designed for clear, accessible publishing.</footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
