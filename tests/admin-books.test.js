@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import bookAdminHandler, { isTrustedMediaUrl, validateBook } from "../api/admin-books.js";
+import bookAdminHandler, { isTrustedMediaUrl, validateBook } from "../src/lib/adminBooksApi.js";
 
 const basic = {
   title: "Understanding Inclusive Learning",
