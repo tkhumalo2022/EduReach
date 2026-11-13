@@ -17,7 +17,7 @@ test("private insights API rejects requests without a session cookie", async () 
   await handleInsightsApi({ method: "GET", headers: {} }, res);
   assert.equal(res.statusCode, 401);
   assert.equal(JSON.parse(res.body).ok, false);
-  assert.match(res.headers["cache-control"], /private/);
+  assert.match(res.headers["cache-control"], /no-store/);
 });
 
 test("insights API refuses methods other than GET", async () => {
