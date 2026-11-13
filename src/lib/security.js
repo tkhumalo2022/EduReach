@@ -115,10 +115,17 @@ export async function readRawBody(request, options = {}) {
 }
 
 export async function enforceRateLimit(request, response, options = {}) {
-  if (process.env.EDUREACH_RATE_LIMIT_DISABLED === "1") return true;
+  const strict = options.failClosed === true && process.env.NODE_ENV === "production";
+  if (process.env.EDUREACH_RATE_LIMIT_DISABLED === "1" && !strict) return true;
 
   const cache = getRateLimitCache();
-  if (!cache) return true;
+  if (!cache) {
+    if (strict) {
+      sendJson(response, 503, { ok: false, message: "Sign-in protection is temporarily unavailable. Try again later." });
+      return false;
+    }
+    return true;
+  }
 
   const name = normalizeRateLimitName(options.name || "api");
   const limit = readPositiveInteger(`EDUREACH_RATE_LIMIT_${name.toUpperCase()}_MAX`, options.limit || 60);
@@ -129,7 +136,7 @@ export async function enforceRateLimit(request, response, options = {}) {
   const now = Date.now();
   const bucket = Math.floor(now / (windowSeconds * 1000));
   const resetAt = (bucket + 1) * windowSeconds;
-  const key = `${name}:${bucket}:${rateLimitIdentity(request, name)}`;
+  const key = `${name}:${bucket}:${rateLimitIdentity(request, name, options)}`;
 
   try {
     const current = await cache.get(key);
@@ -154,10 +161,11 @@ export async function enforceRateLimit(request, response, options = {}) {
       return false;
     }
   } catch (error) {
-    console.warn("EduReach rate limit check failed open.", {
-      name,
-      message: error instanceof Error ? error.message : "Unknown error"
-    });
+    console.warn("EduReach rate limit check unavailable.", { name });
+    if (strict) {
+      sendJson(response, 503, { ok: false, message: "Sign-in protection is temporarily unavailable. Try again later." });
+      return false;
+    }
   }
 
   return true;
@@ -206,11 +214,14 @@ function getRateLimitCache() {
   }
 }
 
-function rateLimitIdentity(request, name) {
+function rateLimitIdentity(request, name, options = {}) {
   const forwardedFor = getRequestHeader(request, "x-forwarded-for").split(",")[0].trim();
   const realIp = getRequestHeader(request, "x-real-ip").trim();
   const userAgent = getRequestHeader(request, "user-agent").slice(0, 160);
-  const identity = [forwardedFor || realIp || "unknown", userAgent].join("|");
+  // A spoofed user-agent must not reset the login attempt counter.
+  const identity = options.failClosed === true
+    ? forwardedFor || realIp || "unknown"
+    : [forwardedFor || realIp || "unknown", userAgent].join("|");
   const secret =
     process.env.EDUREACH_RATE_LIMIT_SECRET ||
     process.env.EDUREACH_BACKEND_SECRET ||
