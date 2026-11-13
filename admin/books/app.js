@@ -38,7 +38,7 @@
   }
 
   async function adminPost(payload) {
-    return json("/api/admin-books", {
+    return json("/api/admin/books", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-edureach-csrf": csrf },
       body: JSON.stringify(payload)
@@ -152,7 +152,7 @@
     try {
       const results = await Promise.allSettled([
         json("/api/wix-content?type=ebooks&limit=100"),
-        json("/api/admin-books")
+        json("/api/admin/books")
       ]);
 
       const publicResult = results[0].status === "fulfilled" ? results[0].value : { items: [] };
