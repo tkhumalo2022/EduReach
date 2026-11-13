@@ -93,7 +93,40 @@ export function organizationStructuredData() {
 }
 
 export function contentStructuredData(item, type = "") {
-  if (!["articles", "blogs"].includes(type || item?.type)) return null;
+  const contentType = type || item?.type;
+  if (contentType === "ebooks") {
+    // All properties below come from the published Wix CMS record.
+    // No invented ISBNs, ratings, reviews, or author names.
+    const metadata = itemSeo(item, type);
+    const book = {
+      "@context": "https://schema.org",
+      "@type": "Book",
+      name: metadata.title,
+      description: metadata.description,
+      url: metadata.canonical,
+      bookFormat: "https://schema.org/EBook",
+      inLanguage: text(item?.language) || "en",
+      publisher: {
+        "@type": "EducationalOrganization",
+        name: "EduReach Inclusive Education Consultancy",
+        url: SITE_ORIGIN
+      }
+    };
+    if (item?.image?.url) book.image = [absoluteUrl(item.image.url)];
+    if (item?.author) book.author = { "@type": "Person", name: text(item.author) };
+    if (item?.isbn) book.isbn = text(item.isbn);
+    if (item?.date) book.datePublished = item.date;
+    const price = Number(item?.price);
+    if (Number.isFinite(price) && price >= 0 && ["free", "paid"].includes(item?.accessType)) {
+      book.offers = {
+        "@type": "Offer", url: metadata.canonical,
+        price: Number(price.toFixed(2)), priceCurrency: "ZAR",
+        seller: { "@type": "Organization", name: "EduReach Inclusive Education Consultancy" }
+      };
+    }
+    return book;
+  }
+  if (!["articles", "blogs"].includes(contentType)) return null;
 
   const seo = itemSeo(item, type);
   const structuredData = {
