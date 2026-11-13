@@ -3,13 +3,9 @@ import { SITE_ORIGIN } from "../src/lib/seo.js";
 const ROBOTS_TXT = `User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /checkout
-Disallow: /payment-success
-Disallow: /payment-cancelled
 Disallow: /api/orders
 Disallow: /api/payfast/
 Disallow: /admin
-Disallow: /cart
 Disallow: /private/
 
 Sitemap: ${SITE_ORIGIN}/sitemap.xml
