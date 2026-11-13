@@ -80,3 +80,13 @@ The public bookshop preview renders all three real books. Browser QA confirmed A
 - The Book Studio now reports disconnected if Wix draft queries fail, instead of reporting a healthy connection.
 - Important **unresolved preexisting commerce risk**: current paid download fulfillment redirects customers to Wix media URLs after purchase. A buyer may share that media URL outside checkout. This feature branch does **not** modify the live checkout or its paid download handler; a protected file storage and delivery redesign is required before treating paid PDFs as non-shareable.
 - A redacted source audit found no committed environment-secret file beyond template `.env.example`; this is not proof that previously shared credentials or Wix media files have never leaked. Rotate any credential known to be exposed and move paid PDFs out of public storage after choosing a protected delivery system.
+
+## Preview-only owner sign-in preparation — 13 November 2026
+
+- Verified the live Vercel project's environment-variable **names only**, without decrypting secret values. `EDUREACH_ADMIN_EMAIL` and `EDUREACH_ADMIN_PASSWORD_HASH` are not yet configured, so sign-in fails closed.
+- The authenticated owner dashboard lives at `/admin`. Book Studio is `/admin/books`. When a visitor opens Book Studio without a session, they are directed to `/admin?next=%2Fadmin%2Fbooks`; this return path is explicitly allowlisted and cannot redirect externally.
+- Removed the localhost `?preview=dashboard` demo bypass so the UI only renders an authenticated dashboard from a real server-verified session.
+- The owner has a private, local PowerShell script on the authorised laptop that prompts for an email and a password (16+ characters) without echoing the password; it generates a salted scrypt verifier with `N=16384,r=8,p=1` and copies only the verifier to the clipboard.
+- To activate **review** access, the owner must set `EDUREACH_ADMIN_EMAIL` and `EDUREACH_ADMIN_PASSWORD_HASH` as **sensitive Preview variables scoped to this review branch**, then redeploy this branch to pick them up. Do not expose the password or verifier in chat, source control, logs or screenshots.
+- Do not add these variables to Production until the owner explicitly authorises launch. Do not attach a broad Wix administrative API key while testing login.
+- After preview variables are set, verify login, session renewal, protection of `/api/admin/books`, redirect back to the Book Studio, logout and cookie invalidation without publishing any books.
