@@ -21,7 +21,7 @@ export function validateBook(input) {
   if (author.length < 2 || author.length > 100) throw new Error("Enter the author's name.");
   if (description.length < 20 || description.length > 3200) throw new Error("Add at least 20 characters about the book.");
   if (!CATEGORIES.has(category)) throw new Error("Choose one of the available categories.");
-  if (!Number.isFinite(price) || price < 0 || price > 100000 || Math.round(price * 100) !== price * 100) {
+  if (!Number.isFinite(price) || price < 0 || price > 100000 || Math.abs(price * 100 - Math.round(price * 100)) > 0.000001) {
     throw new Error("Enter a valid price in rand, or 0 for a free book.");
   }
   for (const url of [coverImage, pdfFile]) {
@@ -76,9 +76,9 @@ function publicDraft(value) {
   const data = value.data || {};
   return {
     id: value.id || data._id || "", title: String(data.title || ""),
-    author: String(data.author || ""), category: String(data.category || ""),
+    author: String(data.author || ""), description: String(data.description || ""), category: String(data.category || ""),
     price: Number(data.price || 0), featured: Boolean(data.featured),
-    coverImage: String(data.coverImage || ""), pdfFile: Boolean(data.pdfFile)
+    coverImage: String(data.coverImage || ""), pdfFile: String(data.pdfFile || "")
   };
 }
 
@@ -122,6 +122,17 @@ export default async function handler(req, res) {
         dataCollectionId: config.collectionId + "__drafts", dataItem: { data: book }
       });
       return sendJson(res, 201, { ok: true, message: "Book saved as a draft in Wix.", draft: publicDraft(created.dataItem || {}) });
+    }
+    if (input.action === "updateDraft") {
+      const id = String(input.id || "").trim();
+      if (!/^[a-zA-Z0-9_-]{5,128}$/.test(id)) {
+        return sendJson(res, 400, { ok: false, message: "Choose a saved draft to update." });
+      }
+      const book = validateBook(input.book);
+      const updated = await wixFetch(config, "/wix-data/v2/items/" + encodeURIComponent(id), "PUT", {
+        dataCollectionId: config.collectionId + "__drafts", dataItem: { id, data: book }
+      });
+      return sendJson(res, 200, { ok: true, message: "Draft changes saved in Wix.", draft: publicDraft(updated.dataItem || {}) });
     }
     if (input.action === "publishDraft") {
       const id = String(input.id || "").trim();
