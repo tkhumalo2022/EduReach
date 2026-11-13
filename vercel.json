@@ -52,7 +52,7 @@
     },
     {
       "source": "/api/admin/books",
-      "destination": "/api/admin-books"
+      "destination": "/api/contact?adminAction=books"
     },
     {
       "source": "/api/admin/login",
