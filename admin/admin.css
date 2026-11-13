@@ -79,6 +79,13 @@ p { margin-top: 0; }
   text-transform: uppercase;
 }
 
+.password-hint {
+  margin: 0.5rem 0 0.7rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .login-view {
   min-height: 100vh;
   display: grid;
