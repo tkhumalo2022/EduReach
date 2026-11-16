@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import net from "node:net";
 import { getCache } from "@vercel/functions";
 
 const RATE_LIMIT_NAMESPACE = "edureach-rate-limits";
@@ -214,14 +215,17 @@ function getRateLimitCache() {
   }
 }
 
-function rateLimitIdentity(request, name, options = {}) {
-  const forwardedFor = getRequestHeader(request, "x-forwarded-for").split(",")[0].trim();
-  const realIp = getRequestHeader(request, "x-real-ip").trim();
-  const userAgent = getRequestHeader(request, "user-agent").slice(0, 160);
-  // A spoofed user-agent must not reset the login attempt counter.
-  const identity = options.failClosed === true
-    ? forwardedFor || realIp || "unknown"
-    : [forwardedFor || realIp || "unknown", userAgent].join("|");
+export function rateLimitIdentity(request, name, options = {}) {
+  // Vercel overwrites client IP headers at its proxy. Never accept raw
+  // x-forwarded-for or a user-agent as security-sensitive identity.
+  // On other runtimes use the direct socket peer rather than spoofable headers.
+  const onVercel = process.env.VERCEL === "1";
+  const realIp = onVercel ? getRequestHeader(request, "x-real-ip").trim() : "";
+  const vercelForwarded = onVercel
+    ? getRequestHeader(request, "x-vercel-forwarded-for").split(",")[0].trim()
+    : "";
+  const socketIp = String(request?.socket?.remoteAddress || request?.connection?.remoteAddress || "").trim();
+  const clientIp = [realIp, vercelForwarded, socketIp].find((value) => net.isIP(value)) || "unknown";
   const secret =
     process.env.EDUREACH_RATE_LIMIT_SECRET ||
     process.env.EDUREACH_BACKEND_SECRET ||
@@ -229,7 +233,7 @@ function rateLimitIdentity(request, name, options = {}) {
 
   return crypto
     .createHash("sha256")
-    .update(`${secret}:${name}:${identity}`)
+    .update(`${secret}:${name}:${clientIp}`)
     .digest("hex");
 }
 
