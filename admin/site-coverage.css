@@ -1,0 +1,78 @@
+/* Review-only website coverage map. Mirrors existing admin cards and variables. */
+.website-section-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr));
+  gap: .8rem;
+}
+.website-section-card {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+.website-section-card h3 {
+  margin: 0;
+  color: var(--blue-dark);
+  font-size: 1rem;
+}
+.website-section-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.5;
+}
+.website-section-status {
+  width: fit-content;
+  padding: .3rem .5rem;
+  border-radius: 6px;
+  background: #eef3f8;
+  color: #37516a;
+  font-size: .76rem;
+  font-weight: 700;
+}
+.website-section-status.connected {
+  background: #e6f6ef;
+  color: #086845;
+}
+.website-section-status.needs-setup {
+  background: #fff4e4;
+  color: #755016;
+}
+.website-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+  margin-top: auto;
+  padding-top: .35rem;
+}
+.website-section-actions a {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.website-section-note {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: .87rem;
+}
+.website-core-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem .85rem;
+  margin-top: .9rem;
+}
+.website-core-links a {
+  color: var(--blue);
+  font-size: .83rem;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+@media (max-width: 600px) {
+  .website-section-map { grid-template-columns: 1fr; }
+}

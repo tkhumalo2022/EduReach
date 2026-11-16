@@ -1,0 +1,116 @@
+/* EduReach homepage hero refinement — preview only.
+   Preserves the existing classroom photograph, calls to action and site palette.
+   Small, predictable selectors keep the CSS cascade easy to audit. */
+.hero {
+  min-height: min(740px, calc(100svh - var(--header-height)));
+  isolation: isolate;
+  background: #fbf8ef;
+}
+
+.hero-image {
+  inset: 1.25rem max(1rem, calc((100vw - var(--container)) / 2)) 1.25rem auto;
+  width: min(50.5%, 680px);
+  height: calc(100% - 2.5rem);
+  border-radius: var(--radius);
+  object-position: center;
+  box-shadow: 0 22px 48px rgba(4, 40, 91, 0.13);
+}
+
+.hero-scrim {
+  background: linear-gradient(90deg, #fbf8ef 0%, rgba(251, 248, 239, 0.98) 35%, rgba(251, 248, 239, 0) 68%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  display: flex;
+  min-height: 590px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding-block: 4rem;
+}
+
+.hero .eyebrow {
+  color: var(--teal);
+  letter-spacing: 0.08em;
+}
+
+.hero-inner h1 {
+  max-width: min(585px, 55%);
+  color: var(--blue-dark);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.6rem, 4.35vw, 4.8rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.hero-inner .hero-intro {
+  max-width: min(530px, 53%);
+  color: #405265;
+  font-size: clamp(1rem, 1.15vw, 1.1rem);
+  line-height: 1.7;
+}
+
+.hero .button-glass {
+  color: var(--blue-dark);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(6, 59, 130, 0.32);
+  backdrop-filter: none;
+}
+
+.hero .button-glass:hover {
+  background: var(--white);
+  border-color: var(--blue);
+}
+
+@media (max-width: 980px) {
+  .hero-inner h1 { max-width: 55%; font-size: clamp(2.45rem, 4.6vw, 3.55rem); }
+  .hero-inner .hero-intro { max-width: 53%; }
+  .hero-image { width: 48%; }
+}
+
+@media (max-width: 780px) {
+  .hero {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: visible;
+  }
+
+  .hero-inner {
+    order: 0;
+    min-height: 0;
+    padding-block: 3.25rem 2rem;
+  }
+
+  .hero-image {
+    position: relative;
+    inset: auto;
+    order: 1;
+    width: calc(100% - 2rem);
+    height: auto;
+    max-height: 420px;
+    margin: 0 auto 1.25rem;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .hero-scrim { display: none; }
+  .hero-inner h1,
+  .hero-inner .hero-intro { max-width: 700px; }
+}
+
+@media (max-width: 480px) {
+  .hero-inner { padding-block: 2.5rem 1.5rem; }
+  .hero-inner h1 { font-size: clamp(2.2rem, 9vw, 3rem); }
+  .hero-actions { width: 100%; }
+  .hero-actions .button { width: 100%; }
+  .hero-image { width: calc(100% - 1.25rem); aspect-ratio: 5 / 4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero .button { transition: none; }
+  .hero .button:hover { transform: none; }
+}
