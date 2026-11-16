@@ -185,3 +185,22 @@
   .hero .button { transition: none; }
   .hero .button:hover { transform: none; }
 }
+
+/* Browser-QA refinements: keep headline out of photo and caption away from floating tools. */
+.site-header .primary-nav > a.button.button-primary { color: #fff; }
+@media (min-width: 781px) {
+  .hero-inner h1 {
+    max-width: min(475px, 43%);
+    font-size: clamp(2.45rem, 3.95vw, 4.6rem);
+  }
+  .hero-inner .hero-intro { max-width: min(466px, 42.5%); }
+  .hero-scene-caption {
+    right: clamp(13.5rem, 18vw, 20rem);
+    width: min(268px, 25vw);
+  }
+}
+@media (min-width: 781px) and (max-width: 1100px) {
+  .hero-inner h1 { max-width: 40%; font-size: clamp(2.25rem, 3.75vw, 3.2rem); }
+  .hero-inner .hero-intro { max-width: 40%; font-size: 1rem; }
+  .hero-scene-caption { display: none; }
+}
