@@ -1,73 +1,136 @@
-/* EduReach homepage hero refinement — preview only.
-   Preserves the existing classroom photograph, calls to action and site palette.
-   Small, predictable selectors keep the CSS cascade easy to audit. */
+/* Concept B — GetLayers-inspired editorial scene.
+   Lightweight hand-built HTML/CSS, not a copied premium template.
+   Existing EduReach site, imagery, forms, CMS and brand are untouched. */
 .hero {
-  min-height: min(740px, calc(100svh - var(--header-height)));
+  position: relative;
+  display: grid;
+  align-items: center;
   isolation: isolate;
-  background: #fbf8ef;
+  min-height: min(790px, max(650px, calc(100svh - var(--header-height))));
+  overflow: hidden;
+  background: #061e3b;
 }
 
 .hero-image {
-  inset: 1.25rem max(1rem, calc((100vw - var(--container)) / 2)) 1.25rem auto;
-  width: min(50.5%, 680px);
-  height: calc(100% - 2.5rem);
-  border-radius: var(--radius);
+  position: absolute;
+  top: clamp(1.25rem, 2.8vw, 2.8rem);
+  right: clamp(1rem, 2.3vw, 2.8rem);
+  bottom: clamp(1.25rem, 2.8vw, 2.8rem);
+  left: auto;
+  width: min(55%, 950px);
+  height: calc(100% - clamp(2.5rem, 5.6vw, 5.6rem));
+  object-fit: cover;
   object-position: center;
-  box-shadow: 0 22px 48px rgba(4, 40, 91, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 18px;
+  box-shadow: 0 25px 70px rgba(0, 12, 31, 0.27);
 }
 
 .hero-scrim {
-  background: linear-gradient(90deg, #fbf8ef 0%, rgba(251, 248, 239, 0.98) 35%, rgba(251, 248, 239, 0) 68%);
+  background:
+    linear-gradient(90deg, #061e3b 0%, #061e3b 29%, rgba(6, 30, 59, .94) 39%, rgba(6, 30, 59, .40) 58%, rgba(6, 30, 59, .04) 84%),
+    linear-gradient(0deg, rgba(6, 30, 59, .32), transparent 45%);
   pointer-events: none;
 }
 
 .hero-inner {
+  position: relative;
+  z-index: 2;
   display: flex;
-  min-height: 590px;
+  min-height: 640px;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding-block: 4rem;
+  padding-block: 4.6rem;
 }
 
 .hero .eyebrow {
-  color: var(--teal);
-  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  color: #f2c965;
+  letter-spacing: .12em;
+  font-size: .76rem;
+}
+
+.hero .eyebrow::before {
+  content: "";
+  display: block;
+  width: 2.2rem;
+  height: 2px;
+  flex-shrink: 0;
+  background: var(--gold);
 }
 
 .hero-inner h1 {
-  max-width: min(585px, 55%);
-  color: var(--blue-dark);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.6rem, 4.35vw, 4.8rem);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  max-width: min(650px, 57%);
+  margin-bottom: 1.4rem;
+  color: #fff;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.6rem, 4.25vw, 5.15rem);
+  font-weight: 790;
+  line-height: 1.075;
+  letter-spacing: -.048em;
+  text-wrap: balance;
 }
 
 .hero-inner .hero-intro {
-  max-width: min(530px, 53%);
-  color: #405265;
-  font-size: clamp(1rem, 1.15vw, 1.1rem);
+  max-width: min(510px, 49%);
+  color: rgba(255, 255, 255, .86);
+  font-size: clamp(1rem, 1.13vw, 1.12rem);
   line-height: 1.7;
 }
 
 .hero .button-glass {
-  color: var(--blue-dark);
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(6, 59, 130, 0.32);
+  color: #fff;
+  background: rgba(8, 37, 69, .72);
+  border-color: rgba(255, 255, 255, .63);
   backdrop-filter: none;
 }
 
-.hero .button-glass:hover {
-  background: var(--white);
-  border-color: var(--blue);
+.hero .button-glass:hover,
+.hero .button-glass:focus-visible {
+  background: rgba(255, 255, 255, .12);
+  border-color: #fff;
 }
 
-@media (max-width: 980px) {
-  .hero-inner h1 { max-width: 55%; font-size: clamp(2.45rem, 4.6vw, 3.55rem); }
-  .hero-inner .hero-intro { max-width: 53%; }
-  .hero-image { width: 48%; }
+.hero-scene-caption {
+  position: absolute;
+  z-index: 2;
+  right: clamp(2.2rem, 4vw, 5.2rem);
+  bottom: clamp(2.25rem, 4vw, 4.9rem);
+  width: min(295px, 24vw);
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, .33);
+  border-left: 3px solid #e4b846;
+  border-radius: 8px;
+  color: #fff;
+  background: rgba(6, 30, 59, .90);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .22);
+}
+
+.hero-scene-caption span {
+  display: block;
+  margin-bottom: .28rem;
+  color: #f2c965;
+  font-size: .72rem;
+  font-weight: 780;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.hero-scene-caption strong {
+  display: block;
+  font-size: clamp(.86rem, 1.05vw, 1.03rem);
+  line-height: 1.45;
+  font-weight: 680;
+}
+
+@media (max-width: 970px) {
+  .hero-inner h1 { max-width: 56%; font-size: clamp(2.5rem, 4.25vw, 3.65rem); }
+  .hero-inner .hero-intro { max-width: 50%; }
+  .hero-image { width: 52%; }
+  .hero-scene-caption { width: 220px; }
 }
 
 @media (max-width: 780px) {
@@ -78,36 +141,44 @@
     align-items: stretch;
     overflow: visible;
   }
-
   .hero-inner {
     order: 0;
     min-height: 0;
-    padding-block: 3.25rem 2rem;
+    padding-block: 3.2rem 1.4rem;
   }
-
+  .hero-inner h1,
+  .hero-inner .hero-intro { max-width: 700px; }
   .hero-image {
     position: relative;
     inset: auto;
     order: 1;
+    display: block;
     width: calc(100% - 2rem);
     height: auto;
-    max-height: 420px;
-    margin: 0 auto 1.25rem;
+    max-height: 430px;
     aspect-ratio: 16 / 10;
-    object-fit: cover;
+    margin: 0 auto;
+    border-radius: 10px;
   }
-
   .hero-scrim { display: none; }
-  .hero-inner h1,
-  .hero-inner .hero-intro { max-width: 700px; }
+  .hero-scene-caption {
+    position: relative;
+    inset: auto;
+    order: 2;
+    width: calc(100% - 3rem);
+    max-width: 480px;
+    margin: -1.4rem auto 2rem;
+    padding: .85rem 1rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .hero-inner { padding-block: 2.5rem 1.5rem; }
-  .hero-inner h1 { font-size: clamp(2.2rem, 9vw, 3rem); }
+  .hero-inner { padding-block: 2.45rem 1rem; }
+  .hero-inner h1 { font-size: clamp(2.28rem, 9.2vw, 3rem); }
   .hero-actions { width: 100%; }
   .hero-actions .button { width: 100%; }
   .hero-image { width: calc(100% - 1.25rem); aspect-ratio: 5 / 4; }
+  .hero-scene-caption { width: calc(100% - 2.3rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
