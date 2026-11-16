@@ -8,6 +8,7 @@
   <title>Admin Workspace | EduReach</title>
   <link rel="icon" href="/assets/logo-mark.png" type="image/png" />
   <link rel="stylesheet" href="/admin/admin.css" />
+  <link rel="stylesheet" href="/admin/site-coverage.css" />
   <script src="/admin/admin.js" defer></script>
   <script src="/admin/publisher.js" defer></script>
 </head>
@@ -123,6 +124,7 @@
           <p class="sidebar-label">Workspace</p>
           <nav>
             <a class="active" href="#overview">Overview</a>
+            <a href="#site-map">Website sections</a>
             <a href="#insights">Visitor insights</a>
             <a href="#publisher">Upload & drafts</a>
             <a href="#publish">Publishing shortcuts</a>
@@ -165,6 +167,31 @@
               <div><p>Content library</p><strong data-content-count>Loading…</strong></div>
               <i class="status-dot" data-library-dot aria-hidden="true"></i>
             </article>
+          </section>
+
+          <section class="dashboard-section" id="site-map" aria-labelledby="site-map-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Across your live site</p>
+                <h2 id="site-map-title">Website sections &amp; content connections</h2>
+                <p>See what is published on the EduReach website and where each section is managed.</p>
+              </div>
+            </div>
+            <div class="website-section-map" data-website-sections aria-live="polite">
+              <p>Checking your Wix content collections…</p>
+            </div>
+            <p class="website-section-note">Books, free resources and articles have a direct draft editor above. Other content types are managed in Wix. Saving a draft never publishes it automatically; the Wix drafts feature must be enabled before direct editing works.</p>
+            <nav class="website-core-links" aria-label="Review fixed website sections">
+              <a href="/#home" target="_blank" rel="noopener">Hero</a>
+              <a href="/#story" target="_blank" rel="noopener">Our story</a>
+              <a href="/#founder" target="_blank" rel="noopener">Founder</a>
+              <a href="/#services" target="_blank" rel="noopener">Services</a>
+              <a href="/#vision" target="_blank" rel="noopener">Vision</a>
+              <a href="/#mission" target="_blank" rel="noopener">Mission</a>
+              <a href="/#pilot" target="_blank" rel="noopener">School pilot</a>
+              <a href="/#contact" target="_blank" rel="noopener">Contact</a>
+            </nav>
+            <p class="website-section-note">These core pages use website source content, not Wix drafts. Changing them requires a reviewed website update.</p>
           </section>
 
           <section class="dashboard-section insights-section" id="insights" aria-labelledby="insights-title">
