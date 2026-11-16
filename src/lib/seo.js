@@ -1,7 +1,7 @@
 export const SITE_ORIGIN = "https://edureach.network";
-export const DEFAULT_TITLE = "EduReach | Inclusive Education Consultancy";
+export const DEFAULT_TITLE = "Inclusive Education Consultancy Richards Bay | EduReach";
 export const DEFAULT_DESCRIPTION =
-  "EduReach supports schools, educators, learners and families through inclusive education training, learner support, research and practical school programmes.";
+  "EduReach provides inclusive education consultancy, teacher training, school inclusion audits and learner-support guidance in Richards Bay and South Africa.";
 export const DEFAULT_IMAGE_PATH = "/assets/images/hero-inclusive-classroom.png";
 
 const CONTENT_OG_TYPES = Object.freeze({

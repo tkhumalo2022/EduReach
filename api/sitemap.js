@@ -11,10 +11,6 @@ const STATIC_SITEMAP_PATHS = [
   "/resources/ebooks",
   "/resources/gallery",
   "/resources/workshops",
-  "/cart",
-  "/checkout",
-  "/payment-success",
-  "/payment-cancelled",
   "/team",
   "/partners",
   "/testimonials"

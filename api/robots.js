@@ -4,6 +4,7 @@ const ROBOTS_TXT = `User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /checkout
+Disallow: /cart
 Disallow: /payment-success
 Disallow: /payment-cancelled
 Disallow: /api/orders
