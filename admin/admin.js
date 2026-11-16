@@ -17,6 +17,19 @@
   const libraryDot = document.querySelector("[data-library-dot]");
   const insightRefresh = document.querySelector("[data-refresh-insights]");
   const insightNote = document.querySelector("[data-insights-note]");
+  const sectionMap = document.querySelector("[data-website-sections]");
+
+  const websiteCollections = Object.freeze([
+    { type: "articles", label: "Articles", directDraft: true },
+    { type: "blogs", label: "Blog posts", directDraft: false },
+    { type: "downloads", label: "Free resources", directDraft: true },
+    { type: "ebooks", label: "Ebooks", directDraft: true },
+    { type: "workshops", label: "Workshop albums", directDraft: false },
+    { type: "gallery", label: "Gallery albums", directDraft: false },
+    { type: "team", label: "Team members", directDraft: false },
+    { type: "partners", label: "Partners and sponsors", directDraft: false },
+    { type: "testimonials", label: "Testimonials", directDraft: false }
+  ]);
 
   let session = null;
 
@@ -145,23 +158,33 @@
     if (force && refreshButton) refreshButton.disabled = true;
     recentList.innerHTML = '<p class="loading-state">Loading published content…</p>';
 
-    const types = ["articles", "blogs", "downloads", "ebooks", "workshops", "gallery"];
+    const types = websiteCollections.map(({ type }) => type);
 
     try {
-      const statusRequest = fetch("/api/wix-content?status=1", { headers: { Accept: "application/json" } });
-      const contentRequests = types.map((type) =>
-        fetch(`/api/wix-content?type=${encodeURIComponent(type)}&limit=1`, {
-          headers: { Accept: "application/json" }
-        }).then(async (response) => ({ type, response, data: await response.json() }))
-      );
+      const statusRequest = fetch("/api/wix-content?status=1", {
+        headers: { Accept: "application/json" }
+      }).then(async response => ({ response, data: await response.json() }))
+        .catch(() => ({ response: { ok: false }, data: null }));
+
+      // One unavailable collection should not hide all other working sections.
+      const contentRequests = types.map(async (type) => {
+        try {
+          const response = await fetch(`/api/wix-content?type=${encodeURIComponent(type)}&limit=1`, {
+            headers: { Accept: "application/json" }
+          });
+          return { type, response, data: await response.json() };
+        } catch {
+          return { type, response: { ok: false }, data: null };
+        }
+      });
 
       const [statusResponse, results] = await Promise.all([
-        statusRequest.then(async (response) => ({ response, data: await response.json() })),
+        statusRequest,
         Promise.all(contentRequests)
       ]);
 
       const cmsHealthy = statusResponse.response.ok && statusResponse.data?.status === "healthy";
-      cmsStatus.textContent = cmsHealthy ? "Connected" : "Needs attention";
+      cmsStatus.textContent = cmsHealthy ? "Configured" : "Needs attention";
       cmsDot.classList.toggle("is-live", cmsHealthy);
 
       const successful = results.filter((result) => result.response.ok && result.data?.configured !== false);
@@ -179,12 +202,14 @@
         .slice(0, 6);
 
       renderRecentItems(recentItems);
+      renderWebsiteSections(results);
     } catch {
       cmsStatus.textContent = "Unavailable";
       contentCount.textContent = "Could not load";
       cmsDot.classList.remove("is-live");
       libraryDot.classList.remove("is-live");
       recentList.innerHTML = '<p class="empty-state">Published content could not be loaded right now. The Wix dashboard is still available.</p>';
+      renderWebsiteSections([]);
     } finally {
       if (refreshButton) refreshButton.disabled = false;
     }
@@ -254,6 +279,66 @@
     }
   }
 
+  function renderWebsiteSections(results) {
+    if (!sectionMap) return;
+    const byType = new Map(results.map(result => [result.type, result]));
+    sectionMap.replaceChildren();
+
+    for (const collection of websiteCollections) {
+      const result = byType.get(collection.type);
+      const card = document.createElement("article");
+      card.className = "website-section-card";
+
+      const title = document.createElement("h3");
+      title.textContent = collection.label;
+
+      const status = document.createElement("span");
+      status.className = "website-section-status";
+
+      if (result?.data?.configured === false) {
+        status.textContent = "Wix collection setup needed";
+        status.classList.add("needs-setup");
+      } else if (!result?.response?.ok || !result?.data) {
+        status.textContent = "Connection needs checking";
+        status.classList.add("needs-setup");
+      } else {
+        const total = result.data?.pagination?.total;
+        const amount = Number(total);
+        const count = total !== undefined && total !== null && Number.isFinite(amount) && amount >= 0
+          ? amount + " published"
+          : (result.data?.items?.length ? "Published content available" : "No items returned");
+        status.textContent = count;
+        status.classList.add("connected");
+      }
+
+      const description = document.createElement("p");
+      description.textContent = collection.directDraft
+        ? "Draft editing in EduReach; publishing and approvals in Wix."
+        : "Published from Wix CMS to the EduReach website.";
+
+      const actions = document.createElement("div");
+      actions.className = "website-section-actions";
+
+      const view = document.createElement("a");
+      view.href = publicPath(collection.type);
+      view.target = "_blank";
+      view.rel = "noopener";
+      view.textContent = "View public page";
+
+      const manage = document.createElement("a");
+      manage.href = collection.directDraft ? "#publisher" : "https://manage.wix.com/dashboard";
+      manage.textContent = collection.directDraft ? "Open draft editor" : "Manage in Wix";
+      if (!collection.directDraft) {
+        manage.target = "_blank";
+        manage.rel = "noopener noreferrer";
+      }
+
+      actions.append(view, manage);
+      card.append(title, status, description, actions);
+      sectionMap.append(card);
+    }
+  }
+
   function renderRecentItems(items) {
     recentList.replaceChildren();
 
@@ -317,7 +402,7 @@
   }
 
   function shortType(type) {
-    return ({ articles: "AR", blogs: "BL", downloads: "DL", ebooks: "EB", workshops: "WS", gallery: "GA" })[type] || "ER";
+    return ({ articles: "AR", blogs: "BL", downloads: "DL", ebooks: "EB", workshops: "WS", gallery: "GA", team: "TM", partners: "PT", testimonials: "TS" })[type] || "ER";
   }
 
   function typeLabel(type) {
@@ -327,7 +412,10 @@
       downloads: "Resource",
       ebooks: "Ebook",
       workshops: "Workshop",
-      gallery: "Gallery"
+      gallery: "Gallery",
+      team: "Team member",
+      partners: "Partner",
+      testimonials: "Testimonial"
     })[type] || "Content";
   }
 
@@ -338,7 +426,10 @@
       downloads: "/resources/downloads",
       ebooks: "/resources/ebooks",
       workshops: "/resources/workshops",
-      gallery: "/resources/gallery"
+      gallery: "/resources/gallery",
+      team: "/#community",
+      partners: "/#community",
+      testimonials: "/#community"
     })[type] || "/";
   }
 
