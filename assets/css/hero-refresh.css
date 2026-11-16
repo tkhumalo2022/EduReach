@@ -224,3 +224,6 @@
   .hero:hover .hero-image,
   .hero .button:hover { transform: none; }
 }
+
+/* Browser QA: fix pre-existing low-contrast header CTA. */
+.site-header .primary-nav > a.button.button-primary { color: #fff; }
