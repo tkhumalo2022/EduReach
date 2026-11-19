@@ -25,6 +25,7 @@
     passwordInput.type = showPassword ? "text" : "password";
     passwordToggle.textContent = showPassword ? "Hide" : "Show";
     passwordToggle.setAttribute("aria-pressed", String(showPassword));
+    passwordToggle.setAttribute("aria-label", showPassword ? "Hide password" : "Show password");
     passwordInput.focus();
   });
 
@@ -136,7 +137,7 @@
     loginView.hidden = false;
     document.body.classList.remove("dashboard-active");
     document.title = "Admin Login | EduReach";
-    window.setTimeout(() => document.querySelector("#admin-email")?.focus(), 40);
+    window.setTimeout(() => document.querySelector("#admin-email")?.focus({ preventScroll: true }), 40);
   }
 
   async function loadContentSnapshot(force = false) {

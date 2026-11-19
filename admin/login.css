@@ -1,0 +1,38 @@
+/* Scoped to sign-in. The authenticated workspace keeps its own layout. */
+.learning-door { position:relative; isolation:isolate; display:flex; align-items:center; min-height:100svh; padding:40px clamp(24px,7vw,112px); overflow:hidden; background:#eaeae3; }
+.learning-scene { position:absolute; inset:0; z-index:-1; width:100%; height:100%; max-width:none; object-fit:cover; object-position:64% center; }
+.learning-door .login-card { width:420px; max-width:100%; margin:0; padding:36px; background:#fff; border:0; border-radius:12px; box-shadow:0 12px 48px rgba(26,42,46,.1); }
+.learning-brand { display:block; width:176px; margin-bottom:28px; }
+.learning-brand img { width:100%; height:auto; }
+.learning-door h1 { margin:0; color:#203536; font-family:inherit; font-size:30px; line-height:1.2; font-weight:500; letter-spacing:-.035em; }
+.learning-door .login-intro { margin:12px 0 24px; font-size:14px; line-height:1.6; color:#546468; }
+.learning-door .login-form { display:grid; gap:20px; }
+.learning-field { display:grid; gap:8px; }
+.learning-door .login-form label { margin:0; font-size:14px; color:#263e40; font-weight:500; }
+.learning-door input { margin:0; min-height:48px; padding:12px; border:1px solid #c6d2d0; border-radius:6px; background:#fff; color:#203536; font-size:16px; box-shadow:none; }
+.learning-door input:focus { outline:2px solid #096860; outline-offset:2px; border-color:#096860; box-shadow:none; }
+.learning-password { display:flex; border:1px solid #c6d2d0; border-radius:6px; background:#fff; }
+.learning-password:focus-within { outline:2px solid #096860; outline-offset:2px; }
+.learning-password input { min-width:0; width:100%; border:0; }
+.learning-password input:focus { outline:none; }
+.learning-password .text-button { flex-shrink:0; min-width:56px; min-height:48px; padding:8px 12px; color:#096860; font-size:13px; font-weight:500; }
+.learning-door .password-hint { margin:0; font-size:12px; color:#5a686b; line-height:1.55; }
+.learning-door .totp-details { margin:0; padding:0; color:#2c5453; border:0; background:transparent; }
+.learning-door summary { min-height:44px; display:list-item; padding:12px 0; font-size:13px; font-weight:500; cursor:pointer; }
+.learning-door .totp-details label { display:block; margin:8px 0; }
+.learning-door .totp-details small { display:block; margin-top:8px; color:#5a686b; font-size:12px; }
+.learning-door .form-message { margin:0; min-height:0; font-size:13px; color:#864029; line-height:1.5; }
+.learning-door .form-message:empty { display:none; }
+.learning-door .primary-button { min-height:48px; margin:0; padding:12px 16px; border:0; border-radius:6px; background:#08645e; color:#fff; box-shadow:none; font-size:14px; font-weight:500; transition:background-color 160ms; }
+.learning-door .primary-button:hover:not(:disabled) { background:#064d49; transform:none; }
+.learning-door .primary-button:disabled { opacity:.65; cursor:wait; }
+.learning-door .learning-access { margin:20px 0 12px; color:#5a686b; font-size:12px; }
+.learning-door .back-link { display:flex; align-items:center; gap:16px; min-height:44px; margin:0; color:#2c5453; font-size:13px; font-weight:400; text-decoration:none; }
+.learning-door a:hover { text-decoration:underline; text-underline-offset:4px; }
+.learning-door :is(a,button,summary):focus-visible { outline:3px solid #08645e; outline-offset:4px; }
+.learning-caption { position:absolute; bottom:36px; right:36px; max-width:360px; padding:24px 28px; background:#fff; color:#244443; }
+.learning-caption span { display:block; font-size:12px; color:#516765; margin-bottom:12px; }
+.learning-caption p { margin:0; font-size:28px; font-weight:400; line-height:1.15; letter-spacing:-.03em; }
+@media(max-width:1000px) { .learning-door { padding:48px 32px; }.learning-caption { right:24px; bottom:24px; max-width:240px; padding:20px; }.learning-caption p { font-size:22px; } }
+@media(max-width:700px) { .learning-door { padding:208px 20px 24px; display:block; background:#e9efec; }.learning-scene { height:280px; object-position:center 40%; }.learning-door .login-card { position:relative; width:100%; max-width:440px; margin:auto; padding:28px 24px; }.learning-brand { width:164px; margin-bottom:28px; }.learning-caption { position:relative; inset:auto; margin:24px auto 0; max-width:440px; padding:0 12px; background:transparent; }.learning-caption p { font-size:20px; }.learning-caption span { display:none; }.learning-caption br { display:none; } }
+@media(prefers-reduced-motion:reduce) { .learning-door * { transition:none; } }

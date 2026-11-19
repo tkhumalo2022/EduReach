@@ -8,101 +8,45 @@
   <title>Admin Workspace | EduReach</title>
   <link rel="icon" href="/assets/logo-mark.png" type="image/png" />
   <link rel="stylesheet" href="/admin/admin.css" />
+  <link rel="stylesheet" href="/admin/login.css" />
   <script src="/admin/admin.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#admin-main">Skip to admin workspace</a>
 
   <main class="admin-main" id="admin-main">
-    <section class="login-view" data-login-view aria-labelledby="login-title">
-      <aside class="brand-panel" aria-label="EduReach admin introduction">
-        <a class="brand-lockup" href="/" aria-label="Return to EduReach website">
-          <img src="/assets/logo.png" alt="EduReach" width="320" height="92" />
-        </a>
-
-        <div class="brand-copy">
-          <p class="eyebrow">Secure admin workspace</p>
-          <h1>Manage the stories and resources that move inclusion forward.</h1>
-          <p>
-            A focused workspace for publishing articles, uploading learning resources,
-            sharing workshop moments and keeping EduReach content current.
-          </p>
-        </div>
-
-        <ol class="workflow-list" aria-label="Publishing workflow">
-          <li><span>1</span><div><strong>Create</strong><small>Add approved content in Wix CMS.</small></div></li>
-          <li><span>2</span><div><strong>Review</strong><small>Check consent, accessibility and details.</small></div></li>
-          <li><span>3</span><div><strong>Publish</strong><small>Make it live on the EduReach website.</small></div></li>
-        </ol>
-
-        <p class="brand-footnote">EduReach Inclusive Education Consultancy</p>
-      </aside>
-
-      <div class="login-panel">
-        <div class="login-card">
-          <div class="mobile-logo" aria-hidden="true">
-            <img src="/assets/logo.png" alt="" width="260" height="75" />
-          </div>
-          <div class="lock-badge" aria-hidden="true">ER</div>
-          <p class="eyebrow">Authorised access only</p>
-          <h2 id="login-title">Welcome back</h2>
-          <p class="login-intro">Sign in to continue to the EduReach publishing workspace.</p>
-
-          <form class="login-form" data-login-form novalidate>
+    <section class="login-view learning-door" data-login-view aria-labelledby="login-title">
+      <img class="learning-scene" src="/assets/images/login-classroom.webp" alt="" width="1600" height="1000" fetchpriority="high" />
+      <div class="login-card">
+        <a class="learning-brand" href="/" aria-label="EduReach home"><img src="/assets/logo.png" alt="EduReach" width="320" height="92" /></a>
+        <h1 id="login-title">Publishing workspace</h1>
+        <p class="login-intro">The next resource starts here.</p>
+        <form class="login-form" data-login-form novalidate>
+          <div class="learning-field">
             <label for="admin-email">Admin email</label>
-            <input
-              id="admin-email"
-              name="email"
-              type="email"
-              autocomplete="username"
-              inputmode="email"
-              placeholder="name@example.com"
-              required
-            />
-
-            <div class="password-label-row">
-              <label for="admin-password">Password</label>
-              <button class="text-button" type="button" data-password-toggle aria-controls="admin-password">
-                Show
-              </button>
-            </div>
-            <input
-              id="admin-password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              placeholder="Enter your password"
-              minlength="6"
-              aria-describedby="admin-password-hint"
-              required
-            />
-            <p class="password-hint" id="admin-password-hint">6+ characters with at least one special character (such as ! or @).</p>
-
-            <details class="totp-details">
-              <summary>Use an authenticator code (if enabled)</summary>
-              <label for="admin-totp">6-digit authenticator code</label>
-              <input id="admin-totp" name="totpCode" type="text" inputmode="numeric"
-                     pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code"
-                     placeholder="123456" aria-describedby="totp-help" />
-              <small id="totp-help">Only required if your account has two-step verification switched on.</small>
-            </details>
-
-            <p class="form-message" data-login-message role="status" aria-live="polite"></p>
-
-            <button class="primary-button login-button" type="submit" data-login-button>
-              <span>Sign in securely</span>
-              <span aria-hidden="true">→</span>
-            </button>
-          </form>
-
-          <div class="security-note">
-            <span aria-hidden="true">✓</span>
-            <p>Your session is protected and automatically expires.</p>
+            <input id="admin-email" name="email" type="email" autocomplete="username" inputmode="email" required />
           </div>
-
-          <a class="back-link" href="/">← Back to the public website</a>
-        </div>
+          <div class="learning-field">
+            <label for="admin-password">Password</label>
+            <div class="learning-password">
+              <input id="admin-password" name="password" type="password" autocomplete="current-password" minlength="6" aria-describedby="admin-password-hint" required />
+              <button class="text-button" type="button" data-password-toggle aria-controls="admin-password" aria-label="Show password" aria-pressed="false">Show</button>
+            </div>
+            <p class="password-hint" id="admin-password-hint">At least 6 characters, including a special character.</p>
+          </div>
+          <details class="totp-details">
+            <summary>Use an authenticator code</summary>
+            <label for="admin-totp">6-digit code</label>
+            <input id="admin-totp" name="totpCode" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" aria-describedby="totp-help" />
+            <small id="totp-help">Required only when two-step verification is enabled.</small>
+          </details>
+          <p class="form-message" data-login-message role="status" aria-live="polite"></p>
+          <button class="primary-button login-button" type="submit" data-login-button><span>Sign in</span><span aria-hidden="true">→</span></button>
+        </form>
+        <p class="learning-access">For authorised EduReach administrators.</p>
+        <a class="back-link" href="/">Back to EduReach <span aria-hidden="true">↗</span></a>
       </div>
+      <div class="learning-caption"><span>EduReach</span><p>Resources for a more <br />inclusive classroom.</p></div>
     </section>
 
     <section class="dashboard-view" data-dashboard-view hidden aria-labelledby="dashboard-title">
