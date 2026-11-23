@@ -1358,7 +1358,9 @@
       </div>
     `;
 
-    document.body.insertBefore(footer, document.querySelector("script"));
+    // CMS subpages may have their first script in <head>, not as a body child.
+    // Append the footer to body directly to avoid a DOM Hierarchy/NotFoundError.
+    document.body.appendChild(footer);
     footer.querySelector("[data-cms-current-year]").textContent = new Date().getFullYear();
   }
 })();
