@@ -1,0 +1,43 @@
+/* EduReach: human-first editorial refinement. Keep learning content and commerce logic untouched. */
+html[data-hc-site="edureach"] {scroll-padding-top:6rem}
+html[data-hc-site="edureach"] body {
+  font-family:"Segoe UI",Aptos,"Trebuchet MS",sans-serif;
+  font-size:1rem; -webkit-font-smoothing:antialiased;
+}
+html[data-hc-site="edureach"] :is(h1,h2) {
+  font-family:Georgia,"Times New Roman",serif;
+  font-weight:500; letter-spacing:-.042em;
+  line-height:1.14; text-wrap:balance;
+}
+html[data-hc-site="edureach"] h3 {letter-spacing:-.025em;text-wrap:balance}
+html[data-hc-site="edureach"] .hero h1 {max-width:18ch}
+html[data-hc-site="edureach"] .eyebrow {
+  font-family:"Segoe UI",Aptos,sans-serif;
+  font-size:.79rem !important; letter-spacing:.035em; text-transform:none;
+  border:0; background:transparent; border-radius:0; padding:0;
+  font-weight:700;
+}
+html[data-hc-site="edureach"] :is(.story-copy,.founder-content,.section-heading) h2 {
+  max-width:23ch; margin-block-start:.5rem;
+}
+html[data-hc-site="edureach"] :is(.story-copy,.founder-content) p:not(.eyebrow) {
+  max-width:67ch; line-height:1.72;
+}
+html[data-hc-site="edureach"] :is(a,button,input,select,textarea,[role="button"]):focus-visible {
+  outline:3px solid #235d55 !important; outline-offset:4px;
+}
+html[data-hc-site="edureach"] :is(button,.btn,[role="button"]) {
+  touch-action:manipulation;
+}
+html[data-hc-site="edureach"] .section {scroll-margin-top:6rem}
+@media(max-width:640px){
+ html[data-hc-site="edureach"] h1 {font-size:clamp(2.35rem,9vw,3.8rem);letter-spacing:-.035em}
+ html[data-hc-site="edureach"] :is(h1,h2){overflow-wrap:break-word}
+}
+@media(prefers-reduced-motion:reduce) {
+ html[data-hc-site="edureach"] {scroll-behavior:auto!important}
+ html[data-hc-site="edureach"] :is(*,*::before,*::after) {
+  transition-duration:.01ms!important;animation-duration:.01ms!important;
+  animation-iteration-count:1!important;scroll-behavior:auto!important;
+ }
+}
